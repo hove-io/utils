@@ -40,7 +40,6 @@ struct Lotus {
     PGresult* exec(const std::string & request, const std::string & error_message = std::string(), int expected_code = PGRES_COMMAND_OK) {
         PGresult *res = PQexec(this->connection, request.c_str());
         if (PQresultStatus(res) != expected_code) {
-            std::cout << PQresStatus(PQresultStatus(res)) << std::endl;
             std::string message = "Impossible d’exécuter la requête : " + error_message + " " +  PQresultErrorMessage(res);
             PQclear(res);
             throw LotusException(message);
