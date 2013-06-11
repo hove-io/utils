@@ -1,4 +1,6 @@
 #include "encoding_converter.h"
+
+#ifdef HAVE_ICONV_H
 #include <string.h>
 #include <fstream>
 
@@ -33,3 +35,4 @@ EncodingConverter::~EncodingConverter(){
 }
 
 
+#endif

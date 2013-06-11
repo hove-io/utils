@@ -5,6 +5,8 @@
 #include <fstream>
 #include <sstream>
 #include <boost/algorithm/string.hpp>
+#include <boost/foreach.hpp>
+
 
 typedef boost::tokenizer<boost::escaped_list_separator<char> > Tokenizer;
 
@@ -64,17 +66,19 @@ bool CsvReader::is_open() {
 }
 
 bool CsvReader::validate(const std::vector<std::string> &mandatory_headers) {
-    for(auto header : mandatory_headers)
+    BOOST_FOREACH(auto header, mandatory_headers){
         if(headers.find(header) == headers.end())
             return false;
+	}
     return true;
 }
 
 std::string CsvReader::missing_headers(const std::vector<std::string> &mandatory_headers) {
     std::string result;
-    for(auto header : mandatory_headers)
+    BOOST_FOREACH(auto header, mandatory_headers){
         if(headers.find(header) == headers.end())
             result += header + ", ";
+	}
 
     return result;
 
@@ -126,7 +130,7 @@ std::vector<std::string> CsvReader::next(){
     try {
         Tokenizer tok(line, functor);
         vec.assign(tok.begin(), tok.end());
-        for(auto &s: vec)
+        BOOST_FOREACH(auto &s, vec)
             boost::trim(s);
     } catch(...) {
         LOG4CPLUS_WARN(log4cplus::Logger::getInstance("log") ,"Impossible de parser la ligne :  " + line);
