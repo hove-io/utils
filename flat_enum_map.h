@@ -46,6 +46,8 @@ template <typename EnumKey, typename Value>
 struct flat_enum_map {
     std::array<Value, enum_size_trait<EnumKey>::size()> array;
 
+    flat_enum_map() : array() {}
+
     Value& operator[] (EnumKey key) {
         return array[static_cast<typename get_enum_type<EnumKey>::type>(key)];
     }
