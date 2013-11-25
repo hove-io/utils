@@ -15,7 +15,7 @@ enum class Mode {
   *
   **/
 BOOST_AUTO_TEST_CASE(flatEnumMap_simple_test) {
-    navitia::flat_enum_map<Mode, int> map {};
+    navitia::flat_enum_map<Mode, int> map;
 
     map[Mode::bike] = 2;
 

@@ -1,6 +1,8 @@
 #pragma once
 #include <array>
 #include <type_traits>
+#include <boost/serialization/serialization.hpp>
+#include <boost/serialization/array.hpp>
 
 namespace navitia {
 
@@ -31,20 +33,28 @@ struct enum_size_trait {
 };
 
 /**
- * Simple container associating an enum value to a value
+ * Simple container associating an enum value to a value.
+ *
+ * The mapped enum MUST have its first value initialized to 0
+ *
+ * to get the number of elements in the enum we can either define a 'size' last element
+ * or specialize the enum_size_trait for the enum
  *
  * the underlying type is a std::array for performance concern
  */
 template <typename EnumKey, typename Value>
-class flat_enum_map {
-    std::array<Value, enum_size_trait<EnumKey>::size()> _array;
+struct flat_enum_map {
+    std::array<Value, enum_size_trait<EnumKey>::size()> array;
 
-public:
     Value& operator[] (EnumKey key) {
-        return _array[static_cast<typename get_enum_type<EnumKey>::type>(key)];
+        return array[static_cast<typename get_enum_type<EnumKey>::type>(key)];
     }
     const Value& operator[] (EnumKey key) const {
-        return _array[static_cast<typename get_enum_type<EnumKey>::type>(key)];
+        return array[static_cast<typename get_enum_type<EnumKey>::type>(key)];
+    }
+
+    template<class Archive> void serialize(Archive & ar, const unsigned int) {
+        ar & boost::serialization::make_array(array.data(), array.size()); //default serialization not available in boost 1.48
     }
 
     //TODO if needed : forward arg for constructor
