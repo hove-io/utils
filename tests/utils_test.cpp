@@ -35,7 +35,7 @@ namespace navitia {
 template <>
 struct enum_size_trait<RawEnum> {
     static constexpr typename get_enum_type<RawEnum>::type size() {
-        return 2;
+        return 3;
     }
 };
 }
@@ -59,4 +59,29 @@ BOOST_AUTO_TEST_CASE(flatEnumMap_no_size_test) {
 
     //default initialization
     BOOST_CHECK_EQUAL(map[RawEnum::first].val, 0);
+}
+
+/**
+  * basic test for iterator
+  *
+  **/
+BOOST_AUTO_TEST_CASE(flatEnumMap_iterator_test) {
+    navitia::flat_enum_map<RawEnum, int> map;
+
+    map[RawEnum::first] = 4;
+    map[RawEnum::second] = 42;
+    map[RawEnum::last] = 420;
+
+    std::vector<int> expected {4, 42, 420};
+    std::vector<RawEnum> expectedEnum {RawEnum::first, RawEnum::second, RawEnum::last};
+    std::vector<int> val;
+    std::vector<RawEnum> enumVal;
+
+    for (const auto& pair : map) {
+        val.push_back(pair.second);
+        enumVal.push_back(pair.first);
+    }
+
+    BOOST_CHECK(val == expected);
+    BOOST_CHECK(enumVal == expectedEnum);
 }

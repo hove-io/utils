@@ -3,6 +3,7 @@
 #include <type_traits>
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/array.hpp>
+#include <boost/iterator/iterator_facade.hpp>
 
 namespace navitia {
 
@@ -32,6 +33,8 @@ struct enum_size_trait {
     }
 };
 
+template <typename EnumKey, typename Value>
+class flat_enum_map_iterator;
 /**
  * Simple container associating an enum value to a value.
  *
@@ -44,7 +47,11 @@ struct enum_size_trait {
  */
 template <typename EnumKey, typename Value>
 struct flat_enum_map {
-    std::array<Value, enum_size_trait<EnumKey>::size()> array;
+    typedef std::array<Value, enum_size_trait<EnumKey>::size()> underlying_container;
+    typedef flat_enum_map_iterator<EnumKey, Value> iterator;
+    typedef flat_enum_map_iterator<EnumKey, const Value> const_iterator;
+
+    underlying_container array;
 
     flat_enum_map() : array() {}
 
@@ -59,8 +66,57 @@ struct flat_enum_map {
         ar & boost::serialization::make_array(array.data(), array.size()); //default serialization not available in boost 1.48
     }
 
+    const_iterator begin() const { return const_iterator(array.begin(), static_cast<EnumKey>(0)); }
+    const_iterator end() const { return const_iterator(array.end()); }
+
     //TODO if needed : forward arg for constructor
-    //TODO if needed : create map like iterator (key value pair)
+};
+
+template <typename EnumKey, typename Value>
+class flat_enum_map_iterator : public boost::iterator_facade<flat_enum_map_iterator<EnumKey, Value>,
+                                                            std::pair<EnumKey, Value>,
+                                                            boost::random_access_traversal_tag,
+                                                            std::pair<EnumKey, Value&>> {
+    typedef flat_enum_map<EnumKey, Value> enum_map;
+    typedef typename flat_enum_map_iterator<EnumKey, Value>::difference_type difference_type;
+    typename enum_map::underlying_container::iterator _iterator;
+    EnumKey _enumKey;
+    EnumKey moveEnum(difference_type n) { return static_cast<EnumKey>(static_cast<typename get_enum_type<EnumKey>::type>(_enumKey) + n); }
+public:
+    flat_enum_map_iterator() {}
+    flat_enum_map_iterator(typename enum_map::underlying_container::iterator it) : _iterator(it) {}
+    flat_enum_map_iterator(typename enum_map::underlying_container::iterator it, EnumKey e) : _iterator(it), _enumKey(e) {}
+
+    void increment() {
+        ++_iterator;
+        _enumKey = moveEnum(1);
+    }
+
+    void decrement() {
+        --_iterator;
+        _enumKey = moveEnum(-1);
+    }
+
+    void advance(difference_type n) {
+        if ( n > 0 ) {
+            _iterator += n;
+        }
+        else {
+            _iterator -= n;
+        }
+        _enumKey = moveEnum(n);
+    }
+    difference_type distance_to(const flat_enum_map_iterator& other) {
+        return this->_iterator - other._iterator;
+    }
+
+    bool equal(const flat_enum_map_iterator& other) const
+    {
+        return this->_iterator == other._iterator;
+    }
+
+    std::pair<EnumKey, Value&> dereference() const { return {_enumKey, *_iterator}; }
+
 };
 
 }
