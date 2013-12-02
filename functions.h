@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <vector>
+#include <memory>
 
 double str_to_double(std::string);
 int str_to_int(std::string str);
@@ -30,3 +31,15 @@ struct Indexer{
     template<class T>
         void operator()(T* obj){obj->idx = idx; idx++;}
 };
+
+/**
+ * Adding a make_unique for unique_ptr construction to ease use and ensure better exception safety
+ */
+#if __cplusplus <= 201103L //the make_unique will be added in c++14
+namespace std {
+template <typename T, typename ...Args>
+unique_ptr<T> make_unique(Args&& ...args) {
+    return unique_ptr<T>(new T(forward<Args>(args)...));
+}
+}
+#endif
