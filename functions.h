@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <vector>
+#include<map>
 
 double str_to_double(std::string);
 int str_to_int(std::string str);
@@ -9,6 +10,12 @@ int str_to_int(std::string str);
   Cette fonction permet de recupérer une chaine qui se trouve à une position donnée
   */
 std::vector< std::string > split_string(const std::string&,const std::string & );
+
+
+/**
+  Cette fonction permet de recupérer une valeur par une clef à partir de std::map<key, value>
+  */
+std::string value_by_key(const std::map<std::string, std::string>& vect, const std::string& key);
 
 /** Foncteur permettant de comparer les objets en passant des pointeurs vers ces objets */
 struct Less{
