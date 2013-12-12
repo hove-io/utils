@@ -1,7 +1,14 @@
 #define BOOST_TEST_DYN_LINK
 #define BOOST_TEST_MODULE utils_test
 #include <boost/test/unit_test.hpp>
-#include <utils/flat_enum_map.h>
+#include "utils/flat_enum_map.h"
+#include "utils/logger.h"
+#include "utils/init.h"
+
+struct logger_initialized {
+    logger_initialized()   { init_logger(); }
+};
+BOOST_GLOBAL_FIXTURE( logger_initialized )
 
 enum class Mode {
     bike = 0,
