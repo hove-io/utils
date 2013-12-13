@@ -4,6 +4,7 @@
 #include "utils/flat_enum_map.h"
 #include "utils/logger.h"
 #include "utils/init.h"
+#include "utils/base64_encode.h"
 
 struct logger_initialized {
     logger_initialized()   { init_logger(); }
@@ -92,10 +93,7 @@ BOOST_AUTO_TEST_CASE(flatEnumMap_iterator_test) {
     BOOST_CHECK(val == expected);
     BOOST_CHECK(enumVal == expectedEnum);
 }
-<<<<<<< Updated upstream
-=======
 
 BOOST_AUTO_TEST_CASE(base64_encode_test) {
-    BOOST_REQUIRE_EQUAL(base64_encode("line:RTP:1000387"), "bGluZTpSVFA6MTAwMDM4Nw");
+    BOOST_REQUIRE_EQUAL(navitia::base64_encode("line:RTP:1000387"), "bGluZTpSVFA6MTAwMDM4Nw");
 }
->>>>>>> Stashed changes
