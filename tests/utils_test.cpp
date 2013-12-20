@@ -30,7 +30,9 @@ BOOST_AUTO_TEST_CASE(flatEnumMap_simple_test) {
     BOOST_CHECK_EQUAL(map[Mode::bike], 2);
 
     //default initialization
-    BOOST_CHECK_EQUAL(map[Mode::car], 0);
+    //due to a gcc bug http://gcc.gnu.org/bugzilla/show_bug.cgi?id=57086 the container cannont be
+    // default initialized any longer cf comment in flat_enum_map
+//    BOOST_CHECK_EQUAL(map[Mode::car], 0);
 }
 
 enum class RawEnum {
@@ -66,7 +68,21 @@ BOOST_AUTO_TEST_CASE(flatEnumMap_no_size_test) {
     BOOST_CHECK_EQUAL(map[RawEnum::second].val, 42);
 
     //default initialization
-    BOOST_CHECK_EQUAL(map[RawEnum::first].val, 0);
+    //due to a gcc bug http://gcc.gnu.org/bugzilla/show_bug.cgi?id=57086 the container cannont be
+    // default initialized any longer
+//    BOOST_CHECK_EQUAL(map[RawEnum::first].val, 0);
+}
+
+/**
+  * test with an initilizer construction
+  * The test is more that it should compile :)
+  **/
+BOOST_AUTO_TEST_CASE(flatEnumMap_initializer) {
+    const navitia::flat_enum_map<RawEnum, int> map = {{{1, 3, 4}}}; //yes 3 curly braces :) one for the flat_enum_map and 2 for the underlying array
+
+    BOOST_CHECK_EQUAL(map[RawEnum::first], 1);
+    BOOST_CHECK_EQUAL(map[RawEnum::second], 3);
+    BOOST_CHECK_EQUAL(map[RawEnum::last], 4);
 }
 
 /**

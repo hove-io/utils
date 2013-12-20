@@ -44,6 +44,11 @@ class flat_enum_map_iterator;
  * or specialize the enum_size_trait for the enum
  *
  * the underlying type is a std::array for performance concern
+ *
+ * Note:
+ * Due to a gcc bug http://gcc.gnu.org/bugzilla/show_bug.cgi?id=57086
+ * the flat_enum_container has to be an aggregate (else it won't work nor compile if stored in vector)
+ * so no constructor can be defined thus the array cannot be default initialized
  */
 template <typename EnumKey, typename Value>
 struct flat_enum_map {
@@ -53,7 +58,14 @@ struct flat_enum_map {
 
     underlying_container array;
 
-    flat_enum_map() : array() {}
+//    flat_enum_map() = default;
+//    flat_enum_map(flat_enum_map& v) : array(v.array){}
+//    flat_enum_map(const flat_enum_map& v) = default;
+//    flat_enum_map(flat_enum_map&&) = default;
+//    flat_enum_map& operator=(const flat_enum_map&) = default;
+
+//    template<typename ...Val>
+//    flat_enum_map(Val&& ...v) : array{{std::forward<Val>(v)...}} {}
 
     Value& operator[] (EnumKey key) {
         return array[static_cast<typename get_enum_type<EnumKey>::type>(key)];
@@ -69,7 +81,6 @@ struct flat_enum_map {
     const_iterator begin() const { return const_iterator(array.begin(), static_cast<EnumKey>(0)); }
     const_iterator end() const { return const_iterator(array.end()); }
 
-    //TODO if needed : forward arg for constructor
 };
 
 template <typename EnumKey, typename Value>
