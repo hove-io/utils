@@ -70,8 +70,13 @@ struct flat_enum_map {
     Value& operator[] (EnumKey key) {
         return array[static_cast<typename get_enum_type<EnumKey>::type>(key)];
     }
-    const Value& operator[] (EnumKey key) const {
+
+    constexpr const Value& operator[] (EnumKey key) const {
         return array[static_cast<typename get_enum_type<EnumKey>::type>(key)];
+    }
+
+    constexpr const Value& operator[] (int idx) const {
+        return array[idx];
     }
 
     template<class Archive> void serialize(Archive & ar, const unsigned int) {
@@ -80,6 +85,8 @@ struct flat_enum_map {
 
     const_iterator begin() const { return const_iterator(array.begin(), static_cast<EnumKey>(0)); }
     const_iterator end() const { return const_iterator(array.end()); }
+    iterator begin() { return iterator(array.begin(), static_cast<EnumKey>(0)); }
+    iterator end() { return iterator(array.end()); }
 
 };
 
