@@ -1,10 +1,18 @@
-IF(CMAKE_COMPILER_IS_GNUCXX)
-    SET(CMAKE_CXX_FLAGS "-Wall -pedantic -Wextra -std=c++0x -Woverloaded-virtual -Wundef -rdynamic ")
-ENDIF(CMAKE_COMPILER_IS_GNUCXX)
+SET(UTILS_SRC
+     csv.cpp
+     encoding_converter.cpp
+     configuration.cpp
+     timer.cpp
+     functions.cpp
+     paginate.h
+     flat_enum_map.h
+     init.h
+     redis.cpp
+     base64_encode.cpp
+)
 
-SET(SRC csv.cpp encoding_converter.cpp configuration.cpp functions.cpp)
-IF(NOT MSVC)
-	SET(SRC ${SRC} timer.cpp)
-ENDIF(NOT MSVC)
+add_library(utils ${UTILS_SRC})
 
-add_library(utils ${SRC})
+target_link_libraries(utils ${BOOST_LIBS} log4cplus)
+
+add_subdirectory(tests)

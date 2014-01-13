@@ -1,7 +1,10 @@
 #pragma once
+#include "config.h"
 #include <log4cplus/logger.h>
 #include <log4cplus/configurator.h>
+#ifdef HAVE_LOGGINGMACROS_H
 #include <log4cplus/loggingmacros.h>
+#endif
 
 /** Crée une configuration par défaut pour le logger */
 inline void init_logger(){
