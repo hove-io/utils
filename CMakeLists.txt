@@ -7,6 +7,7 @@ SET(UTILS_SRC
      paginate.h
      flat_enum_map.h
      init.h
+     backtrace.h
      redis.cpp
      base64_encode.cpp
 )
