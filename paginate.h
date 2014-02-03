@@ -1,7 +1,7 @@
 #pragma once
 namespace navitia {
 template<typename T>
-std::vector<T> paginate(std::vector<T> &indexes,
+std::vector<T> paginate(const std::vector<T> &indexes,
                                   int count, int start_page) {
     std::vector<T> response;
     if(count>=0 && start_page>=0) {
