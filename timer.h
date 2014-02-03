@@ -1,10 +1,10 @@
 #pragma once
 #include <string>
-#include <boost/chrono.hpp>
+#include <chrono>
 #include <iostream>
 /// Petit outil tout bête permettant de mesurer et afficher des temps d'exécution
 struct Timer {
-    boost::chrono::time_point<boost::chrono::system_clock> start;
+    std::chrono::time_point<std::chrono::system_clock> start;
     std::string name;
     bool print_at_destruction;
 

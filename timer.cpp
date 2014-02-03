@@ -1,8 +1,8 @@
 #include "timer.h"
 
-Timer::Timer() : start(boost::chrono::system_clock::now()), print_at_destruction(false) {}
+Timer::Timer() : start(std::chrono::system_clock::now()), print_at_destruction(false) {}
 
-Timer::Timer(const std::string &name, bool print_at_destruction) : start(boost::chrono::system_clock::now()), name(name), print_at_destruction(print_at_destruction){}
+Timer::Timer(const std::string &name, bool print_at_destruction) : start(std::chrono::system_clock::now()), name(name), print_at_destruction(print_at_destruction){}
 
 Timer::~Timer() {
     if(this->print_at_destruction)
@@ -10,12 +10,12 @@ Timer::~Timer() {
 }
 
 int Timer::ms() const {
-    auto delta = boost::chrono::system_clock::now() - this->start;
-    return boost::chrono::duration_cast<boost::chrono::milliseconds>(delta).count();
+    auto delta = std::chrono::system_clock::now() - this->start;
+    return std::chrono::duration_cast<std::chrono::milliseconds>(delta).count();
 }
 
 void Timer::reset() {
-    start = boost::chrono::system_clock::now();
+    start = std::chrono::system_clock::now();
 }
 
 std::ostream & operator<<(std::ostream & os, const Timer & timer){
