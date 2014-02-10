@@ -23,6 +23,8 @@ class CsvReader {
         ~CsvReader();
         std::vector<std::string> next();
         int get_pos_col(const std::string&);
+        bool has_col(int col_idx, const std::vector<std::string>& row);
+        bool is_valid(int col_idx, const std::vector<std::string>& row);
         bool eof() const;
         void close();
         bool is_open();

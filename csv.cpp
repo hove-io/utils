@@ -32,8 +32,10 @@ CsvReader::CsvReader(const std::string& filename, char separator, bool read_head
 
         if(read_headers) {
             auto line = next();
-            for(size_t i=0; i<line.size(); ++i)
+            for(size_t i=0; i<line.size(); ++i){
+            	boost::to_lower(line[i]);
                 this->headers.insert(std::make_pair(line[i], i));
+            }
         }
     } else {
         closed = true;
@@ -56,8 +58,10 @@ CsvReader::CsvReader(std::stringstream &sstream, char separator, bool read_heade
 
     if(read_headers) {
         auto line = next();
-        for(size_t i=0; i<line.size(); ++i)
+        for(size_t i=0; i<line.size(); ++i){
+            boost::to_lower(line[i]);
             this->headers.insert(std::make_pair(line[i], i));
+        }
     } 
 }
 
@@ -147,6 +151,15 @@ int CsvReader::get_pos_col(const std::string & str){
         return headers[str];
     return -1;
 }
+
+bool CsvReader::has_col(int col_idx, const std::vector<std::string>& row) {
+    return col_idx >= 0 && static_cast<size_t>(col_idx) < row.size();
+}
+
+bool CsvReader::is_valid(int col_idx, const std::vector<std::string>& row){
+    return (has_col(col_idx, row) && (!row[col_idx].empty()));
+}
+
 
 void remove_bom(std::fstream& stream){
     char buffer[3];
