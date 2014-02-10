@@ -10,7 +10,7 @@
 
 typedef boost::tokenizer<boost::escaped_list_separator<char> > Tokenizer;
 
-CsvReader::CsvReader(const std::string& filename, char separator, bool read_headers, std::string encoding): filename(filename),
+CsvReader::CsvReader(const std::string& filename, char separator, bool read_headers, bool to_lower_headers, std::string encoding): filename(filename),
     file(), closed(false), functor('\\', separator, '"') 
 #ifdef HAVE_ICONV_H
 	, converter(NULL)
@@ -33,7 +33,8 @@ CsvReader::CsvReader(const std::string& filename, char separator, bool read_head
         if(read_headers) {
             auto line = next();
             for(size_t i=0; i<line.size(); ++i){
-            	boost::to_lower(line[i]);
+	            if(to_lower_headers)
+            		boost::to_lower(line[i]);
                 this->headers.insert(std::make_pair(line[i], i));
             }
         }
@@ -42,7 +43,7 @@ CsvReader::CsvReader(const std::string& filename, char separator, bool read_head
     }
 }
 
-CsvReader::CsvReader(std::stringstream &sstream, char separator, bool read_headers, std::string encoding): filename("sstream"),
+CsvReader::CsvReader(std::stringstream &sstream, char separator, bool read_headers, bool to_lower_headers, std::string encoding): filename("sstream"),
     file(), closed(false), functor('\\', separator, '"') 
 #ifdef HAVE_ICONV_H
 	, converter(NULL)
@@ -59,7 +60,8 @@ CsvReader::CsvReader(std::stringstream &sstream, char separator, bool read_heade
     if(read_headers) {
         auto line = next();
         for(size_t i=0; i<line.size(); ++i){
-            boost::to_lower(line[i]);
+            if(to_lower_headers)
+	            boost::to_lower(line[i]);
             this->headers.insert(std::make_pair(line[i], i));
         }
     } 
