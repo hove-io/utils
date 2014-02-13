@@ -8,7 +8,6 @@ SET(UTILS_SRC
      flat_enum_map.h
      init.h
      backtrace.h
-     redis.cpp
      base64_encode.cpp
 )
 
