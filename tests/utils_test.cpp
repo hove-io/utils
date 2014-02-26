@@ -110,6 +110,6 @@ BOOST_AUTO_TEST_CASE(flatEnumMap_iterator_test) {
     BOOST_CHECK(enumVal == expectedEnum);
 }
 
-BOOST_AUTO_TEST_CASE(base64_encode_test) {
+BOOST_AUTO_TEST_CASE(encode_uri_test) {
     BOOST_REQUIRE_EQUAL(navitia::base64_encode("line:RTP:1000387"), "bGluZTpSVFA6MTAwMDM4Nw");
 }

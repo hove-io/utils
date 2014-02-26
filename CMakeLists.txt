@@ -1,3 +1,8 @@
+#uri base64 encoding activated by giving a ENABLE_URI_ENCODING variable to cmake
+IF(DEFINED ENABLE_URI_ENCODING)
+    add_definitions(-DENABLE_URI_ENCODING)
+ENDIF(DEFINED ENABLE_URI_ENCODING)
+
 SET(UTILS_SRC
      csv.cpp
      encoding_converter.cpp

@@ -1,3 +1,4 @@
+#include "base64_encode.h"
 #include <boost/archive/iterators/base64_from_binary.hpp>
 #include <boost/archive/iterators/transform_width.hpp>
 #include <boost/archive/iterators/ostream_iterator.hpp>
@@ -6,6 +7,7 @@
 
 // copy paste from http://stackoverflow.com/questions/7053538/how-do-i-encode-a-string-to-base64-using-only-boost
 namespace navitia {
+
 std::string base64_encode(const std::string& input) {
     namespace bi = boost::archive::iterators;
     std::stringstream os;
