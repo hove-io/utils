@@ -1,7 +1,9 @@
 #pragma once
-
+#include "config.h"
+#ifdef HAVE_ICONV_H
 #include <iconv.h>
 #include <string>
+
 
 /// Classe permettant de convertir l'encodage de chaînes de caractères
 class EncodingConverter{
@@ -18,3 +20,4 @@ class EncodingConverter{
 
 
 
+#endif

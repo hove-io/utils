@@ -1,5 +1,6 @@
 #pragma once
 
+#include "config.h"
 #include <string>
 #include <fstream>
 #include <sstream>
@@ -16,12 +17,14 @@
  */
 class CsvReader {
     public:
-        CsvReader(const std::string& filename, char separator=';', bool read_headers = false, std::string encoding="UTF-8");
-        CsvReader(std::stringstream& sstream, char separator=';', bool read_headers = false, std::string encoding="UTF-8");
+        CsvReader(const std::string& filename, char separator=';', bool read_headers = false, bool to_lower_headers = false, std::string encoding="UTF-8");
+        CsvReader(std::stringstream& sstream, char separator=';', bool read_headers = false, bool to_lower_headers = false, std::string encoding="UTF-8");
 
         ~CsvReader();
         std::vector<std::string> next();
         int get_pos_col(const std::string&);
+        bool has_col(int col_idx, const std::vector<std::string>& row);
+        bool is_valid(int col_idx, const std::vector<std::string>& row);
         bool eof() const;
         void close();
         bool is_open();

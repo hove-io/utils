@@ -4,7 +4,6 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/split.hpp>
 
-
 double str_to_double(std::string str){
     boost::trim(str);
     try{
@@ -31,4 +30,11 @@ std::vector<std::string> split_string(const std::string& str,const std::string &
     std::vector< std::string > SplitVec;
     split( SplitVec, str, boost::is_any_of(separator), boost::token_compress_on );
     return SplitVec;
+}
+
+std::string value_by_key(const std::map<std::string, std::string>& vect, const std::string& key){
+
+    if (vect.find(key) != vect.end())
+        return vect.at(key);
+    return "";
 }
