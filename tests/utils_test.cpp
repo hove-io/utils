@@ -5,6 +5,7 @@
 #include "utils/logger.h"
 #include "utils/init.h"
 #include "utils/base64_encode.h"
+#include "utils/functions.h"
 
 struct logger_initialized {
     logger_initialized()   { init_logger(); }
@@ -113,3 +114,29 @@ BOOST_AUTO_TEST_CASE(flatEnumMap_iterator_test) {
 BOOST_AUTO_TEST_CASE(encode_uri_test) {
     BOOST_REQUIRE_EQUAL(navitia::base64_encode("line:RTP:1000387"), "bGluZTpSVFA6MTAwMDM4Nw");
 }
+
+BOOST_AUTO_TEST_CASE(natural_sort_test) {
+    std::vector<std::string> list {
+        "toto",
+        "tutu",
+        "tutu10",
+        "tutu2",
+        "15",
+        "25",
+        "5"
+    };
+
+    std::sort(list.begin(), list.end(), navitia::pseudo_natural_sort());
+
+    int i = 0;
+    BOOST_CHECK_EQUAL(list[i++], "5");
+    BOOST_CHECK_EQUAL(list[i++], "15");
+    BOOST_CHECK_EQUAL(list[i++], "25");
+    BOOST_CHECK_EQUAL(list[i++], "toto");
+    BOOST_CHECK_EQUAL(list[i++], "tutu");
+    //we wont be able to sort  tutu10 and tutu2
+    //(in a pure natural order tutu10 is after tutu2, but it's too complicated for our need)
+    BOOST_CHECK_EQUAL(list[i++], "tutu10");
+    BOOST_CHECK_EQUAL(list[i++], "tutu2");
+}
+

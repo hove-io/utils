@@ -38,3 +38,20 @@ std::string value_by_key(const std::map<std::string, std::string>& vect, const s
         return vect.at(key);
     return "";
 }
+
+namespace navitia {
+
+/**
+ * We don't try to do a real natural sort (too complicated for our purpose)
+ * we only want to compare the strings as numbers only if they are castable to number
+ */
+bool pseudo_natural_sort::operator() (const std::string& a, const std::string&b) const {
+    try {
+        auto a_int = boost::lexical_cast<int>(a);
+        auto b_int = boost::lexical_cast<int>(b);
+        return a_int < b_int;
+    } catch (boost::bad_lexical_cast) {
+        return a < b;
+    }
+}
+}

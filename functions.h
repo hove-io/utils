@@ -50,3 +50,14 @@ unique_ptr<T> make_unique(Args&& ...args) {
 }
 }
 #endif
+
+namespace navitia {
+
+/**
+ * speudo natural sort:
+ * if both string cary integer, we compare them, else we compare the string
+ */
+struct pseudo_natural_sort {
+    bool operator() (const std::string&, const std::string&) const;
+};
+}
