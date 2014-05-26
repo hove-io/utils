@@ -1,21 +1,55 @@
+/* Copyright © 2001-2014, Canal TP and/or its affiliates. All rights reserved.
+
+This file is part of Navitia,
+    the software to build cool stuff with public transport.
+
+Hope you'll enjoy and contribute to this project,
+    powered by Canal TP (www.canaltp.fr).
+Help us simplify mobility and open public transport:
+    a non ending quest to the responsive locomotion way of traveling!
+
+LICENCE: This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+Stay tuned using
+twitter @navitia
+IRC #navitia on freenode
+https://groups.google.com/d/forum/navitia
+www.navitia.io
+*/
+
 #include "csv.h"
 #include "logger.h"
-#include <exception>
+#include "exception.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include <boost/algorithm/string.hpp>
 #include <boost/foreach.hpp>
 
-
-typedef boost::tokenizer<boost::escaped_list_separator<char> > Tokenizer;
+void CsvReader::init(){
+    this->quoted_string = '"' >> *(qi::char_ - '"') >> '"';
+    this->valid_characters = qi::char_ - '"' - this->separator;
+    this->item = *(this->quoted_string | this->valid_characters);
+    this->csv_parser = this->item % separator;
+}
 
 CsvReader::CsvReader(const std::string& filename, char separator, bool read_headers, bool to_lower_headers, std::string encoding): filename(filename),
-    file(), closed(false), functor('\\', separator, '"') 
+    file(), separator(separator), closed(false)
 #ifdef HAVE_ICONV_H
 	, converter(NULL)
 #endif
 {
+    this->init();
     file.open(filename);
     stream = new std::istream(file.rdbuf());
     stream->setstate(file.rdstate());
@@ -44,11 +78,12 @@ CsvReader::CsvReader(const std::string& filename, char separator, bool read_head
 }
 
 CsvReader::CsvReader(std::stringstream &sstream, char separator, bool read_headers, bool to_lower_headers, std::string encoding): filename("sstream"),
-    file(), closed(false), functor('\\', separator, '"') 
+    file() , separator(separator), closed(false)
 #ifdef HAVE_ICONV_H
 	, converter(NULL)
 #endif
 {
+    this->init();
     stream = new std::istream(sstream.rdbuf());
     if(encoding != "UTF-8"){
         //TODO la taille en dur s'mal
@@ -84,17 +119,16 @@ std::string CsvReader::missing_headers(const std::vector<std::string> &mandatory
     BOOST_FOREACH(auto header, mandatory_headers){
         if(headers.find(header) == headers.end())
             result += header + ", ";
-	}
+    }
 
     return result;
-
 }
 
 void CsvReader::close(){
     if(!closed){
         file.close();
 #ifdef HAVE_ICONV_H
-		//TODO gérer des options de compile plutot que par plateforme
+		//TODO handle with compil option and not with the platform
         if(converter != NULL) {
             delete converter;
             converter = NULL;
@@ -112,49 +146,71 @@ CsvReader::~CsvReader(){
     this->close();
 }
 
-std::vector<std::string> CsvReader::next(){
-    if(!is_open()){
-        throw std::exception();
-    }
-
-    do{
-        if(eof()){
-            return std::vector<std::string>();
-        }
-        std::getline(*stream, line);
-    }while(line.empty());
-
-
+std::string CsvReader::convert(std::string st){
 #ifdef HAVE_ICONV_H
     if(converter != NULL){
-        line = converter->convert(line);
+        st = converter->convert(st);
     }
 #endif
+    return st;
+}
 
-    boost::trim(line);
+std::vector<std::string> CsvReader::get_line(const std::string& str){
+    if (str.empty())
+        return std::vector<std::string>();
+
     std::vector<std::string> vec;
-    try {
-        Tokenizer tok(line, functor);
-        vec.assign(tok.begin(), tok.end());
-        BOOST_FOREACH(auto &s, vec)
-            boost::trim(s);
-    } catch(...) {
-        LOG4CPLUS_WARN(log4cplus::Logger::getInstance("log") ,"Impossible de parser la ligne :  " + line);
-        return next();
+    std::string::const_iterator s_begin = line.begin();
+    std::string::const_iterator s_end = line.end();
+    bool result = boost::spirit::qi::parse(s_begin, s_end, this->csv_parser, vec);
+
+    if(!result || (s_begin != s_end)){
+        return std::vector<std::string>();
     }
+    for(size_t i = 0; i < vec.size(); i++){
+        vec[i] = this->convert(vec[i]);
+        boost::trim(vec[i]);
+    }
+    return vec;
+}
+
+std::vector<std::string> CsvReader::next(){
+    if(!is_open()){
+        throw navitia::exception("file not open");
+    }
+    std::string temp;
+    std::vector<std::string> vec;
+    line.clear();
+    do{
+        if(eof()){
+            if (line != ""){
+                LOG4CPLUS_WARN(log4cplus::Logger::getInstance("log") ,"Impossible to parse line: " << line);
+            }
+            return std::vector<std::string>();
+        }
+        std::getline(*stream, temp);
+        if (line.empty()){
+            line = temp;
+        }else{
+            if (!temp.empty()){
+                line += '\n' + temp;
+            }
+        }
+        vec = get_line(line);
+    }while(vec.size() == 0);
 
     return vec;
 }
 
 int CsvReader::get_pos_col(const std::string & str){
-    auto it = headers.find(str);  /// Utilisation dans le cas où le key n'existe pas size_t = 0
+    auto it = headers.find(str);  /// Use when key does not exist
 
     if (it != headers.end())
         return headers[str];
     return -1;
 }
 
-bool CsvReader::has_col(int col_idx, const std::vector<std::string>& row) {
+bool CsvReader::has_col(int col_idx, const std::vector<std::string>& row){
     return col_idx >= 0 && static_cast<size_t>(col_idx) < row.size();
 }
 
@@ -172,8 +228,7 @@ void remove_bom(std::fstream& stream){
         //BOM UTF8
         return;
     }
-    
-    //pas de correspondance avec un BOM, on remet les caractères lus
+    // no match with the BOM, we put back the char read
     for(int i=0; i<3; i++){
         stream.unget();
     }
