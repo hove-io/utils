@@ -146,7 +146,7 @@ CsvReader::~CsvReader(){
     this->close();
 }
 
-std::string CsvReader::convert(std::string st){
+std::string CsvReader::convert(std::string& st){
 #ifdef HAVE_ICONV_H
     if(converter != NULL){
         st = converter->convert(st);
