@@ -46,7 +46,7 @@ void CsvReader::init(){
 CsvReader::CsvReader(const std::string& filename, char separator, bool read_headers, bool to_lower_headers, std::string encoding): filename(filename),
     file(), separator(separator), closed(false)
 #ifdef HAVE_ICONV_H
-	, converter(NULL)
+    , converter(nullptr)
 #endif
 {
     this->init();
@@ -80,7 +80,7 @@ CsvReader::CsvReader(const std::string& filename, char separator, bool read_head
 CsvReader::CsvReader(std::stringstream &sstream, char separator, bool read_headers, bool to_lower_headers, std::string encoding): filename("sstream"),
     file() , separator(separator), closed(false)
 #ifdef HAVE_ICONV_H
-	, converter(NULL)
+    , converter(nullptr)
 #endif
 {
     this->init();
@@ -129,9 +129,9 @@ void CsvReader::close(){
         file.close();
 #ifdef HAVE_ICONV_H
 		//TODO handle with compil option and not with the platform
-        if(converter != NULL) {
+        if(converter != nullptr) {
             delete converter;
-            converter = NULL;
+            converter = nullptr;
         }
 #endif
         closed = true;
@@ -146,10 +146,10 @@ CsvReader::~CsvReader(){
     this->close();
 }
 
-std::string CsvReader::convert(std::string& st){
+std::string CsvReader::convert(const std::string& st){
 #ifdef HAVE_ICONV_H
-    if(converter != NULL){
-        st = converter->convert(st);
+    if(converter != nullptr){
+        return converter->convert(st);
     }
 #endif
     return st;

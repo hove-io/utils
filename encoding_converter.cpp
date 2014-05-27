@@ -41,7 +41,7 @@ EncodingConverter::EncodingConverter(std::string from, std::string to, size_t bu
 }
 
 
-std::string EncodingConverter::convert(std::string& str){
+std::string EncodingConverter::convert(const std::string& str){
     memset(iconv_output_buffer, 0, buffer_size);
     strncpy(iconv_input_buffer, str.c_str(), buffer_size);
     char* working_input = iconv_input_buffer;

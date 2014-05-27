@@ -65,7 +65,7 @@ class CsvReader {
         std::string missing_headers(const std::vector<std::string> &mandatory_headers);
         std::string filename;
         std::vector<std::string> get_line(const std::string& str);
-        std::string convert(std::string& st);
+        std::string convert(const std::string& st);
         void init();
     private:
 
