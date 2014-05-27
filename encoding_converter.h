@@ -39,7 +39,7 @@ www.navitia.io
 class EncodingConverter{
     public:
         EncodingConverter(std::string from, std::string to, size_t buffer_size);
-        std::string convert(std::string& str);
+        std::string convert(const std::string& str);
         virtual ~EncodingConverter();
     private:
         iconv_t iconv_handler;
