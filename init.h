@@ -29,6 +29,7 @@ www.navitia.io
 */
 
 #pragma once
+#include "config.h"
 #include "logger.h"
 #include "backtrace.h"
 #include <csignal>
@@ -52,7 +53,7 @@ inline void print_backtrace() {
 namespace {
 void before_dying(int signum) {
     log4cplus::Logger logger = log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("logger"));
-    LOG4CPLUS_FATAL(logger, "We reveived signal: " << signum << ", so it's time to die!!");
+    LOG4CPLUS_FATAL(logger, "We reveived signal: " << signum << ", so it's time to die!! version: " << KRAKEN_VERSION);
 
     navitia::print_backtrace();
 
