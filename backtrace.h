@@ -78,7 +78,7 @@ inline std::string get_backtrace()
         }
 
         if (begin != symbol) {
-            ss << std::string(symbol, ++begin - symbol);
+            ss << std::string(symbol, size_t(++begin - symbol));
             *end++ = '\0';
             ss << demangle(begin) << '+' << end;
         }

@@ -50,8 +50,6 @@ public:
     const std::string& backtrace() const noexcept {
         return _backtrace;
     }
-
-    virtual ~exception() noexcept {}
 };
 
 /**

@@ -105,7 +105,7 @@ struct flat_enum_map {
         return array[static_cast<typename get_enum_type<EnumKey>::type>(key)];
     }
 
-    constexpr const Value& operator[] (int idx) const {
+    constexpr const Value& operator[] (size_t idx) const {
         return array[idx];
     }
 
