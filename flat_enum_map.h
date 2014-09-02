@@ -146,12 +146,7 @@ public:
     }
 
     void advance(difference_type n) {
-        if ( n > 0 ) {
-            _iterator += n;
-        }
-        else {
-            _iterator -= n;
-        }
+        _iterator += n;
         _enumKey = moveEnum(n);
     }
     difference_type distance_to(const flat_enum_map_iterator& other) {
