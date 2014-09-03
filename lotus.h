@@ -36,10 +36,9 @@ www.navitia.io
 struct LotusException : public std::exception {
     std::string message;
     LotusException(const std::string & message) : message(message) {}
-    virtual const char* what() const throw() {
+    virtual const char* what() const noexcept override {
         return message.c_str();
     }
-    virtual ~LotusException() throw (){}
 };
 
 struct Lotus {
@@ -92,7 +91,7 @@ struct Lotus {
         }
 
         std::string line = boost::algorithm::join(elements, this->delimiter) + "\n";
-        int result_code = PQputCopyData(this->connection, line.c_str(),  line.size());
+        int result_code = PQputCopyData(this->connection, line.c_str(),  int(line.size()));
         if(result_code != 1){
             throw LotusException(std::string("Impossible d’ajouter une ligne en bulk insert ") + PQerrorMessage(this->connection));
         }

@@ -98,11 +98,11 @@ struct flat_enum_map {
 //    flat_enum_map(Val&& ...v) : array{{std::forward<Val>(v)...}} {}
 
     Value& operator[] (EnumKey key) {
-        return array[static_cast<typename get_enum_type<EnumKey>::type>(key)];
+        return array[size_t(key)];
     }
 
     constexpr const Value& operator[] (EnumKey key) const {
-        return array[static_cast<typename get_enum_type<EnumKey>::type>(key)];
+        return array[size_t(key)];
     }
 
     constexpr const Value& operator[] (size_t idx) const {
