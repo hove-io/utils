@@ -44,6 +44,19 @@ std::vector< std::string > split_string(const std::string&,const std::string & )
 
 
 /**
+ * Returns the corresponding mapped const reference in the map, or the
+ * default constructed mapped_type if there is no such element.
+ */
+template<typename Map>
+const typename Map::mapped_type&
+find_or_default(const typename Map::key_type& k, const Map& m) {
+    typedef typename Map::mapped_type mapped_type;
+    static const mapped_type default_value = mapped_type();
+    const auto search = m.find(k);
+    return search == m.end() ? default_value : search->second;
+}
+
+/**
   Cette fonction permet de recupérer une valeur par une clef à partir de std::map<key, value>
   */
 std::string value_by_key(const std::map<std::string, std::string>& vect, const std::string& key);
