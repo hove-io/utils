@@ -68,6 +68,15 @@ struct Less{
             return *x < *y;
         }
 };
+/**
+ * tests if elt is in range range
+ */
+template<typename T, typename U>
+bool in(const T& elt, std::initializer_list<U> range) {
+    for (const auto& cur: range)
+        if (elt == cur) return true;
+    return false;
+}
 
 /** Foncteur fixe le membre "idx" d'un objet en incrémentant toujours de 1
  *
@@ -103,4 +112,6 @@ namespace navitia {
 struct pseudo_natural_sort {
     bool operator() (const std::string&, const std::string&) const;
 };
+
+
 }
