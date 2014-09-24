@@ -14,6 +14,8 @@ SET(UTILS_SRC
      init.h
      backtrace.h
      base64_encode.cpp
+     exception.h
+     exception.cpp
 )
 
 add_library(utils ${UTILS_SRC})
