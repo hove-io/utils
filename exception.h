@@ -45,7 +45,7 @@ public:
     exception() = default;
     exception(const exception&) = default;
     exception& operator=(const exception&) = default;
-    virtual ~exception();
+    virtual ~exception() noexcept;
 
     const char* what() const noexcept {
         return msg.c_str();
@@ -67,7 +67,7 @@ struct recoverable_exception : public exception
     recoverable_exception() = default;
     recoverable_exception(const recoverable_exception&) = default;
     recoverable_exception& operator=(const recoverable_exception&) = default;
-    virtual ~recoverable_exception();
+    virtual ~recoverable_exception() noexcept;
 };
 }
 
