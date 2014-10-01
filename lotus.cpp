@@ -44,29 +44,27 @@ Lotus::Lotus(const std::string & connection_string):
     connection(PQconnectdb(connection_string.c_str()))
 {
     if (PQstatus(this->connection) != CONNECTION_OK) {
-        throw LotusException(std::string("Impossible de se connecter : ")
+        throw LotusException(std::string("Failed to connect: ")
                              + PQerrorMessage(this->connection));
     }
 }
 
 void Lotus::start_transaction() {
-    this->exec("BEGIN", "Créer la transaction");
+    this->exec("BEGIN", "Begin transaction");
 }
 
 void Lotus::rollback() {
-    this->exec("ROLLBACK", "Rollback de la transaction");
+    this->exec("ROLLBACK", "Rollback transaction");
 }
 
 void Lotus::commit() {
-    this->exec("COMMIT", "Fermer la transaction");
+    this->exec("COMMIT", "Commit transaction");
 }
 
-/// Attention, c’est à l’appelant de nettoyer le résultat !
 void Lotus::exec(const std::string& request, const std::string& error_message, int expected_code) {
     PGresult *res = PQexec(this->connection, request.c_str());
     if (PQresultStatus(res) != expected_code) {
-        std::string message = "Impossible d’exécuter la requête : " + error_message + " "
-            +  PQresultErrorMessage(res);
+        std::string message = "Request failed: " + error_message + " " +  PQresultErrorMessage(res);
         PQclear(res);
         throw LotusException(message);
     }
@@ -78,11 +76,11 @@ void Lotus::prepare_bulk_insert(const std::string& table, const std::vector<std:
     std::string request = "COPY " + table + "(" + boost::algorithm::join(columns, ",")
         + ")  FROM STDIN WITH (FORMAT CSV, DELIMITER '" + delimiter + "', NULL '" + null_value
         + "', QUOTE '\"')";
-    this->exec(request, "Préparer le bulk insert",  PGRES_COPY_IN);
+    this->exec(request, "Prepare bulk insert",  PGRES_COPY_IN);
 }
 
 
-void Lotus::insert(std::vector<std::string> elements) { // On copie le tableau pour le modifier
+void Lotus::insert(std::vector<std::string> elements) {
     for(std::string & element : elements){
         if(element != null_value){
             element = "\"" + boost::algorithm::replace_all_copy(element, "\"", "\"\"") + "\"";
@@ -92,14 +90,16 @@ void Lotus::insert(std::vector<std::string> elements) { // On copie le tableau p
     std::string line = boost::algorithm::join(elements, this->delimiter) + "\n";
     int result_code = PQputCopyData(this->connection, line.c_str(),  int(line.size()));
     if(result_code != 1){
-        throw LotusException(std::string("Impossible d’ajouter une ligne en bulk insert ") + PQerrorMessage(this->connection));
+        throw LotusException(std::string("Failed to insert an entry in bulk insert ")
+                             + PQerrorMessage(this->connection));
     }
 }
 
 void Lotus::finish_bulk_insert() {
     int result_code =  PQputCopyEnd(this->connection, NULL);
     if(result_code != 1){
-        throw LotusException(std::string("Impossible de finir le bulk insert ") + PQerrorMessage(this->connection));
+        throw LotusException(std::string("finish bulk insert failed: ")
+                             + PQerrorMessage(this->connection));
     }
 
     PGresult *res = NULL;
@@ -109,7 +109,8 @@ void Lotus::finish_bulk_insert() {
         res = PQgetResult(this->connection);
         if(res != NULL && PQresultStatus(res) != PGRES_COMMAND_OK){
             PQclear(res);
-            throw LotusException(std::string("Impossible de finir le bulk insert, dans la boucle de fin ") + PQerrorMessage(this->connection));
+            throw LotusException(std::string("failed to finish bulk insert in final loop: ")
+                                 + PQerrorMessage(this->connection));
         }
     } while(res != NULL);
 
