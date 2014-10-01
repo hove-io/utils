@@ -16,6 +16,7 @@ SET(UTILS_SRC
      base64_encode.cpp
      exception.h
      exception.cpp
+     lotus.cpp
 )
 
 add_library(utils ${UTILS_SRC})
