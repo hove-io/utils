@@ -58,9 +58,57 @@ inline void load(Archive& ar, std::unique_ptr<T>& t, const unsigned int){
 }
 
 template<class Archive, class T>
-inline void serialize(Archive& ar, std::unique_ptr<T>& t,
-        const unsigned int file_version){
+inline void serialize(Archive& ar, std::unique_ptr<T>& t, const unsigned int file_version){
     boost::serialization::split_free(ar, t, file_version);
 }
+
+/**
+ * Functions for std::weak_ptr
+ */
+template<class Archive, class T>
+inline void save(Archive& ar, const std::weak_ptr<T>& t,
+    const unsigned int /* file_version */){
+    const auto sp = t.lock();
+    ar << sp;
+}
+
+template<class Archive, class T>
+inline void load(Archive& ar, std::weak_ptr<T>& t, const unsigned int /* file_version */){
+    std::shared_ptr<T> sp;
+    ar >> sp;
+    t = sp;
+}
+
+template<class Archive, class T>
+inline void serialize(Archive& ar, std::weak_ptr<T>& t, const unsigned int file_version){
+    boost::serialization::split_free(ar, t, file_version);
+}
+
+/**
+ * Functions for std::shared_ptr
+ */
+template<class Archive, class T>
+inline void save(Archive& ar, const std::shared_ptr<T> &t, const unsigned int){
+    // The most common cause of trapping here would be serializing
+    // something like shared_ptr<int>.  This occurs because int
+    // is never tracked by default.  Wrap int in a trackable type
+    BOOST_STATIC_ASSERT((tracking_level< T >::value != track_never));
+    const T * t_ptr = t.get();
+    ar << t_ptr;
+}
+
+template<class Archive, class T>
+inline void load(Archive& ar, std::shared_ptr<T>& t, const unsigned int){
+    BOOST_STATIC_ASSERT((tracking_level< T >::value != track_never));
+    T* sp;
+    ar >> sp;
+    t.reset(sp);
+}
+
+template<class Archive, class T>
+inline void serialize(Archive& ar, std::shared_ptr<T>& t, const unsigned int file_version){
+    boost::serialization::split_free(ar, t, file_version);
+}
+
 } // namespace serialization
 } // namespace boost
