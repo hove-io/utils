@@ -33,6 +33,11 @@ www.navitia.io
 #include <vector>
 #include <memory>
 #include<map>
+#include <algorithm>
+
+namespace google { namespace protobuf {
+template<typename Element> class RepeatedPtrField;
+}}
 
 double str_to_double(std::string);
 int str_to_int(std::string str);
@@ -119,7 +124,7 @@ struct pseudo_natural_sort {
  * and truncate the list at position nbmax
  */
 template <typename Vector, typename Cmp>
-Vector sort_and_truncate(Vector input, size_t nbmax, Cmp cmp) {
+void sort_and_truncate(Vector& input, size_t nbmax, Cmp cmp) {
     typename Vector::iterator middle_iterator;
     if (nbmax < input.size())
         middle_iterator = input.begin() + nbmax;
@@ -127,7 +132,24 @@ Vector sort_and_truncate(Vector input, size_t nbmax, Cmp cmp) {
         middle_iterator = input.end();
     std::partial_sort(input.begin(), middle_iterator, input.end(), cmp);
     if (input.size() > nbmax) input.resize(nbmax);
-    return std::move(input);
+}
+
+/**
+ * sort_and_truncate:
+ * Here we compare two structures on different attributswe compare the string
+ * and truncate the list at position nbmax
+ */
+template <typename Elem, typename Cmp>
+void sort_and_truncate(typename google::protobuf::RepeatedPtrField<Elem>& input, size_t nbmax, Cmp cmp) {
+    typedef typename google::protobuf::RepeatedPtrField<Elem> Vector;
+    typename Vector::iterator middle_iterator;
+    if (nbmax < input.size())
+        middle_iterator = input.begin() + nbmax;
+    else
+        middle_iterator = input.end();
+    std::partial_sort(input.begin(), middle_iterator, input.end(), cmp);
+    while (input.size() > nbmax)
+        input.RemoveLast();
 }
 
 }
