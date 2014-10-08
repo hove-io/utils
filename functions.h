@@ -113,5 +113,24 @@ struct pseudo_natural_sort {
     bool operator() (const std::string&, const std::string&) const;
 };
 
+/**
+ * sort_and_truncate:
+ * Here we compare two structures on different attributswe compare the string
+ * and truncate the list at position nbmax
+ */
+template <typename Cmp>
+static std::vector<fl_quality> sort_and_truncate(std::vector<fl_quality> input, size_t nbmax, Cmp cmp) {
+    typename std::vector<fl_quality>::iterator middle_iterator;
+    if(nbmax < input.size())
+        middle_iterator = input.begin() + nbmax;
+    else
+        middle_iterator = input.end();
+
+    std::partial_sort(input.begin(), middle_iterator, input.end(), cmp);
+
+    if (input.size() > nbmax){input.resize(nbmax);}
+    return input;
+}
+
 
 }
