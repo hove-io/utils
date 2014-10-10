@@ -143,12 +143,12 @@ template <typename Elem, typename Cmp>
 void sort_and_truncate(typename google::protobuf::RepeatedPtrField<Elem>& input, size_t nbmax, Cmp cmp) {
     typedef typename google::protobuf::RepeatedPtrField<Elem> Vector;
     typename Vector::iterator middle_iterator;
-    if (nbmax < input.size())
+    if (nbmax < size_t(input.size()))
         middle_iterator = input.begin() + nbmax;
     else
         middle_iterator = input.end();
     std::partial_sort(input.begin(), middle_iterator, input.end(), cmp);
-    while (input.size() > nbmax)
+    while (size_t(input.size()) > nbmax)
         input.RemoveLast();
 }
 
