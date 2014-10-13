@@ -17,6 +17,8 @@ SET(UTILS_SRC
      exception.h
      exception.cpp
      lotus.cpp
+     threadbuf.h
+     threadbuf.cpp
 )
 
 add_library(utils ${UTILS_SRC})
