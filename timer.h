@@ -29,28 +29,40 @@ www.navitia.io
 */
 
 #pragma once
+
 #include <string>
-#include <chrono>
 #include <iostream>
-/// Petit outil tout bête permettant de mesurer et afficher des temps d'exécution
+#include <tuple>
+#include <sys/times.h>
+
+/// Small tool to time something and print these informations
 struct Timer {
-    std::chrono::time_point<std::chrono::system_clock> start;
-    std::string name;
+private:
+    struct tms tms_start;
+    clock_t real_start;
+    std::string header;
     bool print_at_destruction;
 
+public:
     Timer();
-    /// Nom du timer qui sera affiché
-    Timer(const std::string & name, bool print_at_destruction = true);
-
-    /// À la destruction il affiche le temps
+    Timer(const std::string& header, bool print_at_destruction = true);
     ~Timer();
-
-    /// Retourne le nombre de secondes depuis la dernière initialisation
     int ms() const;
 
-    /// Remet le compteur à 0
+    // Returns real, user and system time in seconds
+    std::tuple<double, double, double> get_real_user_sys() const;
+
+    /// Reset the start to now
     void reset();
+
+    /// Print enlapsed time
+    friend std::ostream & operator<<(std::ostream & os, const Timer & timer);
 };
 
-/// Affiche le temps écoulé
-std::ostream & operator<<(std::ostream & os, const Timer & timer);
+template<class Function, class... Args>
+inline auto time_it(const std::string &header, Function&& f, Args&&... args)
+    -> decltype(f(std::forward<Args>(args)...))
+{
+    Timer t(header);
+    return f(std::forward<Args>(args)...);
+}

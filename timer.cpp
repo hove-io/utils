@@ -30,33 +30,45 @@ www.navitia.io
 
 #include "timer.h"
 
-Timer::Timer() : start(std::chrono::system_clock::now()), print_at_destruction(false) {}
+#include <unistd.h>
 
-Timer::Timer(const std::string &name, bool print_at_destruction) : start(std::chrono::system_clock::now()), name(name), print_at_destruction(print_at_destruction){}
+std::tuple<double, double, double> Timer::get_real_user_sys() const {
+    const long ticks_ps = sysconf(_SC_CLK_TCK);
+    struct tms tms_end;
+    const clock_t real_end = times(&tms_end);
+    return std::make_tuple(
+        ((double)real_end - real_start) / ticks_ps,
+        ((double)tms_end.tms_utime - tms_start.tms_utime) / ticks_ps,
+        ((double)tms_end.tms_stime - tms_start.tms_stime) / ticks_ps
+        );
+}
+
+Timer::Timer() : print_at_destruction(false) {
+    reset();
+}
+
+Timer::Timer(const std::string& h, bool p): header(h), print_at_destruction(p) {
+    reset();
+}
 
 Timer::~Timer() {
-    if(this->print_at_destruction)
+    if (this->print_at_destruction)
         std::cout << *this << std::endl;
 }
 
 int Timer::ms() const {
-    auto delta = std::chrono::system_clock::now() - this->start;
-    return std::chrono::duration_cast<std::chrono::milliseconds>(delta).count();
+    return int(std::get<0>(get_real_user_sys()) * 1000.);
 }
 
 void Timer::reset() {
-    start = std::chrono::system_clock::now();
+    real_start = times(&tms_start);
 }
 
-std::ostream & operator<<(std::ostream & os, const Timer & timer){
-    os << "Timer " << timer.name << " ";
-    int ms = timer.ms();
-
-    if(ms < 10000)
-        os << ms << " ms";
-    else
-        os << (ms/1000) << " s";
-
-    return os;
+std::ostream & operator<<(std::ostream& os, const Timer& timer) {
+    auto rus = timer.get_real_user_sys();
+    return os << timer.header
+              << "real = " << std::get<0>(rus)
+              << "s, user = " << std::get<1>(rus)
+              << "s, sys = " << std::get<2>(rus) << "s";
 }
 
