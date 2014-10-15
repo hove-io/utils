@@ -34,6 +34,7 @@ www.navitia.io
 #include <memory>
 #include<map>
 #include <algorithm>
+#include <boost/range/algorithm/remove_if.hpp>
 
 namespace google { namespace protobuf {
 template<typename Element> class RepeatedPtrField;
@@ -150,6 +151,16 @@ void sort_and_truncate(typename google::protobuf::RepeatedPtrField<Elem>& input,
     std::partial_sort(input.begin(), middle_iterator, input.end(), cmp);
     while (size_t(input.size()) > nbmax)
         input.RemoveLast();
+}
+
+/**
+ * cleanup a vector a weak_ptr, removing expired ones
+ */
+template <typename T>
+void clean_up_weak_ptr(std::vector<std::weak_ptr<T>>& container) {
+    container.erase(boost::remove_if(container, [](const std::weak_ptr<T>& weak) {
+                                                return weak.expired();
+                                            }), std::end(container));
 }
 
 }
