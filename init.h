@@ -53,7 +53,7 @@ inline void print_backtrace() {
 namespace {
 void before_dying(int signum) {
     log4cplus::Logger logger = log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("logger"));
-    LOG4CPLUS_FATAL(logger, "We reveived signal: " << signum << ", so it's time to die!! version: " << KRAKEN_VERSION);
+    LOG4CPLUS_FATAL(logger, "We received signal: " << signum << ", so it's time to die!! version: " << KRAKEN_VERSION);
 
     navitia::print_backtrace();
 
