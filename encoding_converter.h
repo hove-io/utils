@@ -29,7 +29,7 @@ www.navitia.io
 */
 
 #pragma once
-#include "config.h"
+#include "conf.h"
 #ifdef HAVE_ICONV_H
 #include <iconv.h>
 #include <string>

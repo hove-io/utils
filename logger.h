@@ -29,7 +29,7 @@ www.navitia.io
 */
 
 #pragma once
-#include "config.h"
+#include "conf.h"
 #include <log4cplus/logger.h>
 #include <log4cplus/configurator.h>
 #ifdef HAVE_LOGGINGMACROS_H

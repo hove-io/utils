@@ -23,6 +23,6 @@ SET(UTILS_SRC
 
 add_library(utils ${UTILS_SRC})
 
-target_link_libraries(utils ${BOOST_LIBS} pq log4cplus)
+target_link_libraries(utils ${Boost_SYSTEM_LIBRARY} pq log4cplus config)
 
 add_subdirectory(tests)

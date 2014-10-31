@@ -30,7 +30,7 @@ www.navitia.io
 
 #pragma once
 
-#include "config.h"
+#include "conf.h"
 #include <string>
 #include <fstream>
 #include <sstream>
