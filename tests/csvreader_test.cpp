@@ -124,25 +124,93 @@ BOOST_AUTO_TEST_CASE(return_line_separator_slash) {
     BOOST_CHECK_EQUAL(result[2], "13");
 }
 
-// TODO
-/*
-\"n" between double quote, exemple :
-    "AA BB\"CC"
-*/
-/*
-BOOST_AUTO_TEST_CASE(quote) {
-
+BOOST_AUTO_TEST_CASE(quoted_then_dos_newline) {
     std::stringstream sstream(std::stringstream::in | std::stringstream::out);
-    sstream << boost::algorithm::join(std::vector<std::string>({"12", "\"AA BB\"CC\"", "13"}), ";") << "\n";
+    sstream << "\"test\"\r\n";
+    CsvReader csv(sstream);
+    std::vector<std::string> result = csv.next();
+    BOOST_REQUIRE_EQUAL(result.size(), 1);
+    BOOST_CHECK_EQUAL(result[0], "test");
+}
+
+BOOST_AUTO_TEST_CASE(spaces_around_quoted) {
+    std::stringstream sstream(std::stringstream::in | std::stringstream::out);
+    sstream << " \"test1\" ;\"test2\" ; \"test3\"\n";
+    CsvReader csv(sstream);
+    std::vector<std::string> result = csv.next();
+    BOOST_REQUIRE_EQUAL(result.size(), 3);
+    BOOST_CHECK_EQUAL(result[0], "test1");
+    BOOST_CHECK_EQUAL(result[1], "test2");
+    BOOST_CHECK_EQUAL(result[2], "test3");
+}
+
+BOOST_AUTO_TEST_CASE(quote_quote_in_quoted) {
+    std::stringstream sstream(std::stringstream::in | std::stringstream::out);
+    sstream << "\"\"\"12\";\"AA BB\"\"CC\";\"13\"\"\"\n";
 
     CsvReader csv(sstream);
     std::vector<std::string> result = csv.next();
     BOOST_REQUIRE_EQUAL(result.size(), 3);
-    BOOST_CHECK_EQUAL(result[0], "12");
+    BOOST_CHECK_EQUAL(result[0], "\"12");
     BOOST_CHECK_EQUAL(result[1], "AA BB\"CC");
-    BOOST_CHECK_EQUAL(result[2], "13");
+    BOOST_CHECK_EQUAL(result[2], "13\"");
 }
+
+/*
+\"n" between double quote, exemple :
+    "AA BB\"CC"
 */
+BOOST_AUTO_TEST_CASE(backslash_quote_in_quoted) {
+
+    std::stringstream sstream(std::stringstream::in | std::stringstream::out);
+    sstream << boost::algorithm::join(std::vector<std::string>({"\"\\\"12\"", "\"AA BB\\\"CC\"", "\"13\\\"\""}), ";") << "\n";
+
+    CsvReader csv(sstream);
+    std::vector<std::string> result = csv.next();
+    BOOST_REQUIRE_EQUAL(result.size(), 3);
+    BOOST_CHECK_EQUAL(result[0], "\"12");
+    BOOST_CHECK_EQUAL(result[1], "AA BB\"CC");
+    BOOST_CHECK_EQUAL(result[2], "13\"");
+}
+
+BOOST_AUTO_TEST_CASE(empty_quoted_field) {
+
+    std::stringstream sstream(std::stringstream::in | std::stringstream::out);
+    sstream << "\"\";\"\";\"\"";
+
+    CsvReader csv(sstream);
+    std::vector<std::string> result = csv.next();
+    BOOST_REQUIRE_EQUAL(result.size(), 3);
+    BOOST_CHECK_EQUAL(result[0], "");
+    BOOST_CHECK_EQUAL(result[1], "");
+    BOOST_CHECK_EQUAL(result[2], "");
+}
+
+/*
+  can read a line after a failed line
+*/
+BOOST_AUTO_TEST_CASE(failed_line_then_correct_line) {
+
+    std::stringstream sstream(std::stringstream::in | std::stringstream::out);
+    sstream << "foo \"bar;titi\n";
+    sstream << "toto;tata\n";
+
+    CsvReader csv(sstream);
+    std::vector<std::string> result = csv.next();
+    BOOST_REQUIRE_EQUAL(result.size(), 0);
+    result = csv.next();
+    BOOST_REQUIRE_EQUAL(result.size(), 2);
+    BOOST_CHECK_EQUAL(result[0], "toto");
+    BOOST_CHECK_EQUAL(result[1], "tata");
+}
+
+BOOST_AUTO_TEST_CASE(parse_empty) {
+    std::stringstream sstream(std::stringstream::in | std::stringstream::out);
+    CsvReader csv(sstream);
+    std::vector<std::string> result = csv.next();
+    BOOST_REQUIRE_EQUAL(result.size(), 0);
+}
+
 /*
 All tests
 */
@@ -154,7 +222,7 @@ BOOST_AUTO_TEST_CASE(all) {
     sstream << boost::algorithm::join(std::vector<std::string>({"12", "\"AA;BB\\CC\"", "13"}), ";") << "\n";
     sstream << boost::algorithm::join(std::vector<std::string>({"12", "\"AA BB\nCC\"", "13"}), ";") << "\n";
     sstream << boost::algorithm::join(std::vector<std::string>({"12", "\"AA;BB\nCC\\DD\"", "13"}), ";") << "\n";
-    sstream << boost::algorithm::join(std::vector<std::string>({"12", "\"AA BB\"CC\"", "13"}), ";") << "\n";
+    sstream << boost::algorithm::join(std::vector<std::string>({"12", "\"AA BB\\\"CC\"", "13"}), ";") << "\n";
 
     CsvReader csv(sstream);
 
@@ -181,13 +249,11 @@ BOOST_AUTO_TEST_CASE(all) {
     BOOST_CHECK_EQUAL(result[0], "12");
     BOOST_CHECK_EQUAL(result[1], "AA;BB\nCC\\DD");
     BOOST_CHECK_EQUAL(result[2], "13");
-// TODO
-/*
+
     result = csv.next();
     BOOST_REQUIRE_EQUAL(result.size(), 3);
     BOOST_CHECK_EQUAL(result[0], "12");
     BOOST_CHECK_EQUAL(result[1], "AA BB\"CC");
     BOOST_CHECK_EQUAL(result[2], "13");
-*/
 
 }

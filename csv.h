@@ -55,18 +55,18 @@ class CsvReader {
 
         ~CsvReader();
         std::vector<std::string> next();
-        int get_pos_col(const std::string&);
-        bool has_col(int col_idx, const std::vector<std::string>& row);
-        bool is_valid(int col_idx, const std::vector<std::string>& row);
+        int get_pos_col(const std::string&) const;
+        bool has_col(int col_idx, const std::vector<std::string>& row) const;
+        bool is_valid(int col_idx, const std::vector<std::string>& row) const;
         bool eof() const;
         void close();
-        bool is_open();
-        bool validate(const std::vector<std::string> &mandatory_headers);
-        std::string missing_headers(const std::vector<std::string> &mandatory_headers);
+        bool is_open() const;
+        bool validate(const std::vector<std::string> &mandatory_headers) const;
+        std::string missing_headers(const std::vector<std::string> &mandatory_headers) const;
+        std::string convert(const std::string& st) const;
+
         std::string filename;
-        std::vector<std::string> get_line(const std::string& str);
-        std::string convert(const std::string& st);
-        void init();
+
     private:
 
         qi::rule<std::string::const_iterator, std::string()> quoted_string;
@@ -74,7 +74,6 @@ class CsvReader {
         qi::rule<std::string::const_iterator, std::string()> item ;
         qi::rule<std::string::const_iterator, std::vector<std::string>()> csv_parser;
 
-        std::string line;
         std::fstream file;
         std::stringstream sstream;
         std::istream *stream;
@@ -82,9 +81,17 @@ class CsvReader {
         bool closed;
         std::unordered_map<std::string, int> headers;
 #ifdef HAVE_ICONV_H
-        EncodingConverter* converter;
+        std::unique_ptr<EncodingConverter> converter;
 #endif
 
+        void init();
+        enum class ParseStatus {
+            OK,
+            CONTINUE,
+            FAIL
+        };
+        std::pair<ParseStatus, std::vector<std::string>>
+        get_line(const std::string& str) const;
 
 };
 
