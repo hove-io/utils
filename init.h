@@ -61,17 +61,24 @@ void before_dying(int signum) {
     signal(signum, SIG_DFL);
     kill(getpid(), signum); //kill the process to enable the core generation
 }
+
+void before_exit(int signum) {
+    log4cplus::Logger logger = log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("logger"));
+    LOG4CPLUS_INFO(logger, "Process terminated by signal: " << signum);
+    signal(signum, SIG_DFL);
+    exit(0);
+}
 }
 
 inline void init_signal_handling() {
-    //    signal(SIGINT, stop);
-    //    signal(SIGTERM, stop);
-
     signal(SIGPIPE, before_dying);
     signal(SIGABRT, before_dying);
     signal(SIGSEGV, before_dying);
     signal(SIGFPE, before_dying);
     signal(SIGILL, before_dying);
+
+    signal(SIGTERM, before_exit);
+    signal(SIGINT, before_exit);
 }
 
 inline void init_app() {
