@@ -8,3 +8,7 @@ ADD_TEST(utils_test ${EXECUTABLE_OUTPUT_PATH}/utils_test --log_format=XML --log_
 add_executable(csvreader_test csvreader_test.cpp)
 target_link_libraries(csvreader_test utils ${Boost_LIBRARIES} log4cplus)
 ADD_TEST(csvreader_test ${EXECUTABLE_OUTPUT_PATH}/csvreader_test --log_format=XML --log_sink=results_utils_test.xml --log_level=all --report_level=no)
+
+add_executable(lru_test lru_test.cpp)
+target_link_libraries(lru_test ${Boost_LIBRARIES} log4cplus)
+add_boost_test(lru_test)
