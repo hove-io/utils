@@ -36,6 +36,10 @@ www.navitia.io
 #include <algorithm>
 #include <boost/range/algorithm/remove_if.hpp>
 #include <boost/weak_ptr.hpp>
+#include <boost/uuid/uuid_generators.hpp>
+#include <boost/uuid/uuid.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/uuid/uuid_io.hpp>
 
 namespace google { namespace protobuf {
 template<typename Element> class RepeatedPtrField;
@@ -163,5 +167,8 @@ void clean_up_weak_ptr(std::vector<boost::weak_ptr<T>>& container) {
                                                 return weak.expired();
                                             }), std::end(container));
 }
+
+std::string make_adapted_uri(const std::string& ref_uri);
+
 
 }

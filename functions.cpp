@@ -84,4 +84,13 @@ bool pseudo_natural_sort::operator() (const std::string& a, const std::string&b)
         return a < b;
     }
 }
+
+
+std::string make_adapted_uri(const std::string& ref_uri) {
+    boost::uuids::uuid uuid = boost::uuids::random_generator()();
+    std::stringstream uuid_stream;
+    uuid_stream << uuid;
+    return ref_uri + ":adapted-" + uuid_stream.str();
+}
+
 }
