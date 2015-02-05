@@ -12,3 +12,7 @@ ADD_TEST(csvreader_test ${EXECUTABLE_OUTPUT_PATH}/csvreader_test --log_format=XM
 add_executable(lru_test lru_test.cpp)
 target_link_libraries(lru_test ${Boost_LIBRARIES} log4cplus)
 add_boost_test(lru_test)
+
+add_executable(idx_map_test idx_map_test.cpp)
+target_link_libraries(idx_map_test ${Boost_LIBRARIES} log4cplus)
+add_boost_test(idx_map_test)

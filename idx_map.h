@@ -114,10 +114,10 @@ template<typename T, typename V> struct IdxMap {
     // iterator getters
     inline iterator begin() { return iterator(0, map.begin()); }
     inline iterator end() { return iterator(map.size(), map.end()); }
-    inline const_iterator begin() const { return iterator(0, map.cbegin()); }
-    inline const_iterator end() const { return iterator(map.size(), map.cend()); }
-    inline const_iterator cbegin() const { return iterator(0, map.cbegin()); }
-    inline const_iterator cend() const { return iterator(map.size(), map.cend()); }
+    inline const_iterator begin() const { return const_iterator(0, map.cbegin()); }
+    inline const_iterator end() const { return const_iterator(map.size(), map.cend()); }
+    inline const_iterator cbegin() const { return const_iterator(0, map.cbegin()); }
+    inline const_iterator cend() const { return const_iterator(map.size(), map.cend()); }
 
     // iterate on const values
     inline boost::iterator_range<typename std::vector<V>::const_iterator>

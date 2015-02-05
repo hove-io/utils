@@ -31,7 +31,7 @@ www.navitia.io
 #include "utils/lru.h"
 
 #define BOOST_TEST_DYN_LINK
-#define BOOST_TEST_MODULE csvreader_test
+#define BOOST_TEST_MODULE lru_test
 #include <boost/test/unit_test.hpp>
 
 struct Fun {
