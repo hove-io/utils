@@ -101,10 +101,14 @@ template<typename T, typename V> struct IdxMap {
     inline IdxMap(size_t nb, const V& val = V()): map(nb, val) {}
 
     // initialize the map with the number of element
-    inline void assign(size_t nb, const V& val = V()) { map.assign(nb, val); }
+    // we give the container for type checking
+    inline void assign(const std::vector<T*>& c, const V& val = V()) { map.assign(c.size(), val); }
+    inline void assign(const std::vector<T>& c, const V& val = V()) { map.assign(c.size(), val); }
 
     // resize the map
-    inline void resize(size_t nb) { map.resize(nb); }
+    inline void resize(const std::vector<T*>& c) { map.resize(c.size()); }
+    inline void resize(const std::vector<T>& c) { map.resize(c.size()); }
+    inline void resize(const IdxMap& c) { map.resize(c.size()); }
 
     // accessors
     inline size_t size() const { return map.size(); }

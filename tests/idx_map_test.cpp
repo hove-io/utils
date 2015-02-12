@@ -39,6 +39,7 @@ struct Bob {
     Bob() = delete;
     Bob(const Bob&) = delete;
     Bob& operator=(const Bob&) = delete;
+    Bob(Bob&&) = default;
     Bob(navitia::idx_t i): idx(i) {}
     navitia::idx_t idx;
 };
@@ -50,8 +51,14 @@ BOOST_AUTO_TEST_CASE(idx_constructor) {
 }
 
 BOOST_AUTO_TEST_CASE(idx_map_iterations_read_write) {
+    //we need a container to back our idx map
+    std::vector<Bob> bob_container;
+    for (size_t i = 0; i < 42; ++i) {
+        bob_container.emplace_back(std::move(Bob(i)));
+    }
+
     navitia::IdxMap<Bob, int> map;
-    map.assign(42, 0);
+    map.assign(bob_container, 0);
     navitia::idx_t idx = 0;
 
     // mut iteration
