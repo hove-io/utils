@@ -98,7 +98,8 @@ template<typename T, typename V> struct IdxMap {
     typedef IdxMapIterator<key_type, typename container::const_iterator> const_iterator;
 
     inline IdxMap() = default;
-    inline IdxMap(size_t nb, const V& val = V()): map(nb, val) {}
+    inline IdxMap(const std::vector<T*>& c, const V& val = V()): map(c.size(), val) {}
+    inline IdxMap(const std::vector<T>& c, const V& val = V()): map(c.size(), val) {}
 
     // initialize the map with the number of element
     // we give the container for type checking
