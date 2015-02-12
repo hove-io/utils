@@ -110,6 +110,8 @@ template<typename T, typename V> struct IdxMap {
     inline size_t size() const { return map.size(); }
     inline const V& operator[](const Idx<T>& idx) const { return map[idx.val]; }
     inline V& operator[](const Idx<T>& idx) { return map[idx.val]; }
+    inline V& at(const Idx<T>& idx) { return map.at(idx.val); }
+    inline const V& at(const Idx<T>& idx) const { return map.at(idx.val); }
 
     // iterator getters
     inline iterator begin() { return iterator(0, map.begin()); }
