@@ -96,6 +96,8 @@ template<typename T, typename V> struct IdxMap {
     typedef std::vector<V> container;
     typedef IdxMapIterator<key_type, typename container::iterator> iterator;
     typedef IdxMapIterator<key_type, typename container::const_iterator> const_iterator;
+    typedef boost::iterator_range<typename std::vector<V>::iterator> range;
+    typedef boost::iterator_range<typename std::vector<V>::const_iterator> const_range;
 
     inline IdxMap() = default;
     inline IdxMap(const std::vector<T*>& c, const V& val = V()): map(c.size(), val) {}
@@ -127,12 +129,10 @@ template<typename T, typename V> struct IdxMap {
     inline const_iterator cend() const { return const_iterator(map.size(), map.cend()); }
 
     // iterate on const values
-    inline boost::iterator_range<typename std::vector<V>::const_iterator>
-    values() const { return boost::make_iterator_range(map.cbegin(), map.cend()); }
+    inline const_range values() const { return boost::make_iterator_range(map.cbegin(), map.cend()); }
 
     // iterate on values
-    inline boost::iterator_range<typename std::vector<V>::iterator>
-    values() { return boost::make_iterator_range(map.begin(), map.end()); }
+    inline range values() { return boost::make_iterator_range(map.begin(), map.end()); }
 
 private:
     container map;
