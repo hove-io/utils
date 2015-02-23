@@ -16,3 +16,7 @@ add_boost_test(lru_test)
 add_executable(idx_map_test idx_map_test.cpp)
 target_link_libraries(idx_map_test ${Boost_LIBRARIES} log4cplus)
 add_boost_test(idx_map_test)
+
+add_executable(multi_obj_pool_test multi_obj_pool_test.cpp)
+target_link_libraries(multi_obj_pool_test utils ${Boost_LIBRARIES} log4cplus)
+add_boost_test(multi_obj_pool_test)

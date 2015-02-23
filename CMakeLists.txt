@@ -13,6 +13,7 @@ SET(UTILS_SRC
      flat_enum_map.h
      init.h
      backtrace.h
+     multi_obj_pool.h
      base64_encode.cpp
      exception.h
      exception.cpp
