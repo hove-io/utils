@@ -1,4 +1,4 @@
-/* Copyright © 2001-2014, Canal TP and/or its affiliates. All rights reserved.
+/* Copyright © 2001-2015, Canal TP and/or its affiliates. All rights reserved.
 
 This file is part of Navitia,
     the software to build cool stuff with public transport.
@@ -36,16 +36,17 @@ www.navitia.io
  *
  * each solution in the pool is part of the pareto front
  *
- * the comparator's operator () takes 2 Obj (the solutions) and checks if the first solution is dominated by the second
+ * the domination function takes 2 Obj (the solutions) and checks if the first solution is dominated by the second
  */
-template <typename Obj, typename Comparator>
+template <typename Obj, typename Dominator>
 struct ParetoFront {
     typedef std::list<Obj> Pool;
+    typedef typename Pool::value_type value_type;
     typedef typename Pool::const_iterator const_iterator;
 
     bool add(const Obj& obj);
 
-    ParetoFront(Comparator c): comp(c) {}
+    ParetoFront(Dominator x): dominate(x) {}
 
     inline size_t size() const { return pareto_front.size(); }
     inline const_iterator begin() const { return pareto_front.begin(); }
@@ -53,7 +54,7 @@ struct ParetoFront {
 
 private:
     Pool pareto_front;
-    Comparator comp;
+    Dominator dominate;
 };
 
 /*
@@ -61,23 +62,27 @@ private:
  *
  * return true if the solution has been added to the pareto front, false otherwise
  */
-template <typename Obj, typename Comparator>
-bool ParetoFront<Obj, Comparator>::add(const Obj& obj) {
+template <typename Obj, typename Dominator>
+bool ParetoFront<Obj, Dominator>::add(const Obj& obj) {
 
     //we check if the new solution is dominated by one of the best
+#ifndef NDEBUG
     bool is_best = false;
+#endif
 
     for (auto it = pareto_front.begin(); it != pareto_front.end();) {
-        const auto& best = *it;
-        if (comp(obj, best)) {
+        const auto& cur = *it;
+        if (dominate(cur, obj)) {
             // a solution cannot be the dominate one solution and be dominated by another
-            // else it means the comparator is not well defined
-            BOOST_ASSERT_MSG(! is_best, "MultiObjPool::add The comparator is not correctly defined");
+            // else it means the domination function is not well defined
+            BOOST_ASSERT_MSG(! is_best, "MultiObjPool::add The Dominator is not correctly defined");
             return false;
         }
         // if the new solution dominate one solution from the pareto front, we need to remove this solution
-        if (comp(best, obj)) {
+        if (dominate(obj, cur)) {
+#ifndef NDEBUG
             is_best = true;
+#endif
 
             it = pareto_front.erase(it);
         } else {
