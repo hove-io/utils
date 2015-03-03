@@ -62,4 +62,7 @@ struct Lotus {
     void insert(std::vector<std::string> elements);
     void finish_bulk_insert();
     void close_connection();
+
+    static std::string make_upsert_string(const std::string& table,
+            const std::vector<std::pair<std::string, std::string>>& key_values);
 };

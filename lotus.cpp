@@ -120,6 +120,39 @@ void Lotus::close_connection() {
     PQfinish(this->connection);
 }
 
+std::string Lotus::make_upsert_string(const std::string& table,
+        const std::vector<std::pair<std::string, std::string>>& key_values) {
+    std::vector<std::string> key_value_updates;
+    key_value_updates.resize(key_values.size());
+    std::transform(key_values.begin(), key_values.end(), key_value_updates.begin(),
+            [](std::pair<std::string, std::string> kv) {
+            return kv.first + "='"+ kv.second + "'";
+            });
+    std::string update_query = "update " + table + " set " +
+        boost::algorithm::join(key_value_updates, ",");
+
+
+    std::vector<std::string> keys_inserts, values_inserts;
+    keys_inserts.resize(key_values.size());
+    values_inserts.resize(key_values.size());
+    std::transform(key_values.begin(), key_values.end(), values_inserts.begin(),
+            [](std::pair<std::string, std::string> kv) {
+            return "'"+ kv.second + "'";
+            });
+    std::transform(key_values.begin(), key_values.end(), keys_inserts.begin(),
+            [](std::pair<std::string, std::string> kv) {
+            return kv.first;
+            });
+
+    std::string insert_query = "insert into " + table + " ("+
+        boost::algorithm::join(keys_inserts, ",") + ") select " +
+        boost::algorithm::join(values_inserts, ",");
+
+    return "WITH upsert AS "
+    "(" + update_query + " RETURNING *) "
+    + insert_query + " WHERE NOT EXISTS (SELECT * FROM upsert);";
+}
+
 Lotus::~Lotus() {
     this->close_connection();
 }
