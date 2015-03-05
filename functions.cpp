@@ -84,7 +84,9 @@ bool pseudo_natural_sort::operator() (const std::string& a, const std::string&b)
         return a < b;
     }
 }
-
+std::string make_adapted_uri_fast(const std::string& ref_uri, size_t s) {
+    return ref_uri + ":adapted-" + boost::lexical_cast<std::string>(s);
+}
 
 std::string make_adapted_uri(const std::string& ref_uri) {
     boost::uuids::uuid uuid = boost::uuids::random_generator()();

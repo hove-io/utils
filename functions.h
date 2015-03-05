@@ -168,6 +168,7 @@ void clean_up_weak_ptr(std::vector<boost::weak_ptr<T>>& container) {
                                             }), std::end(container));
 }
 
+std::string make_adapted_uri_fast(const std::string& ref_uri, size_t s);
 std::string make_adapted_uri(const std::string& ref_uri);
 
 
