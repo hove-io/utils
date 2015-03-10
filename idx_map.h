@@ -102,6 +102,7 @@ template<typename T, typename V> struct IdxMap {
     inline IdxMap() = default;
     inline IdxMap(const std::vector<T*>& c, const V& val = V()): map(c.size(), val) {}
     inline IdxMap(const std::vector<T>& c, const V& val = V()): map(c.size(), val) {}
+    inline friend void swap(IdxMap& lhs, IdxMap& rhs) { using std::swap; swap(lhs.map, rhs.map); }
 
     // initialize the map with the number of element
     // we give the container for type checking
