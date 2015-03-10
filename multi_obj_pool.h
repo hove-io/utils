@@ -44,10 +44,9 @@ struct ParetoFront {
     typedef typename Pool::value_type value_type;
     typedef typename Pool::const_iterator const_iterator;
 
+    explicit ParetoFront(Dominator x): dominate(x) {}
+
     bool add(const Obj& obj);
-
-    ParetoFront(Dominator x): dominate(x) {}
-
     inline size_t size() const { return pareto_front.size(); }
     inline const_iterator begin() const { return pareto_front.begin(); }
     inline const_iterator end() const { return pareto_front.end(); }
