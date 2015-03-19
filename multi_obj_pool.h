@@ -36,7 +36,8 @@ www.navitia.io
  *
  * each solution in the pool is part of the pareto front
  *
- * the domination function takes 2 Obj (the solutions) and checks if the first solution is dominated by the second
+ * the domination function takes 2 Obj (the solutions) and checks if
+ * the first solution is dominated by the second
  */
 template <typename Obj, typename Dominator>
 struct ParetoFront {
@@ -44,6 +45,7 @@ struct ParetoFront {
     typedef typename Pool::value_type value_type;
     typedef typename Pool::const_iterator const_iterator;
 
+    ParetoFront() = default;
     explicit ParetoFront(Dominator x): dominate(x) {}
 
     bool add(const Obj& obj);
