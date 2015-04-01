@@ -75,14 +75,10 @@ std::string value_by_key(const std::map<std::string, std::string>& vect, const s
 /** Foncteur permettant de comparer les objets en passant des pointeurs vers ces objets */
 struct Less{
         template<class T>
-        bool operator() (T* x, T* y) const{
+        bool operator() (const T x, const T y) const{
             return *x < *y;
         }
 
-        template<class T>
-        bool operator() (const boost::shared_ptr<T>& x, const boost::shared_ptr<T>& y) const{
-            return *x < *y;
-        }
 };
 
 /**
