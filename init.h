@@ -48,6 +48,10 @@ namespace navitia {
 
 inline void print_backtrace() {
     LOG4CPLUS_ERROR(log4cplus::Logger::getInstance("Logger"), get_backtrace());
+
+    //without the flush we might not have the error in the standard output
+    std::cout.flush();
+    std::cerr.flush();
 }
 
 namespace {
