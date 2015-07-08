@@ -49,6 +49,8 @@ struct ParetoFront {
     explicit ParetoFront(Dominator x): dominate(x) {}
 
     bool add(const Obj& obj);
+    template <class Predicate>
+    inline void remove_if (Predicate pred) { pareto_front.remove_if(std::move(pred)); }
     inline size_t size() const { return pareto_front.size(); }
     inline const_iterator begin() const { return pareto_front.begin(); }
     inline const_iterator end() const { return pareto_front.end(); }
