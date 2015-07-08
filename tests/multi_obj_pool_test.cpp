@@ -74,7 +74,7 @@ struct Bob {
     }
 };
 
-std::ostream& operator<<(std::ostream& s, const Bob& b) {
+static std::ostream& operator<<(std::ostream& s, const Bob& b) {
     s << b.bobette << " | " << b.bobitto;
     return s;
 }

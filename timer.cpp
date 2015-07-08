@@ -31,15 +31,16 @@ www.navitia.io
 #include "timer.h"
 
 #include <unistd.h>
+#include <boost/lexical_cast.hpp>
 
 std::tuple<double, double, double> Timer::get_real_user_sys() const {
     const long ticks_ps = sysconf(_SC_CLK_TCK);
     struct tms tms_end;
     const clock_t real_end = times(&tms_end);
     return std::make_tuple(
-        ((double)real_end - real_start) / ticks_ps,
-        ((double)tms_end.tms_utime - tms_start.tms_utime) / ticks_ps,
-        ((double)tms_end.tms_stime - tms_start.tms_stime) / ticks_ps
+        (boost::lexical_cast<double>(real_end) - real_start) / ticks_ps,
+        (boost::lexical_cast<double>(tms_end.tms_utime) - tms_start.tms_utime) / ticks_ps,
+        (boost::lexical_cast<double>(tms_end.tms_stime) - tms_start.tms_stime) / ticks_ps
         );
 }
 
