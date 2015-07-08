@@ -1,4 +1,4 @@
-/* Copyright © 2001-2014, Canal TP and/or its affiliates. All rights reserved.
+/* Copyright Â© 2001-2014, Canal TP and/or its affiliates. All rights reserved.
 
 This file is part of Navitia,
     the software to build cool stuff with public transport.
@@ -42,15 +42,15 @@ void CsvReader::init(){
     // finished (by using > instead of >> that disallow backtrack).
     // Like that, if the parser throw, we ask for more input to read
     // the next line
-    this->quoted_string = qi::omit[(*qi::space)] >> // skipping spaces before
-        qi::lit('"') >
-        *(
-            '\\' >> qi::char_('"') // \" as "
-            | '"' >> qi::char_('"') // or "" as "
-            | (qi::char_ - '"') // or not(")
-            ) >
-        qi::lit('"') >
-        qi::omit[(*qi::space)]; // skipping spaces after
+    this->quoted_string = (qi::omit[(*qi::space)] >> // skipping spaces before
+                           qi::lit('"')) >
+                         *(
+                             '\\' >> qi::char_('"') // \" as "
+                             | '"' >> qi::char_('"') // or "" as "
+                             | (qi::char_ - '"') // or not(")
+                             ) >
+                         qi::lit('"') >
+                         qi::omit[(*qi::space)]; // skipping spaces after
     this->valid_characters = qi::char_ - '"' - this->separator - '\n';
     this->item = this->quoted_string | *this->valid_characters;
     this->csv_parser = this->item % separator;
@@ -249,7 +249,7 @@ void remove_bom(std::fstream& stream){
     stream.read(buffer, 3);
     if(stream.gcount() != 3)
         return;
-    if(buffer[0] == (char)0xEF && buffer[1] == (char)0xBB){
+    if(buffer[0] == '\xEF' && buffer[1] == '\xBB'){
         //BOM UTF8
         return;
     }
