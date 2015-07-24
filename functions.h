@@ -173,5 +173,21 @@ void clean_up_weak_ptr(std::vector<boost::weak_ptr<T>>& container) {
 std::string make_adapted_uri_fast(const std::string& ref_uri, size_t s);
 std::string make_adapted_uri(const std::string& ref_uri);
 
+template<int N>
+struct dec_tag: dec_tag<N-1>{};
+template<>
+struct dec_tag<0>{};
+
+// Hint: the use of decltype and comma operator is for the purpose of SFINAE
+template<class C, class T>
+inline auto contains_impl(const C& c, const T& x, dec_tag<1>) -> decltype(c.find(x), true) { return c.find(x) != std::end(c); }
+
+template<class C, class T>
+inline bool contains_impl(const C& v, const T& x, dec_tag<0>) { return std::find(std::begin(v), std::end(v), x) != std::end(v); }
+
+template<class C, class T>
+auto contains(const C& c, const T& x) -> decltype(end(c), true) { return contains_impl(c, x, dec_tag<1>{}); }
+
+
 
 }
