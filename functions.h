@@ -173,5 +173,58 @@ void clean_up_weak_ptr(std::vector<boost::weak_ptr<T>>& container) {
 std::string make_adapted_uri_fast(const std::string& ref_uri, size_t s);
 std::string make_adapted_uri(const std::string& ref_uri);
 
+/*
+ * These are ordered decreasing tags used to do tag dispatching(or SFINAE)
+ * Example:
+
+ * We declare here two functions using decreasing tag:
+ * template<typename T> void fun(T t, dec_tag<1>);
+ * template<typename T> void fun(T t, dec_tag<0>);
+
+ * When we call:
+ * func(int, dec_tag<2>{});
+
+ * The compiler will try to match the function with the dec_tag<1>
+ * at the first place, because dec_tag<1> is more specialized than dec_tag<0>
+ * */
+template<int N>
+struct dec_tag: dec_tag<N-1>{};
+template<>
+struct dec_tag<0>{};
+
+// Hint: the use of decltype and comma operator is for the purpose of SFINAE
+template<class C, class T>
+inline auto contains_impl(const C& c, const T& x, dec_tag<1>) -> decltype(c.find(x), true) {
+    return c.find(x) != std::end(c);
+}
+
+template<class C, class T>
+inline bool contains_impl(const C& v, const T& x, dec_tag<0>) {
+    return std::find(std::begin(v), std::end(v), x) != std::end(v);
+}
+
+/*
+ * This function finds if value is in the container.
+ * It will call container's find if it's implemented(ex: std::map, std::set; boost's containers) for the sake of
+ * performance. Or it calls std::find to do a linear search.
+ *
+ * If the code appears obscure to you, we'd like to suggest you do this to understand the trick:
+ *
+ * 1. remove all dec_tag<> and c.find(x), then call this function on a std::vector, read compilation errors
+ * 2. put back only dec_tags<>, call this function on a std::vector then a std::set, read compilation errors
+ * 3. remove all dec_tags<>, put back only c.find(x), call this function on a std::vector then a std::set
+ *
+ * initial version of this code:
+ * http://codereview.stackexchange.com/questions/59997/contains-algorithm-for-stdvector
+ *
+ * Note:
+ * A better solution may be to do a type_trait to determine if a container HAS a 'find' function, then use
+ * false_type and true_type for tag dispatching.
+ * This function could fail if the container has it own begin and end implementation.
+ * */
+template<class C, class T>
+auto contains(const C& c, const T& x) -> decltype(std::end(c), true) {
+    return contains_impl(c, x, dec_tag<1>{});
+}
 
 }
