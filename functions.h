@@ -177,7 +177,7 @@ std::string make_adapted_uri(const std::string& ref_uri);
 // Hint: the use of decltype and comma operator is for the purpose of SFINAE
 // http://stackoverflow.com/questions/18265536/sfinae-decltype-comma-operator-trick
 template<typename Container, typename Value>
-constexpr auto has_find(void) -> decltype(std::declval<Container>().find(std::declval<Value>()),
+constexpr auto has_find(int) -> decltype(std::declval<Container>().find(std::declval<Value>()),
                                          std::true_type())
 {
 	return std::true_type{};
