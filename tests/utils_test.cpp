@@ -31,6 +31,8 @@ www.navitia.io
 #define BOOST_TEST_DYN_LINK
 #define BOOST_TEST_MODULE utils_test
 #include <boost/test/unit_test.hpp>
+#include <set>
+#include <vector>
 #include "utils/flat_enum_map.h"
 #include "utils/logger.h"
 #include "utils/init.h"
@@ -170,3 +172,31 @@ BOOST_AUTO_TEST_CASE(natural_sort_test) {
     BOOST_CHECK_EQUAL(list[i++], "tutu2");
 }
 
+namespace std{
+    template<typename T>
+    struct MockedContainerWithFind: public std::initializer_list<T> {
+
+        MockedContainerWithFind(std::initializer_list<T>&& list):std::initializer_list<T>(list){};
+        bool mutable find_is_called{false};
+        auto find(const T&) const -> decltype(std::end(*this)) {
+    	    find_is_called = true;
+    	    return std::end(*this);
+        }
+    };
+}
+
+/*
+ * Test the behavior of contains. Especially, when 'find' is implemented
+ * */
+BOOST_AUTO_TEST_CASE(contains_test) {
+    std::set<int> s{0, 1, 2};
+    BOOST_CHECK_EQUAL(navitia::contains(s, 0), true);
+    BOOST_CHECK_EQUAL(navitia::contains(s, 3), false);
+    std::vector<int> v{0, 1, 2};
+    BOOST_CHECK_EQUAL(navitia::contains(v, 0), true);
+    BOOST_CHECK_EQUAL(navitia::contains(v, 3), false);
+
+    std::MockedContainerWithFind<int> mocked_container{1,2,3};
+    navitia::contains(mocked_container, 4);
+    BOOST_CHECK_EQUAL(mocked_container.find_is_called, true);
+}

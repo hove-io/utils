@@ -174,29 +174,17 @@ std::string make_adapted_uri_fast(const std::string& ref_uri, size_t s);
 std::string make_adapted_uri(const std::string& ref_uri);
 
 
-// Hint: the use of decltype and comma operator is for the purpose of SFINAE
-// http://stackoverflow.com/questions/18265536/sfinae-decltype-comma-operator-trick
-template<typename Container, typename Value>
-constexpr auto has_find(int) -> decltype(std::declval<Container>().find(std::declval<Value>()),
-                                         std::true_type())
-{
-	return std::true_type{};
-}
-
-template<typename Container, typename Value>
-constexpr std::false_type has_find(...)
-{
-	return std::false_type{};
-}
-
-template<class Container, class Value>
-inline bool contains_impl(const Container& c, const Value& x, std::true_type) {
-    return c.find(x) != std::end(c);
-}
-
-template<class Container, class Value>
-inline bool contains_impl(const Container& v, const Value& x, std::false_type) {
-    return std::find(std::begin(v), std::end(v), x) != std::end(v);
+namespace impl {
+    // using decltype as SFINAE
+    template<class Container, class Value>
+    inline auto
+    contains_impl(const Container& c, const Value& x, int) -> decltype(bool(c.find(x) != std::end(c))) {
+return c.find(x) != std::end(c);
+    }
+    template<class Container, class Value>
+    inline bool contains_impl(const Container& v, const Value& x, ...) {
+        return std::find(std::begin(v), std::end(v), x) != std::end(v);
+    }
 }
 
 /*
@@ -204,12 +192,12 @@ inline bool contains_impl(const Container& v, const Value& x, std::false_type) {
  * It will call container's find if it's implemented(ex: std::map, std::set; boost's containers) for the sake of
  * performance. Or it calls std::find to do a linear search.
  *
- * initial version of this code:
+ * original version of this code:
  * http://codereview.stackexchange.com/questions/59997/contains-algorithm-for-stdvector
  * */
 template<class Container, class Value>
 inline auto contains(const Container& c, const Value& x) -> decltype(std::end(c), true) {
-    return contains_impl(c, x, has_find<Container, Value>(0));
+    return impl::contains_impl(c, x, 0);
 }
 
 }
