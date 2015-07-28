@@ -176,7 +176,8 @@ namespace std{
     template<typename T>
     struct MockedContainerWithFind: public std::initializer_list<T> {
 
-        MockedContainerWithFind(std::initializer_list<T>&& list):std::initializer_list<T>(list){};
+        MockedContainerWithFind(std::initializer_list<T>&& list):
+        	std::initializer_list<T>(std::forward<std::initializer_list<T>>(list)){};
         bool mutable find_is_called{false};
         auto find(const T&) const -> decltype(std::end(*this)) {
     	    find_is_called = true;
