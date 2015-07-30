@@ -178,7 +178,7 @@ namespace impl {
     // using decltype as SFINAE
     template<class Container, class Value>
     inline auto
-    contains_impl(const Container& c, const Value& x, int) -> decltype(bool(c.find(x) != std::end(c))) {
+    contains_impl(const Container& c, const Value& x, int) -> decltype(c.find(x) != std::end(c)) {
         return c.find(x) != std::end(c);
     }
     template<class Container, class Value>
