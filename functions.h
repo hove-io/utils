@@ -179,11 +179,11 @@ namespace impl {
     template<class Container, class Value>
     inline auto
     contains_impl(const Container& c, const Value& x, int) -> decltype(bool(c.find(x) != std::end(c))) {
-return c.find(x) != std::end(c);
+        return c.find(x) != std::end(c);
     }
     template<class Container, class Value>
-    inline bool contains_impl(const Container& v, const Value& x, ...) {
-        return std::find(std::begin(v), std::end(v), x) != std::end(v);
+    inline bool contains_impl(const Container& c, const Value& x, ...) {
+        return std::find(std::begin(c), std::end(c), x) != std::end(c);
     }
 }
 
