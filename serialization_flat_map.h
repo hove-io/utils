@@ -30,14 +30,14 @@ www.navitia.io
 
 // from boost/serialization/map.hpp with the following copyright:
 
-// (C) Copyright 2002 Robert Ramey - http://www.rrsd.com . 
+// (C) Copyright 2002 Robert Ramey - http://www.rrsd.com .
 // Use, modification and distribution is subject to the Boost Software
 // License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
 #pragma once
 
-#include <unordered_map>
+#include <boost/container/flat_map.hpp>
 
 #include <boost/serialization/utility.hpp>
 #include <boost/serialization/collections_save_imp.hpp>
@@ -49,23 +49,23 @@ namespace boost { namespace serialization {
 template<class Archive, class ...Types>
 inline void save(
     Archive & ar,
-    const std::unordered_map<Types...> &t,
+    const boost::container::flat_map<Types...> &t,
     const unsigned int /* file_version */
 ){
-    boost::serialization::stl::save_collection<Archive, std::unordered_map<Types...>>(ar, t);
+    boost::serialization::stl::save_collection<Archive, boost::container::flat_map<Types...>>(ar, t);
 }
 
 template<class Archive, class ...Types>
 inline void load(
     Archive & ar,
-    std::unordered_map<Types...> &t,
+    boost::container::flat_map<Types...> &t,
     const unsigned int /* file_version */
 ){
     boost::serialization::stl::load_collection<
         Archive,
-        std::unordered_map<Types...>,
-        boost::serialization::stl::archive_input_map<Archive, std::unordered_map<Types...>>,
-        boost::serialization::stl::reserve_imp<std::unordered_map<Types...>>
+        boost::container::flat_map<Types...>,
+        boost::serialization::stl::archive_input_map<Archive, boost::container::flat_map<Types...>>,
+        boost::serialization::stl::reserve_imp<boost::container::flat_map<Types...>>
     >(ar, t);
 }
 
@@ -74,7 +74,7 @@ inline void load(
 template<class Archive, class ...Types>
 inline void serialize(
     Archive & ar,
-    std::unordered_map<Types...> &t,
+    boost::container::flat_map<Types...> &t,
     const unsigned int file_version
 ){
     boost::serialization::split_free(ar, t, file_version);
