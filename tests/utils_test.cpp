@@ -172,18 +172,19 @@ BOOST_AUTO_TEST_CASE(natural_sort_test) {
     BOOST_CHECK_EQUAL(list[i++], "tutu2");
 }
 
-namespace std{
-    template<typename T>
-    struct MockedContainerWithFind: public std::initializer_list<T> {
+struct MockedContainerWithFind {
+    struct iterator{};
+    iterator end() const{return iterator();}
+    bool mutable find_is_called{false};
+    iterator find(int) const {
+        find_is_called = true;
+        return iterator();
+    }
+};
 
-        MockedContainerWithFind(std::initializer_list<T>&& list):
-        	std::initializer_list<T>(std::forward<std::initializer_list<T>>(list)){};
-        bool mutable find_is_called{false};
-        auto find(const T&) const -> decltype(std::end(*this)) {
-    	    find_is_called = true;
-    	    return std::end(*this);
-        }
-    };
+inline bool operator!=(const MockedContainerWithFind::iterator&,
+                       const MockedContainerWithFind::iterator&) {
+    return false;
 }
 
 /*
@@ -197,7 +198,7 @@ BOOST_AUTO_TEST_CASE(contains_test) {
     BOOST_CHECK_EQUAL(navitia::contains(v, 0), true);
     BOOST_CHECK_EQUAL(navitia::contains(v, 3), false);
 
-    std::MockedContainerWithFind<int> mocked_container{1,2,3};
+    MockedContainerWithFind mocked_container;
     navitia::contains(mocked_container, 4);
     BOOST_CHECK_EQUAL(mocked_container.find_is_called, true);
 }
