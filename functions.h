@@ -35,6 +35,7 @@ www.navitia.io
 #include<map>
 #include <algorithm>
 #include <boost/range/algorithm/remove_if.hpp>
+#include <boost/range/algorithm/find_if.hpp>
 #include <boost/weak_ptr.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid.hpp>
@@ -198,6 +199,11 @@ namespace impl {
 template<class Container, class Value>
 inline auto contains(const Container& c, const Value& x) -> decltype(std::end(c), true) {
     return impl::contains_impl(c, x, 0);
+}
+
+template<class Container, class Pred>
+inline bool contains_if(Container c, Pred p) {
+    return boost::range::find_if(c, p) != std::end(c);
 }
 
 }
