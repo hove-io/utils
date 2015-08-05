@@ -202,7 +202,7 @@ inline auto contains(const Container& c, const Value& x) -> decltype(std::end(c)
 }
 
 template<class Container, class Pred>
-inline bool contains_if(Container c, Pred p) {
+inline bool contains_if(const Container& c, Pred p) {
     return boost::range::find_if(c, p) != std::end(c);
 }
 
