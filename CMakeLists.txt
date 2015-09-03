@@ -20,6 +20,7 @@ SET(UTILS_SRC
      lotus.cpp
      threadbuf.h
      threadbuf.cpp
+     get_hostname.cpp
 )
 
 add_library(utils ${UTILS_SRC})
