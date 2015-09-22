@@ -75,7 +75,7 @@ private:
     inline void increment() { ++idx; ++iterator; }
     inline void decrement() { --idx; --iterator; }
     inline void advance(difference_type n) { idx += n; iterator += n; }
-    inline difference_type distance_to(const IdxMapIterator& other) {
+    inline difference_type distance_to(const IdxMapIterator& other) const {
         return iterator - other.iterator;
     }
     inline bool equal(const IdxMapIterator& other) const {
