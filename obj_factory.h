@@ -80,11 +80,7 @@ public:
     }
 
     const ObjType* operator[] (const std::string& uri) const {
-        const auto obj_it = map.find(uri);
-        if (obj_it == std::end(map)) {
-            return nullptr;
-        }
-        return obj_it->second;
+        return find_or_default(uri, map);
     }
 
     const ObjType* operator[] (const Idx<ObjType>& idx) const {
@@ -95,11 +91,7 @@ public:
     }
 
     ObjType* get_mut(const std::string& uri) {
-        auto obj_it = map.find(uri);
-        if (obj_it == std::end(map)) {
-            return nullptr;
-        }
-        return obj_it->second;
+        return find_or_default(uri, map);
     }
 
     ObjType* get_mut(const Idx<ObjType>& idx) {
