@@ -33,11 +33,12 @@ www.navitia.io
 #define BOOST_TEST_DYN_LINK
 #define BOOST_TEST_MODULE obj_factory_test
 #include <boost/test/unit_test.hpp>
+#include "utils/functions.h"
 
 struct HeaderInt {
     uint32_t idx;
     std::string uri;
-    int val;
+    int val = 0;
 };
 
 BOOST_AUTO_TEST_CASE(simple_obj_factory) {
@@ -61,5 +62,38 @@ BOOST_AUTO_TEST_CASE(simple_obj_factory) {
     obj_factory.get_or_create("BobEmpty");
     obj_factory.insert("OpenData", std::move(iInt_bis));
     obj_factory.get_mut("OpenData")->val = 4;
+    BOOST_CHECK_EQUAL(obj_factory.size(), 6);
+}
+
+struct HeaderUniquePtrInt {
+    HeaderUniquePtrInt(int val) : val(std::make_unique<int>(val)) {}
+    HeaderUniquePtrInt() : val(std::make_unique<int>(0)) {}
+    HeaderUniquePtrInt(HeaderUniquePtrInt&&) = default;
+    HeaderUniquePtrInt& operator=(HeaderUniquePtrInt&&) = default;
+    uint32_t idx;
+    std::string uri;
+    std::unique_ptr<int> val;
+};
+
+BOOST_AUTO_TEST_CASE(non_copyable_obj_factory) {
+    navitia::ObjFactory<HeaderUniquePtrInt> obj_factory;
+
+    obj_factory.emplace("Hubert", HeaderUniquePtrInt(0)); //name dropping
+    BOOST_CHECK_EQUAL(*(obj_factory["Hubert"]->val), 0);
+    obj_factory.get_or_create("Hubert", 2); //should not change value
+    BOOST_CHECK_EQUAL(*(obj_factory[navitia::Idx<HeaderUniquePtrInt>(0)]->val), 0);
+    *(obj_factory.get_or_create("Hubert")->val) = 1; //should change value
+    BOOST_CHECK_EQUAL(*(obj_factory.get_mut(navitia::Idx<HeaderUniquePtrInt>(0))->val), 1);
+
+    auto i_int = HeaderUniquePtrInt(2);
+    obj_factory.insert("John", std::move(i_int));
+    BOOST_CHECK_EQUAL(*(obj_factory.get_mut("John")->val), 2);
+
+    obj_factory.emplace("JohnEmpty");
+    obj_factory.get_or_create("Bob", 0);
+    obj_factory.get_or_create("BobEmpty");
+    auto iInt_bis = HeaderUniquePtrInt(2);
+    obj_factory.insert("OpenData", std::move(iInt_bis));
+    *(obj_factory.get_mut("OpenData")->val) = 4;
     BOOST_CHECK_EQUAL(obj_factory.size(), 6);
 }

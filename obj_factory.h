@@ -76,7 +76,7 @@ public:
     }
 
     ObjType* insert(const std::string& uri, ObjType&& obj) {
-        return emplace(uri, obj);
+        return emplace(uri, std::move(obj));
     }
 
     const ObjType* operator[] (const std::string& uri) const {
