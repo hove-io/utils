@@ -33,7 +33,7 @@ www.navitia.io
 #include "utils/functions.h"
 #include "utils/idx_map.h"
 
-namespace navitia{
+namespace navitia {
 
 /*
  * Factory handling all collections for one object
@@ -41,15 +41,29 @@ namespace navitia{
  */
 template<typename ObjType>
 class ObjFactory {
+private:
+    typedef typename std::vector<std::unique_ptr<ObjType>> inner_vector;
+    typedef typename std::unordered_map<std::string, ObjType*> inner_map;
+
+    inner_vector vec;
+    inner_map map;
+
 public:
-    typedef typename std::vector<std::unique_ptr<ObjType>>::iterator iterator;
-    typedef typename std::vector<std::unique_ptr<ObjType>>::const_iterator const_iterator;
+    using iterator = typename inner_vector::iterator;
+    using const_iterator = typename inner_vector::const_iterator;
 
     template<typename ...Args>
     ObjType* emplace(const std::string& uri, Args&& ...args) {
-        check_free_uri(uri);
+        if (navitia::contains(map, uri)) {
+            throw(std::logic_error(std::string("In ") + typeid(*this).name() +
+                                   ": Object with same uri (" + uri + ") already stored."));
+        }
         vec.push_back(std::make_unique<ObjType>(std::forward<Args>(args)...));
-        return manage_vec_back_consistency(uri);
+        ObjType* obj = vec.back().get();
+        obj->idx = vec.size() - 1;
+        obj->uri = uri;
+        map[obj->uri] = obj;
+        return obj;
     }
 
     template<typename ...Args>
@@ -62,9 +76,7 @@ public:
     }
 
     ObjType* insert(const std::string& uri, ObjType&& obj) {
-        check_free_uri(uri);
-        vec.push_back(std::make_unique<ObjType>(std::move(obj)));
-        return manage_vec_back_consistency(uri);
+        return emplace(uri, obj);
     }
 
     const ObjType* operator[] (const std::string& uri) const {
@@ -97,33 +109,14 @@ public:
         return vec[idx.val];
     }
 
-    iterator begin() {return std::begin(vec);}
-    const_iterator begin() const {return std::begin(vec);}
-    iterator end() {return std::end(vec);}
-    const_iterator end() const {return std::end(vec);}
+    iterator begin() { return std::begin(vec); }
+    const_iterator begin() const { return std::begin(vec); }
+    iterator end() { return std::end(vec); }
+    const_iterator end() const { return std::end(vec); }
 
-    size_t size() const noexcept {return vec.size();}
+    size_t size() const noexcept { return vec.size(); }
 
     template<class Archive> void serialize(Archive & ar, const unsigned int) { ar & vec & map; }
-
-private:
-    std::vector<std::unique_ptr<ObjType>> vec;
-    std::unordered_map<std::string, ObjType*> map;
-
-    ObjType* manage_vec_back_consistency(const std::string& uri) {
-        ObjType* obj = vec.back().get();
-        obj->idx = vec.size() - 1;
-        obj->uri = uri;
-        map[obj->uri] = obj;
-        return obj;
-    }
-
-    void check_free_uri(const std::string& uri) {
-        if (navitia::contains(map, uri)) {
-            throw(std::logic_error(std::string("In ") + typeid(*this).name() +
-                                   ": Object with same uri (" + uri + ") already stored."));
-        }
-    }
 };
 
 } // namespace navitia
