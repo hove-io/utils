@@ -42,8 +42,8 @@ namespace navitia {
 template<typename ObjType>
 class ObjFactory {
 private:
-    typedef typename std::vector<std::unique_ptr<ObjType>> inner_vector;
-    typedef typename std::unordered_map<std::string, ObjType*> inner_map;
+    using inner_vector = typename std::vector<std::unique_ptr<ObjType>>;
+    using inner_map = typename std::unordered_map<std::string, ObjType*>;
 
     inner_vector vec;
     inner_map map;
@@ -91,7 +91,7 @@ public:
         if (idx.val >= vec.size()) {
             return nullptr;
         }
-        return vec[idx.val];
+        return vec[idx.val].get();
     }
 
     ObjType* get_mut(const std::string& uri) {
@@ -106,7 +106,7 @@ public:
         if (idx.val >= vec.size()) {
             return nullptr;
         }
-        return vec[idx.val];
+        return vec[idx.val].get();
     }
 
     iterator begin() { return std::begin(vec); }
