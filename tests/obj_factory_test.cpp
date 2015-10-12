@@ -51,6 +51,7 @@ BOOST_AUTO_TEST_CASE(simple_obj_factory) {
     BOOST_CHECK_EQUAL(obj_factory["Hubert"]->val, 0);
     obj_factory.get_or_create("Hubert", i_int); //should not change value
     BOOST_CHECK_EQUAL(obj_factory[navitia::Idx<HeaderInt>(0)]->val, 0);
+    BOOST_CHECK_EQUAL(obj_factory.size(), 1);
     obj_factory.get_or_create("Hubert")->val = 1; //should change value
     BOOST_CHECK_EQUAL(obj_factory.get_mut(navitia::Idx<HeaderInt>(0))->val, 1);
 
@@ -62,6 +63,7 @@ BOOST_AUTO_TEST_CASE(simple_obj_factory) {
     obj_factory.get_or_create("BobEmpty");
     obj_factory.insert("OpenData", std::move(iInt_bis));
     obj_factory.get_mut("OpenData")->val = 4;
+    BOOST_CHECK_EQUAL(obj_factory["OpenData"]->val, 4);
     BOOST_CHECK_EQUAL(obj_factory.size(), 6);
 }
 
@@ -82,6 +84,7 @@ BOOST_AUTO_TEST_CASE(non_copyable_obj_factory) {
     BOOST_CHECK_EQUAL(*(obj_factory["Hubert"]->val), 0);
     obj_factory.get_or_create("Hubert", 2); //should not change value
     BOOST_CHECK_EQUAL(*(obj_factory[navitia::Idx<HeaderUniquePtrInt>(0)]->val), 0);
+    BOOST_CHECK_EQUAL(obj_factory.size(), 1);
     *(obj_factory.get_or_create("Hubert")->val) = 1; //should change value
     BOOST_CHECK_EQUAL(*(obj_factory.get_mut(navitia::Idx<HeaderUniquePtrInt>(0))->val), 1);
 
@@ -95,5 +98,6 @@ BOOST_AUTO_TEST_CASE(non_copyable_obj_factory) {
     auto iInt_bis = HeaderUniquePtrInt(2);
     obj_factory.insert("OpenData", std::move(iInt_bis));
     *(obj_factory.get_mut("OpenData")->val) = 4;
+    BOOST_CHECK_EQUAL(*(obj_factory["OpenData"]->val), 4);
     BOOST_CHECK_EQUAL(obj_factory.size(), 6);
 }
