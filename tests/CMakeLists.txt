@@ -20,3 +20,7 @@ add_boost_test(idx_map_test)
 add_executable(multi_obj_pool_test multi_obj_pool_test.cpp)
 target_link_libraries(multi_obj_pool_test utils ${Boost_LIBRARIES} log4cplus)
 add_boost_test(multi_obj_pool_test)
+
+add_executable(obj_factory_test obj_factory_test.cpp)
+target_link_libraries(obj_factory_test utils ${Boost_LIBRARIES} log4cplus)
+add_boost_test(obj_factory_test)
