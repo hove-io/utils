@@ -166,7 +166,7 @@ boost::iterator_range<boost::reverse_iterator<enum_iterator<Enum>>> reverse_enum
 }
 
 template <typename Enum>
-boost::iterator_range<boost::reverse_iterator<enum_iterator<Enum>>> reverse_enum_range(Enum e) {
+boost::iterator_range<boost::reverse_iterator<enum_iterator<Enum>>> reverse_enum_range_from(Enum e) {
     typedef enum_iterator<Enum> it;
     typedef boost::reverse_iterator<it> rit;
     return boost::make_iterator_range(rit(it(e)),
