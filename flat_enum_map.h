@@ -137,7 +137,7 @@ class enum_iterator : public boost::iterator_facade<enum_iterator<Enum>,
     typedef typename get_enum_type<Enum>::type underlying_type ;
     underlying_type _it;
 public:
-    typedef typename get_enum_type<Enum>::type difference_type;
+    typedef std::make_signed<typename get_enum_type<Enum>::type> difference_type;
     enum_iterator(): _it(enum_size_trait<Enum>::size()) {}
     enum_iterator(const Enum& e): _it(static_cast<underlying_type>(e)) {}
     enum_iterator(const underlying_type& i): _it(i) {}
