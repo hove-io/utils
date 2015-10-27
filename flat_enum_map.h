@@ -165,6 +165,14 @@ boost::iterator_range<boost::reverse_iterator<enum_iterator<Enum>>> reverse_enum
                                       rit(it(0)));
 }
 
+template <typename Enum>
+boost::iterator_range<boost::reverse_iterator<enum_iterator<Enum>>> reverse_enum_range_from(Enum e) {
+    typedef enum_iterator<Enum> it;
+    typedef boost::reverse_iterator<it> rit;
+    return boost::make_iterator_range(rit(it(e)),
+                                      rit(it(0)));
+}
+
 template <typename EnumKey, typename Value>
 class flat_enum_map_iterator : public boost::iterator_facade<flat_enum_map_iterator<EnumKey, Value>,
                                                             std::pair<EnumKey, Value>,
