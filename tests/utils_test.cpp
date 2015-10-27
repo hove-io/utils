@@ -83,12 +83,51 @@ struct enum_size_trait<RawEnum> {
 };
 }
 
+std::ostream& operator<<(std::ostream& o, RawEnum e) {
+    return o << static_cast<int>(e);
+}
+std::ostream& operator<<(std::ostream& o, Mode e) {
+    return o << static_cast<int>(e);
+}
+
 struct Value {
     Value() : val() {}
     Value(int i) : val(i) {}
     int val;
 };
 
+BOOST_AUTO_TEST_CASE(enum_iterator) {
+    auto it = navitia::enum_iterator<RawEnum>(RawEnum::first);
+    BOOST_CHECK(it != navitia::enum_iterator<RawEnum>());
+    BOOST_CHECK_EQUAL(*it, RawEnum::first);
+    BOOST_CHECK(it != navitia::enum_iterator<RawEnum>());
+    BOOST_CHECK_EQUAL(*++it, RawEnum::second);
+    BOOST_CHECK(it != navitia::enum_iterator<RawEnum>());
+    BOOST_CHECK_EQUAL(*++it, RawEnum::last);
+    BOOST_CHECK(++it == navitia::enum_iterator<RawEnum>()); //invalid iterator
+}
+
+BOOST_AUTO_TEST_CASE(enum_range) {
+    std::vector<RawEnum> res;
+
+    for (auto e: navitia::enum_range<RawEnum>()) {
+        res.push_back(e);
+    }
+    std::vector<RawEnum> wanted_res {RawEnum::first, RawEnum::second, RawEnum::last};
+
+    BOOST_CHECK_EQUAL_COLLECTIONS(std::begin(res), std::end(res), std::begin(wanted_res), std::end(wanted_res));
+}
+
+BOOST_AUTO_TEST_CASE(enum_reverse_range) {
+    std::vector<Mode> res;
+
+    for (auto e: navitia::reverse_enum_range<Mode>()) {
+        res.push_back(e);
+    }
+    std::vector<Mode> wanted_res {Mode::car, Mode::walk, Mode::bike};
+
+    BOOST_CHECK_EQUAL_COLLECTIONS(std::begin(res), std::end(res), std::begin(wanted_res), std::end(wanted_res));
+}
 /**
   * test with an enum without a size last field
   *

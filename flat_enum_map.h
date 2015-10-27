@@ -34,6 +34,7 @@ www.navitia.io
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/array.hpp>
 #include <boost/iterator/iterator_facade.hpp>
+#include <boost/range/iterator_range_core.hpp>
 
 namespace navitia {
 
@@ -62,6 +63,14 @@ struct enum_size_trait {
         return static_cast<typename get_enum_type<Enum>::type>(Enum::size);
     }
 };
+
+/**
+ * Helper, the first elt of the enum should always be 0
+ */
+template <typename Enum>
+Enum get_first_elt() {
+    return static_cast<Enum>(0);
+}
 
 template <typename EnumKey, typename Value>
 class flat_enum_map_iterator;
@@ -113,12 +122,48 @@ struct flat_enum_map {
         ar & boost::serialization::make_array(array.data(), array.size()); //default serialization not available in boost 1.48
     }
 
-    const_iterator begin() const { return const_iterator(array.begin(), static_cast<EnumKey>(0)); }
+    const_iterator begin() const { return const_iterator(array.begin(), get_first_elt<EnumKey>()); }
     const_iterator end() const { return const_iterator(array.end()); }
-    iterator begin() { return iterator(array.begin(), static_cast<EnumKey>(0)); }
+    iterator begin() { return iterator(array.begin(), get_first_elt<EnumKey>()); }
     iterator end() { return iterator(array.end()); }
 
 };
+
+template <typename Enum>
+class enum_iterator : public boost::iterator_facade<enum_iterator<Enum>,
+                                                    Enum,
+                                                    boost::random_access_traversal_tag,
+                                                    Enum> {
+    typedef typename get_enum_type<Enum>::type underlying_type ;
+    underlying_type _it;
+public:
+    typedef typename get_enum_type<Enum>::type difference_type;
+    enum_iterator(): _it(enum_size_trait<Enum>::size()) {}
+    enum_iterator(const Enum& e): _it(static_cast<underlying_type>(e)) {}
+    enum_iterator(const underlying_type& i): _it(i) {}
+
+    void increment() { ++_it; }
+    void decrement() { --_it; }
+    void advance(difference_type n) { _it += n; }
+
+    difference_type distance_to(const enum_iterator& other) { return _it - other._it; }
+    bool equal(const enum_iterator& other) const { return _it == other._it; }
+    Enum dereference() const { return static_cast<Enum>(_it); }
+};
+
+template <typename Enum>
+boost::iterator_range<enum_iterator<Enum>> enum_range() {
+    typedef enum_iterator<Enum> it;
+    return boost::make_iterator_range(it(get_first_elt<Enum>()), it());
+}
+
+template <typename Enum>
+boost::iterator_range<boost::reverse_iterator<enum_iterator<Enum>>> reverse_enum_range() {
+    typedef enum_iterator<Enum> it;
+    typedef boost::reverse_iterator<it> rit;
+    return boost::make_iterator_range(rit(it(enum_size_trait<Enum>::size())),
+                                      rit(it(0)));
+}
 
 template <typename EnumKey, typename Value>
 class flat_enum_map_iterator : public boost::iterator_facade<flat_enum_map_iterator<EnumKey, Value>,
@@ -128,38 +173,37 @@ class flat_enum_map_iterator : public boost::iterator_facade<flat_enum_map_itera
     typedef flat_enum_map<EnumKey, Value> enum_map;
     typedef typename flat_enum_map_iterator<EnumKey, Value>::difference_type difference_type;
     typename enum_map::underlying_container::iterator _iterator;
-    EnumKey _enumKey;
-    EnumKey moveEnum(difference_type n) { return static_cast<EnumKey>(static_cast<typename get_enum_type<EnumKey>::type>(_enumKey) + n); }
+    enum_iterator<EnumKey> _enum_iterator;
 public:
     flat_enum_map_iterator() {}
-    flat_enum_map_iterator(typename enum_map::underlying_container::iterator it) : _iterator(it) {}
-    flat_enum_map_iterator(typename enum_map::underlying_container::iterator it, EnumKey e) : _iterator(it), _enumKey(e) {}
+    flat_enum_map_iterator(typename enum_map::underlying_container::iterator it): _iterator(it) {}
+    flat_enum_map_iterator(typename enum_map::underlying_container::iterator it, EnumKey e):
+        _iterator(it), _enum_iterator(e) {}
 
     void increment() {
         ++_iterator;
-        _enumKey = moveEnum(1);
+        ++ _enum_iterator;
     }
 
     void decrement() {
         --_iterator;
-        _enumKey = moveEnum(-1);
+        -- _enum_iterator;
     }
 
     void advance(difference_type n) {
         _iterator += n;
-        _enumKey = moveEnum(n);
+        _enum_iterator +=n;
     }
+
     difference_type distance_to(const flat_enum_map_iterator& other) {
         return this->_iterator - other._iterator;
     }
 
-    bool equal(const flat_enum_map_iterator& other) const
-    {
+    bool equal(const flat_enum_map_iterator& other) const {
         return this->_iterator == other._iterator;
     }
 
-    std::pair<EnumKey, Value&> dereference() const { return {_enumKey, *_iterator}; }
-
+    std::pair<EnumKey, Value&> dereference() const { return {*_enum_iterator, *_iterator}; }
 };
 
 }
