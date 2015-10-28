@@ -176,7 +176,7 @@ boost::iterator_range<boost::reverse_iterator<enum_iterator<Enum>>> reverse_enum
 
 template <typename EnumKey, typename Value>
 class flat_enum_map_iterator : public boost::iterator_facade<flat_enum_map_iterator<EnumKey, Value>,
-                                                            std::pair<EnumKey, Value>,
+                                                            std::pair<EnumKey,Value&>,
                                                             boost::random_access_traversal_tag,
                                                             std::pair<EnumKey, Value&>> {
     typedef flat_enum_map<EnumKey, Value> enum_map;
