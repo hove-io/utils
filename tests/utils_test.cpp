@@ -128,6 +128,17 @@ BOOST_AUTO_TEST_CASE(enum_reverse_range) {
 
     BOOST_CHECK_EQUAL_COLLECTIONS(std::begin(res), std::end(res), std::begin(wanted_res), std::end(wanted_res));
 }
+
+BOOST_AUTO_TEST_CASE(enum_reverse_range_from) {
+    std::vector<Mode> res;
+
+    for (auto e: navitia::reverse_enum_range_from<Mode>(Mode::walk)) {
+        res.push_back(e);
+    }
+    std::vector<Mode> wanted_res {Mode::walk, Mode::bike};
+
+    BOOST_CHECK_EQUAL_COLLECTIONS(std::begin(res), std::end(res), std::begin(wanted_res), std::end(wanted_res));
+}
 /**
   * test with an enum without a size last field
   *
