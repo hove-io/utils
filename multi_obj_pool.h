@@ -64,6 +64,8 @@ struct ParetoFront {
     inline const_iterator begin() const { return pareto_front.begin(); }
     inline const_iterator end() const { return pareto_front.end(); }
 
+    const Visitor& getV() const { return v; }
+
 private:
     Pool pareto_front;
     Dominator dominate;

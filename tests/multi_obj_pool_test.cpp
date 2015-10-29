@@ -36,29 +36,56 @@ www.navitia.io
 #include <set>
 #include <boost/range/algorithm/find.hpp>
 
+template <typename Obj>
+struct CountParetoFrontVisitor {
+    size_t nb_is_dominated_by = 0;
+    size_t nb_dominates = 0;
+    size_t nb_inserted = 0;
+
+    void is_dominated_by(const Obj& /*to_insert*/, const Obj& /*front_cur*/) { ++nb_is_dominated_by; }
+    void dominates(const Obj& /*to_insert*/, const Obj& /*front_cur*/) { ++nb_dominates; }
+    void inserted(const Obj& /*to_insert*/) { ++nb_inserted; }
+};
 
 BOOST_AUTO_TEST_CASE(one_obj) {
     std::function<bool(int, int)> f = [](int a, int b) { return a >= b; };
 
-    ParetoFront<int, std::function<bool(int, int)>> pool(f);
+    ParetoFront<int, std::function<bool(int, int)>, CountParetoFrontVisitor<int>> pool(f);
+    const auto& visitor = pool.getV();
 
     BOOST_CHECK_EQUAL(pool.size(), 0);
 
     BOOST_CHECK(pool.add(1));
     BOOST_REQUIRE_EQUAL(pool.size(), 1);
     BOOST_CHECK_EQUAL(*pool.begin(), 1);
+    BOOST_CHECK_EQUAL(visitor.nb_inserted, 1);
+    BOOST_CHECK_EQUAL(visitor.nb_dominates, 0);
+    BOOST_CHECK_EQUAL(visitor.nb_is_dominated_by, 0);
 
     BOOST_CHECK(pool.add(2));
     BOOST_REQUIRE_EQUAL(pool.size(), 1);
     BOOST_CHECK_EQUAL(*pool.begin(), 2);
+    BOOST_CHECK_EQUAL(visitor.nb_inserted, 2);
+    BOOST_CHECK_EQUAL(visitor.nb_dominates, 1);
+    BOOST_CHECK_EQUAL(visitor.nb_is_dominated_by, 0);
 
     BOOST_CHECK(! pool.add(1));
     BOOST_REQUIRE_EQUAL(pool.size(), 1);
     BOOST_CHECK_EQUAL(*pool.begin(), 2);
+    BOOST_CHECK_EQUAL(visitor.nb_inserted, 2);
+    BOOST_CHECK_EQUAL(visitor.nb_dominates, 1);
+    BOOST_CHECK_EQUAL(visitor.nb_is_dominated_by, 1);
 
     BOOST_CHECK(! pool.add(2));
     BOOST_REQUIRE_EQUAL(pool.size(), 1);
     BOOST_CHECK_EQUAL(*pool.begin(), 2);
+    BOOST_CHECK_EQUAL(visitor.nb_inserted, 2);
+    BOOST_CHECK_EQUAL(visitor.nb_dominates, 1);
+    BOOST_CHECK_EQUAL(visitor.nb_is_dominated_by, 2);
+
+    BOOST_CHECK(pool.is_dominated(1));
+    BOOST_CHECK(pool.is_dominated(2));
+    BOOST_CHECK(!pool.is_dominated(3));
 }
 
 struct Bob {
