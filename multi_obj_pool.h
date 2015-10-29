@@ -52,6 +52,8 @@ struct ParetoFront {
     typedef typename Pool::value_type value_type;
     typedef typename Pool::const_iterator const_iterator;
 
+    Visitor visitor;
+
     ParetoFront() = default;
     explicit ParetoFront(Dominator x): dominate(x) {}
     explicit ParetoFront(Dominator x, Visitor v): dominate(x), visitor(v) {}
@@ -64,12 +66,9 @@ struct ParetoFront {
     inline const_iterator begin() const { return pareto_front.begin(); }
     inline const_iterator end() const { return pareto_front.end(); }
 
-    const Visitor& get_visitor() const { return visitor; }
-
 private:
     Pool pareto_front;
     Dominator dominate;
-    Visitor visitor;
 };
 
 /*

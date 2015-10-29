@@ -51,37 +51,36 @@ BOOST_AUTO_TEST_CASE(one_obj) {
     std::function<bool(int, int)> f = [](int a, int b) { return a >= b; };
 
     ParetoFront<int, std::function<bool(int, int)>, CountParetoFrontVisitor<int>> pool(f);
-    const auto& visitor = pool.get_visitor();
 
     BOOST_CHECK_EQUAL(pool.size(), 0);
 
     BOOST_CHECK(pool.add(1));
     BOOST_REQUIRE_EQUAL(pool.size(), 1);
     BOOST_CHECK_EQUAL(*pool.begin(), 1);
-    BOOST_CHECK_EQUAL(visitor.nb_inserted, 1);
-    BOOST_CHECK_EQUAL(visitor.nb_dominates, 0);
-    BOOST_CHECK_EQUAL(visitor.nb_dominated, 0);
+    BOOST_CHECK_EQUAL(pool.visitor.nb_inserted, 1);
+    BOOST_CHECK_EQUAL(pool.visitor.nb_dominates, 0);
+    BOOST_CHECK_EQUAL(pool.visitor.nb_dominated, 0);
 
     BOOST_CHECK(pool.add(2));
     BOOST_REQUIRE_EQUAL(pool.size(), 1);
     BOOST_CHECK_EQUAL(*pool.begin(), 2);
-    BOOST_CHECK_EQUAL(visitor.nb_inserted, 2);
-    BOOST_CHECK_EQUAL(visitor.nb_dominates, 1);
-    BOOST_CHECK_EQUAL(visitor.nb_dominated, 0);
+    BOOST_CHECK_EQUAL(pool.visitor.nb_inserted, 2);
+    BOOST_CHECK_EQUAL(pool.visitor.nb_dominates, 1);
+    BOOST_CHECK_EQUAL(pool.visitor.nb_dominated, 0);
 
     BOOST_CHECK(! pool.add(1));
     BOOST_REQUIRE_EQUAL(pool.size(), 1);
     BOOST_CHECK_EQUAL(*pool.begin(), 2);
-    BOOST_CHECK_EQUAL(visitor.nb_inserted, 2);
-    BOOST_CHECK_EQUAL(visitor.nb_dominates, 1);
-    BOOST_CHECK_EQUAL(visitor.nb_dominated, 1);
+    BOOST_CHECK_EQUAL(pool.visitor.nb_inserted, 2);
+    BOOST_CHECK_EQUAL(pool.visitor.nb_dominates, 1);
+    BOOST_CHECK_EQUAL(pool.visitor.nb_dominated, 1);
 
     BOOST_CHECK(! pool.add(2));
     BOOST_REQUIRE_EQUAL(pool.size(), 1);
     BOOST_CHECK_EQUAL(*pool.begin(), 2);
-    BOOST_CHECK_EQUAL(visitor.nb_inserted, 2);
-    BOOST_CHECK_EQUAL(visitor.nb_dominates, 1);
-    BOOST_CHECK_EQUAL(visitor.nb_dominated, 2);
+    BOOST_CHECK_EQUAL(pool.visitor.nb_inserted, 2);
+    BOOST_CHECK_EQUAL(pool.visitor.nb_dominates, 1);
+    BOOST_CHECK_EQUAL(pool.visitor.nb_dominated, 2);
 
     BOOST_CHECK(pool.contains_better_than(1));
     BOOST_CHECK(pool.contains_better_than(2));
@@ -131,6 +130,14 @@ BOOST_AUTO_TEST_CASE(two_obj) {
     BOOST_CHECK(pool.add({1, 3}));
     BOOST_REQUIRE_EQUAL(pool.size(), 1);
     BOOST_CHECK_EQUAL(*pool.begin(), Bob({1, 3}));
+
+    BOOST_CHECK(pool.contains_better_than({0, 2}));
+    BOOST_CHECK(pool.contains_better_than({1, 3}));
+    BOOST_CHECK(pool.contains_better_than({1, 2}));
+    BOOST_CHECK(pool.contains_better_than({0, 3}));
+    BOOST_CHECK(!pool.contains_better_than({2, 3}));
+    BOOST_CHECK(!pool.contains_better_than({1, 4}));
+    BOOST_CHECK(!pool.contains_better_than({2, 4}));
 
     //we add the same bob, so it's dominated by the other one, nothing added
     BOOST_CHECK(! pool.add({1, 3}));
