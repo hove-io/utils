@@ -31,6 +31,13 @@ www.navitia.io
 #pragma once
 #include <list>
 
+template <typename Obj>
+struct DefaultParetoFrontVisitor {
+    void is_dominated_by(const Obj& /*to_insert*/, const Obj& /*front_cur*/){}
+    void dominates(const Obj& /*to_insert*/, const Obj& /*front_cur*/){}
+    void inserted(const Obj& /*to_insert*/){}
+};
+
 /*
  * Pareto front pool
  *
@@ -39,7 +46,7 @@ www.navitia.io
  * the domination function takes 2 Obj (the solutions) and checks if
  * the first solution is dominated by the second
  */
-template <typename Obj, typename Dominator>
+template <typename Obj, typename Dominator, typename Visitor=DefaultParetoFrontVisitor<Obj>>
 struct ParetoFront {
     typedef std::list<Obj> Pool;
     typedef typename Pool::value_type value_type;
@@ -47,8 +54,10 @@ struct ParetoFront {
 
     ParetoFront() = default;
     explicit ParetoFront(Dominator x): dominate(x) {}
+    explicit ParetoFront(Dominator x, Visitor v): dominate(x), v(v) {}
 
     bool add(const Obj& obj);
+    bool is_dominated(const Obj& obj);
     template <class Predicate>
     inline void remove_if (Predicate pred) { pareto_front.remove_if(std::move(pred)); }
     inline size_t size() const { return pareto_front.size(); }
@@ -58,6 +67,7 @@ struct ParetoFront {
 private:
     Pool pareto_front;
     Dominator dominate;
+    Visitor v;
 };
 
 /*
@@ -65,8 +75,8 @@ private:
  *
  * return true if the solution has been added to the pareto front, false otherwise
  */
-template <typename Obj, typename Dominator>
-bool ParetoFront<Obj, Dominator>::add(const Obj& obj) {
+template <typename Obj, typename Dominator, typename Visitor>
+bool ParetoFront<Obj, Dominator, Visitor>::add(const Obj& obj) {
 
     //we check if the new solution is dominated by one of the best
 #ifndef NDEBUG
@@ -79,6 +89,7 @@ bool ParetoFront<Obj, Dominator>::add(const Obj& obj) {
             // a solution cannot be the dominate one solution and be dominated by another
             // else it means the domination function is not well defined
             BOOST_ASSERT_MSG(! is_best, "MultiObjPool::add The Dominator is not correctly defined");
+            v.is_dominated_by(obj, cur);
             return false;
         }
         // if the new solution dominate one solution from the pareto front, we need to remove this solution
@@ -86,7 +97,7 @@ bool ParetoFront<Obj, Dominator>::add(const Obj& obj) {
 #ifndef NDEBUG
             is_best = true;
 #endif
-
+            v.dominates(obj, cur);
             it = pareto_front.erase(it);
         } else {
             ++it;
@@ -95,5 +106,19 @@ bool ParetoFront<Obj, Dominator>::add(const Obj& obj) {
 
     // the solution is not dominated by one of the best, we add it
     pareto_front.push_back(obj);
+    v.inserted(obj);
     return true;
+}
+
+/*
+ * Returns true if the given solution is dominated by one object of the pareto front
+ */
+template <typename Obj, typename Dominator, typename Visitor>
+bool ParetoFront<Obj, Dominator, Visitor>::is_dominated(const Obj& obj) {
+    for (const auto& cur : pareto_front) {
+        if (dominate(cur, obj)) {
+            return true;
+        }
+    }
+    return false;
 }
