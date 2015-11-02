@@ -33,8 +33,10 @@ www.navitia.io
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/split_member.hpp>
 #include <memory>
+#include <map>
 
 #include <boost/serialization/wrapper.hpp>
+#include "serialization_unique_ptr.h"
 
 /**
  * Serialization specialization for std::vector<std::unique_ptr> because unique_ptr are not copiable
@@ -67,10 +69,46 @@ inline void load(Archive & ar, std::vector<std::unique_ptr<T>, Allocator>& t,
     }
 }
 
+
+template<class Archive, class k, class V, class Comp, class MapAlloc>
+inline void save(Archive& ar, const std::map<k, std::unique_ptr<V>, Comp, MapAlloc>& t,
+        const unsigned int /* file_version */) {
+    // record number of elements
+    collection_size_type count (t.size());
+    ar << BOOST_SERIALIZATION_NVP(count);
+
+    for(const auto& p: t) {
+        ar << boost::serialization::make_nvp("key", p.first);
+        ar << boost::serialization::make_nvp("value", p.second);
+    }
+}
+
+template<class Archive, class K, class V, class Comp, class MapAlloc>
+inline void load(Archive& ar, std::map<K, std::unique_ptr<V>, Comp, MapAlloc>& map,
+        const unsigned int /* file_version */) {
+    // retrieve number of elements
+    collection_size_type count;
+    ar >> BOOST_SERIALIZATION_NVP(count);
+    map.clear();
+    while (count-- > 0) {
+        K k;
+        ar >> boost::serialization::make_nvp("key", k);
+        std::unique_ptr<V> v;
+        ar >> boost::serialization::make_nvp("value", v);
+        map[k] = std::move(v);// move object
+    }
+}
+
 template<class Archive, class Allocator, class T>
 inline void serialize(Archive & ar, std::vector<std::unique_ptr<T>, Allocator>& t,
         const unsigned int file_version){
     boost::serialization::split_free(ar, t, file_version);
+}
+
+template<class Archive, class K, class V, class Comp, class Allocator>
+inline void serialize(Archive& ar, std::map<K, std::unique_ptr<V>, Comp, Allocator>& m,
+        const unsigned int file_version) {
+    boost::serialization::split_free(ar, m, file_version);
 }
 }
 }
