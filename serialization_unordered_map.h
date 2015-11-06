@@ -37,8 +37,10 @@ www.navitia.io
 
 #pragma once
 
+#if BOOST_VERSION >= 105700
+#include <boost/serialization/unordered_map.hpp>
+#else
 #include <unordered_map>
-
 #include <boost/serialization/utility.hpp>
 #include <boost/serialization/collections_save_imp.hpp>
 #include <boost/serialization/collections_load_imp.hpp>
@@ -81,3 +83,4 @@ inline void serialize(
 }
 
 }} // namespace boost::serialization
+#endif
