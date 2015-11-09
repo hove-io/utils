@@ -39,10 +39,7 @@ www.navitia.io
 
 #include <boost/container/flat_map.hpp>
 
-#include <boost/serialization/utility.hpp>
-#include <boost/serialization/collections_save_imp.hpp>
-#include <boost/serialization/collections_load_imp.hpp>
-#include <boost/serialization/split_free.hpp>
+#include <boost/serialization/map.hpp>
 
 namespace boost { namespace serialization {
 
@@ -61,12 +58,16 @@ inline void load(
     boost::container::flat_map<Types...> &t,
     const unsigned int /* file_version */
 ){
+#if BOOST_VERSION >= 105800
+    load_map_collection(ar, t);
+#else
     boost::serialization::stl::load_collection<
         Archive,
         boost::container::flat_map<Types...>,
         boost::serialization::stl::archive_input_map<Archive, boost::container::flat_map<Types...>>,
         boost::serialization::stl::reserve_imp<boost::container::flat_map<Types...>>
     >(ar, t);
+#endif
 }
 
 // split non-intrusive serialization function member into separate
