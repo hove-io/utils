@@ -83,10 +83,10 @@ struct enum_size_trait<RawEnum> {
 };
 }
 
-std::ostream& operator<<(std::ostream& o, RawEnum e) {
+static std::ostream& operator<<(std::ostream& o, RawEnum e) {
     return o << static_cast<int>(e);
 }
-std::ostream& operator<<(std::ostream& o, Mode e) {
+static std::ostream& operator<<(std::ostream& o, Mode e) {
     return o << static_cast<int>(e);
 }
 
