@@ -41,6 +41,7 @@ www.navitia.io
 #include <boost/uuid/uuid.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/uuid/uuid_io.hpp>
+#include <boost/range/algorithm_ext/erase.hpp>
 
 namespace google { namespace protobuf {
 template<typename Element> class RepeatedPtrField;
@@ -166,9 +167,7 @@ void sort_and_truncate(typename google::protobuf::RepeatedPtrField<Elem>& input,
  */
 template <typename T>
 void clean_up_weak_ptr(std::vector<boost::weak_ptr<T>>& container) {
-    container.erase(boost::remove_if(container, [](const boost::weak_ptr<T>& weak) {
-                                                return weak.expired();
-                                            }), std::end(container));
+    boost::range::remove_erase_if(container, [](const boost::weak_ptr<T>& weak) { return weak.expired(); });
 }
 
 std::string make_adapted_uri_fast(const std::string& ref_uri, size_t s);
