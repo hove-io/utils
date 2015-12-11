@@ -51,6 +51,7 @@ private:
 public:
     using iterator = typename inner_vector::iterator;
     using const_iterator = typename inner_vector::const_iterator;
+    using const_reference = ObjType const * const;
 
     template<typename ...Args>
     ObjType* emplace(const std::string& uri, Args&& ...args) {
