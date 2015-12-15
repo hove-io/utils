@@ -95,6 +95,14 @@ public:
         return find_or_default(uri, map);
     }
 
+    ObjType* get_or_null(const std::string& uri) const{
+        auto it = map.find(uri);
+        if (it != std::end(map)) {
+            return it->second;
+        }
+        return nullptr;
+    }
+
     ObjType* get_mut(const Idx<ObjType>& idx) {
         if (idx.val >= vec.size()) {
             return nullptr;
