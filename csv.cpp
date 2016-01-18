@@ -63,7 +63,7 @@ CsvReader::CsvReader(const std::string& filename, char separator, bool read_head
 #endif
 {
     this->init();
-    file.open(filename);
+    file.open(filename, std::fstream::in);
     stream = new std::istream(file.rdbuf());
     stream->setstate(file.rdstate());
     if(encoding != "UTF-8"){
