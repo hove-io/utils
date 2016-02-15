@@ -67,6 +67,8 @@ private:
     // the cache, mutable because side effect are not visible from the
     // exterior because of the purity of f
     mutable Cache cache;
+    mutable size_t nb_cache_miss = 0;
+    mutable size_t nb_calls = 0;
 
 public:
     typedef mapped_type const& result_type;
@@ -75,6 +77,7 @@ public:
     Lru(F fun, size_t max = 10): f(std::move(fun)), max_cache(max) {}
 
     result_type operator()(argument_type arg) const {
+        ++nb_calls;
         auto& list = cache.template get<0>();
         auto& map = cache.template get<1>();
         const auto search = map.find(arg);
@@ -83,6 +86,7 @@ public:
             list.relocate(list.begin(), cache.template project<0>(search));
             return search->second;
         } else {
+            ++nb_cache_miss;
             // insert the new value at the begining of the cache
             const auto ins = list.push_front(std::make_pair(arg, f(arg)));
             // clean the cache by the end (where the entries are the
@@ -91,6 +95,9 @@ public:
             return ins.first->second;
         }
     }
+
+    size_t get_nb_cache_miss() const { return nb_cache_miss; }
+    size_t get_nb_calls() const { return nb_calls; }
 };
 template<typename F> inline Lru<F> make_lru(const F& fun, size_t max = 10) {
     return Lru<F>(fun, max);
