@@ -113,3 +113,9 @@ public:
 };
 
 } // namespace navitia
+
+template<typename T>
+const T*
+find_or_default(const std::string& key, const navitia::ObjFactory<T>& m) {
+    return m[key];
+}
