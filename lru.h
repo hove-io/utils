@@ -74,7 +74,12 @@ public:
     typedef mapped_type const& result_type;
     typedef typename F::argument_type argument_type;
 
-    Lru(F fun, size_t max = 10): f(std::move(fun)), max_cache(max) {}
+    Lru(F fun, size_t max = 10): f(std::move(fun)), max_cache(max)
+    {
+        if (max < 1) {
+            throw std::invalid_argument("max (size of cache) must be strictly positive");
+        }
+    }
 
     result_type operator()(argument_type arg) const {
         ++nb_calls;
