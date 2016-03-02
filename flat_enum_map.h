@@ -114,6 +114,14 @@ struct flat_enum_map {
         return array[size_t(key)];
     }
 
+    const Value& at(EnumKey key) const {
+        auto idx = size_t(key);
+        if (idx >= array.size()) {
+            throw std::out_of_range("enum not in range");
+        }
+        return array[idx];
+    }
+
     constexpr const Value& operator[] (size_t idx) const {
         return array[idx];
     }
