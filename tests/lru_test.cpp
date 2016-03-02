@@ -45,6 +45,9 @@ struct Fun {
 BOOST_AUTO_TEST_CASE(simple_lru) {
     size_t nb_call = 0;
 
+    // building a lru with no cache should throw
+    BOOST_REQUIRE_THROW(navitia::make_lru(Fun(nb_call), 0), std::invalid_argument);
+
     // a Lru with 2 elements cached
     auto lru = navitia::make_lru(Fun(nb_call), 2);
 
