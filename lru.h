@@ -133,6 +133,7 @@ public:
     using argument_type = typename SharedPtrF::argument_type;
 
     ConcurrentLru(F fun, size_t max = 10): lru(SharedPtrF{std::move(fun)}, max) {}
+    ConcurrentLru(ConcurrentLru&&) = default;// needed by old version of gcc
 
     result_type operator()(argument_type arg) const {
         std::lock_guard<std::mutex> lock(*mutex);
