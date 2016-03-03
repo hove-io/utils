@@ -83,3 +83,42 @@ BOOST_AUTO_TEST_CASE(simple_lru) {
     BOOST_CHECK_EQUAL(lru(1), 2);
     BOOST_CHECK_EQUAL(nb_call, 4);
 }
+
+BOOST_AUTO_TEST_CASE(concurrent_lru) {
+    size_t nb_call = 0;
+
+    // a Lru with 2 elements cached
+    auto lru = navitia::make_concurrent_lru(Fun(nb_call), 2);
+
+    // cache = { 1 -> 2 }
+    BOOST_CHECK_EQUAL(*lru(1), 2);
+    BOOST_CHECK_EQUAL(nb_call, 1);
+    BOOST_CHECK_EQUAL(*lru(1), 2);
+    BOOST_CHECK_EQUAL(nb_call, 1);
+
+    // cache = { 1 -> 2, 2 -> 4 }
+    BOOST_CHECK_EQUAL(*lru(2), 4);
+    BOOST_CHECK_EQUAL(nb_call, 2);
+    BOOST_CHECK_EQUAL(*lru(2), 4);
+    BOOST_CHECK_EQUAL(nb_call, 2);
+    BOOST_CHECK_EQUAL(*lru(1), 2);
+    BOOST_CHECK_EQUAL(nb_call, 2);
+
+    // cache = { 1 -> 2, 3 -> 6 }
+    // As "1" is the last used element, and the cache can only have 2
+    // elements, the entry "2" is removed.
+    BOOST_CHECK_EQUAL(*lru(3), 6);
+    BOOST_CHECK_EQUAL(nb_call, 3);
+    BOOST_CHECK_EQUAL(*lru(3), 6);
+    BOOST_CHECK_EQUAL(nb_call, 3);
+    BOOST_CHECK_EQUAL(*lru(1), 2);
+    BOOST_CHECK_EQUAL(nb_call, 3);
+
+    // cache = { 1 -> 2, 2 -> 4 }
+    // As "2" was calculated earlier, but removed because of cache
+    // size, we need to call the function to get the value.
+    BOOST_CHECK_EQUAL(*lru(2), 4);
+    BOOST_CHECK_EQUAL(nb_call, 4);
+    BOOST_CHECK_EQUAL(*lru(1), 2);
+    BOOST_CHECK_EQUAL(nb_call, 4);
+}

@@ -28,13 +28,15 @@ https://groups.google.com/d/forum/navitia
 www.navitia.io
 */
 
-#include <stdexcept>
+#include "functions.h"
 #include <boost/multi_index_container.hpp>
 #include <boost/multi_index/ordered_index.hpp>
 #include <boost/multi_index/sequenced_index.hpp>
 #include <boost/multi_index/member.hpp>
 #include <boost/type_traits/remove_cv.hpp>
 #include <boost/type_traits/remove_reference.hpp>
+#include <mutex>
+#include <stdexcept>
 
 namespace navitia {
 
@@ -104,8 +106,44 @@ public:
     size_t get_nb_cache_miss() const { return nb_cache_miss; }
     size_t get_nb_calls() const { return nb_calls; }
 };
-template<typename F> inline Lru<F> make_lru(const F& fun, size_t max = 10) {
-    return Lru<F>(fun, max);
+template<typename F> inline Lru<F> make_lru(F fun, size_t max = 10) {
+    return Lru<F>(std::move(fun), max);
+}
+
+template<typename F> struct ConcurrentLru {
+private:
+    struct SharedPtrF {
+        F f;
+        using argument_type = typename F::argument_type;
+        using underlying_type =
+            typename boost::remove_cv<
+            typename boost::remove_reference<
+                typename F::result_type>::type
+            >::type const;
+        using result_type = std::shared_ptr<underlying_type>;
+        result_type operator()(argument_type arg) const {
+            return std::make_shared<underlying_type>(f(arg));
+        }
+    };
+    Lru<SharedPtrF> lru;
+    std::unique_ptr<std::mutex> mutex = std::make_unique<std::mutex>();
+
+public:
+    using result_type = typename SharedPtrF::result_type;
+    using argument_type = typename SharedPtrF::argument_type;
+
+    ConcurrentLru(F fun, size_t max = 10): lru(SharedPtrF{std::move(fun)}, max) {}
+
+    result_type operator()(argument_type arg) const {
+        std::lock_guard<std::mutex> lock(*mutex);
+        return lru(arg);
+    }
+
+    size_t get_nb_cache_miss() const { return lru.get_nb_cache_miss(); }
+    size_t get_nb_calls() const { return lru.get_nb_calls(); }
+};
+template<typename F> inline ConcurrentLru<F> make_concurrent_lru(F fun, size_t max = 10) {
+    return ConcurrentLru<F>(std::move(fun), max);
 }
 
 } // namespace navitia
