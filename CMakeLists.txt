@@ -35,6 +35,7 @@ SET(UTILS_SRC
      threadbuf.h
      threadbuf.cpp
      get_hostname.cpp
+     zmq.cpp
 )
 
 add_library(utils ${UTILS_SRC})
