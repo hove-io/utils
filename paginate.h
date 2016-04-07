@@ -33,7 +33,6 @@ namespace navitia {
 template<typename Container>
 Container paginate(const Container &indexes,
                                   int count, int start_page) {
-    Container response;
     if(count>=0 && start_page>=0) {
         uint32_t begin_i = start_page * count;
         uint32_t end_i = begin_i + count;
