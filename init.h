@@ -34,6 +34,7 @@ www.navitia.io
 #include "backtrace.h"
 #include <csignal>
 #include <unistd.h>
+#include <iostream>
 
 
 /**
