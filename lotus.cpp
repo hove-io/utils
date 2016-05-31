@@ -40,7 +40,7 @@ const char* LotusException::what() const noexcept {
 
 Lotus::Lotus(const std::string & connection_string):
     delimiter(";"),
-    null_value("__NULL"),
+    null_value("__NULL_LOTUS_VALUE__"),
     connection(PQconnectdb(connection_string.c_str()))
 {
     if (PQstatus(this->connection) != CONNECTION_OK) {
