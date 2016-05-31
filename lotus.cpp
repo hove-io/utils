@@ -40,7 +40,7 @@ const char* LotusException::what() const noexcept {
 
 Lotus::Lotus(const std::string & connection_string):
     delimiter(";"),
-    null_value("NULL"),
+    null_value("__NULL"),
     connection(PQconnectdb(connection_string.c_str()))
 {
     if (PQstatus(this->connection) != CONNECTION_OK) {
@@ -74,7 +74,7 @@ void Lotus::exec(const std::string& request, const std::string& error_message, i
 
 void Lotus::prepare_bulk_insert(const std::string& table, const std::vector<std::string>& columns) {
     std::string request = "COPY " + table + "(" + boost::algorithm::join(columns, ",")
-        + ")  FROM STDIN WITH (FORMAT CSV, DELIMITER '" + delimiter + "', NULL '" + null_value
+        + ")  FROM STDIN WITH (FORMAT CSV, DELIMITER '" + delimiter + "', NULL '" + "NULL"
         + "', QUOTE '\"')";
     this->exec(request, "Prepare bulk insert",  PGRES_COPY_IN);
 }
@@ -84,6 +84,8 @@ void Lotus::insert(std::vector<std::string> elements) {
     for(std::string & element : elements){
         if(element != null_value){
             element = "\"" + boost::algorithm::replace_all_copy(element, "\"", "\"\"") + "\"";
+        } else {
+            element = "NULL";
         }
     }
 
