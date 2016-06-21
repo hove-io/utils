@@ -103,7 +103,7 @@ struct Indexer{
     Indexer(): idx(0){}
 
     template<class T>
-        void operator()(T* obj){obj->idx = idx; idx++;}
+    void operator()(T obj){obj->idx = idx; idx++;}
 };
 
 /**
