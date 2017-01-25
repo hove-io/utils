@@ -32,6 +32,7 @@ www.navitia.io
 #include "conf.h"
 #include <log4cplus/logger.h>
 #include <log4cplus/configurator.h>
+#include <boost/format.hpp>
 #ifdef HAVE_LOGGINGMACROS_H
 #include <log4cplus/loggingmacros.h>
 #endif
@@ -40,6 +41,19 @@ www.navitia.io
 inline void init_logger(){
     log4cplus::BasicConfigurator config;
     config.configure();
+}
+
+/** configure the logger with a level and a pattern, the output will be on stdout */
+inline void init_logger(const std::string& level, const std::string& pattern){
+    log4cplus::BasicConfigurator config;
+    config.configure();
+    auto properties = log4cplus::helpers::Properties();
+    properties.setProperty("log4cplus.rootLogger", (boost::format("%s, default") % level).str());
+    properties.setProperty("log4cplus.appender.default", "log4cplus::ConsoleAppender");
+    properties.setProperty("log4cplus.appender.default.layout", "log4cplus::PatternLayout");
+    properties.setProperty("log4cplus.appender.default.layout.ConversionPattern", pattern);
+    log4cplus::PropertyConfigurator configurator(properties);
+    configurator.configure();
 }
 
 /** Configure le logger à partir du fichier de configuration */
