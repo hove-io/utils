@@ -29,8 +29,8 @@ void LoadBalancer::bind(const std::string& clients_socket_path, const std::strin
 void LoadBalancer::run(){
     while(true){
         zmq_pollitem_t items [] = {
-            {workers, 0, ZMQ_POLLIN, 0},
-            {clients, 0, ZMQ_POLLIN, 0}
+            {static_cast<void*>(workers), 0, ZMQ_POLLIN, 0},
+            {static_cast<void*>(clients), 0, ZMQ_POLLIN, 0}
         };
         if(avalailable_worker.empty()){
             //we don't look for request from client if there is no worker for handling them
