@@ -21,6 +21,8 @@ SET(UTILS_SRC
      csv.cpp
      encoding_converter.cpp
      configuration.cpp
+     coord_parser.h
+     coord_parser.cpp
      timer.cpp
      functions.cpp
      paginate.h

@@ -216,10 +216,50 @@ BOOST_AUTO_TEST_CASE(natural_sort_test) {
     BOOST_CHECK_EQUAL(list[i++], "25");
     BOOST_CHECK_EQUAL(list[i++], "toto");
     BOOST_CHECK_EQUAL(list[i++], "tutu");
-    //we wont be able to sort  tutu10 and tutu2
-    //(in a pure natural order tutu10 is after tutu2, but it's too complicated for our need)
-    BOOST_CHECK_EQUAL(list[i++], "tutu10");
     BOOST_CHECK_EQUAL(list[i++], "tutu2");
+    BOOST_CHECK_EQUAL(list[i++], "tutu10");
+}
+
+BOOST_AUTO_TEST_CASE(natural_sort_test2) {
+    std::vector<std::string> list {
+        "38",
+        "21",
+        "1",
+        "B2",
+        "B",
+        "B7",
+        "Bis",
+        "a3",
+        "3",
+        "2",
+        "Tram 1",
+        "B2A",
+        "A",
+        "251",
+        "B11",
+        "B215A",
+        "3B",
+    };
+    std::sort(list.begin(), list.end(), navitia::pseudo_natural_sort());
+
+    int i = 0;
+    BOOST_CHECK_EQUAL(list[i++], "1");
+    BOOST_CHECK_EQUAL(list[i++], "2");
+    BOOST_CHECK_EQUAL(list[i++], "3");
+    BOOST_CHECK_EQUAL(list[i++], "3B");
+    BOOST_CHECK_EQUAL(list[i++], "21");
+    BOOST_CHECK_EQUAL(list[i++], "38");
+    BOOST_CHECK_EQUAL(list[i++], "251");
+    BOOST_CHECK_EQUAL(list[i++], "A");
+    BOOST_CHECK_EQUAL(list[i++], "B");
+    BOOST_CHECK_EQUAL(list[i++], "B2");
+    BOOST_CHECK_EQUAL(list[i++], "B2A");
+    BOOST_CHECK_EQUAL(list[i++], "B7");
+    BOOST_CHECK_EQUAL(list[i++], "B11");
+    BOOST_CHECK_EQUAL(list[i++], "B215A");
+    BOOST_CHECK_EQUAL(list[i++], "Bis");
+    BOOST_CHECK_EQUAL(list[i++], "Tram 1");
+    BOOST_CHECK_EQUAL(list[i++], "a3");// case insensitive would be better
 }
 
 struct MockedContainerWithFind {

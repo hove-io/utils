@@ -29,6 +29,7 @@ www.navitia.io
 */
 
 #include "functions.h"
+#include "alphanum.hpp"
 #include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/lexical_cast.hpp>
@@ -71,18 +72,8 @@ std::string value_by_key(const std::map<std::string, std::string>& vect, const s
 
 namespace navitia {
 
-/**
- * We don't try to do a real natural sort (too complicated for our purpose)
- * we only want to compare the strings as numbers only if they are castable to number
- */
 bool pseudo_natural_sort::operator() (const std::string& a, const std::string&b) const {
-    try {
-        auto a_int = boost::lexical_cast<int>(a);
-        auto b_int = boost::lexical_cast<int>(b);
-        return a_int < b_int;
-    } catch (boost::bad_lexical_cast) {
-        return a < b;
-    }
+    return doj::alphanum_less<std::string>()(a, b);
 }
 std::string make_adapted_uri_fast(const std::string& ref_uri, size_t s) {
     return ref_uri + ":adapted-" + boost::lexical_cast<std::string>(s);
