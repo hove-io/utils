@@ -35,6 +35,9 @@ www.navitia.io
 namespace navitia {
 
 class wrong_coordinate: public std::runtime_error {
+public:
+    wrong_coordinate(const std::string& what): std::runtime_error(what) {}
+    virtual ~wrong_coordinate();
     using runtime_error::runtime_error;
 };
 

@@ -34,6 +34,8 @@ www.navitia.io
 
 namespace navitia {
 
+wrong_coordinate::~wrong_coordinate() {}
+
 static std::pair<double, double> make_coord(const std::string& lon, const std::string& lat){
     try{
         double dlon = boost::lexical_cast<double>(lon);
@@ -68,7 +70,7 @@ std::pair<double, double> parse_coordinate(const std::string& uri){
             return make_coord(matches[1], matches[2]);
         }
     }
-    throw wrong_coordinate{"coord format invalid"};
+    throw wrong_coordinate("coord format invalid");
 }
 
 }
