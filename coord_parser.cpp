@@ -34,7 +34,7 @@ www.navitia.io
 
 namespace navitia {
 
-wrong_coordinate::~wrong_coordinate() {}
+wrong_coordinate::~wrong_coordinate() noexcept {}
 
 static std::pair<double, double> make_coord(const std::string& lon, const std::string& lat){
     try{
