@@ -1,39 +1,43 @@
 /* Copyright © 2001-2014, Canal TP and/or its affiliates. All rights reserved.
-  
+
 This file is part of Navitia,
     the software to build cool stuff with public transport.
- 
+
 Hope you'll enjoy and contribute to this project,
     powered by Canal TP (www.canaltp.fr).
 Help us simplify mobility and open public transport:
     a non ending quest to the responsive locomotion way of traveling!
-  
+
 LICENCE: This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
-   
+
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU Affero General Public License for more details.
-   
+
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
-  
+
 Stay tuned using
-twitter @navitia 
+twitter @navitia
 IRC #navitia on freenode
 https://groups.google.com/d/forum/navitia
 www.navitia.io
 */
 
 #pragma once
+
 #include <iostream>
 #include <vector>
 #include <memory>
 #include<map>
 #include <algorithm>
+#include <cstdio>
+#include <unistd.h>  // getcwd() definition
+
 #include <boost/range/algorithm/remove_if.hpp>
 #include <boost/range/algorithm/find_if.hpp>
 #include <boost/weak_ptr.hpp>
@@ -205,4 +209,15 @@ inline bool contains_if(const Container& c, Pred p) {
     return boost::range::find_if(c, p) != std::end(c);
 }
 
-}
+/**
+ * @brief Create absolute path
+ *
+ * We create our own absolute path function in "C style",
+ * because there is a compatibility problem with boost < 1.56
+ * sources : https://stackoverflow.com/questions/19405272/c-issues-with-boostfilesystem-on-server-localefacet-s-create-c-locale
+ *
+ * @return The absolute path in std::string
+ */
+std::string absolute_path();
+
+} // namespace navitia
