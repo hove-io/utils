@@ -271,3 +271,4 @@ bool CsvReader::row_is_empty(const std::vector<std::string>& row) {
     else
         return false;
 }
+
