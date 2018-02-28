@@ -112,7 +112,7 @@ CsvReader::CsvReader(std::stringstream &sstream, char separator, bool read_heade
 	            boost::to_lower(line[i]);
             this->headers.insert(std::make_pair(line[i], i));
         }
-    } 
+    }
 }
 
 bool CsvReader::is_open() const {
@@ -258,3 +258,19 @@ void remove_bom(std::fstream& stream){
         stream.unget();
     }
 }
+
+/**
+ * @brief check if row is empty
+ * Avoid to process empty row and row with only carriage return characters.
+ *
+ * @return true if row is empty
+ */
+bool CsvReader::row_is_empty(const std::vector<std::string>& row) {
+    if (row.empty() || (row.size() == 1 && row[0].empty())) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
