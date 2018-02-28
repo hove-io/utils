@@ -266,9 +266,11 @@ void remove_bom(std::fstream& stream){
  * @return true if row is empty
  */
 bool CsvReader::row_is_empty(const std::vector<std::string>& row) {
-    if(row.empty() || (row.size() == 1 && row[0].empty()))
+    if (row.empty() || (row.size() == 1 && row[0].empty())) {
         return true;
-    else
+    }
+    else {
         return false;
+    }
 }
 
