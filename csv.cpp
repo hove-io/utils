@@ -164,9 +164,6 @@ std::string CsvReader::convert(const std::string& st) const {
 std::pair<CsvReader::ParseStatus, std::vector<std::string>>
 CsvReader::get_line(const std::string& str) const
 {
-    // Line is empty
-    if (str.empty()) { return {ParseStatus::OK, {}}; }
-
     std::vector<std::string> vec;
     std::string::const_iterator s_begin = str.begin();
     std::string::const_iterator s_end = str.end();
@@ -175,10 +172,11 @@ CsvReader::get_line(const std::string& str) const
     // If line contains carriage return (\r\n), we decrement the end iterator.
     if (str.back() == '\r') {
         s_end--;
-        // if line is empty, we skip the parser
-        if (s_begin == s_end) {
-            return {ParseStatus::OK, {}};
-        }
+    }
+
+    // if line is empty, we skip the parser
+    if (s_begin == s_end) {
+        return {ParseStatus::OK, {}};
     }
 
     bool result = false;
