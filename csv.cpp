@@ -164,11 +164,22 @@ std::string CsvReader::convert(const std::string& st) const {
 std::pair<CsvReader::ParseStatus, std::vector<std::string>>
 CsvReader::get_line(const std::string& str) const
 {
+    // Line is empty
     if (str.empty()) { return {ParseStatus::OK, {}}; }
 
     std::vector<std::string> vec;
     std::string::const_iterator s_begin = str.begin();
     std::string::const_iterator s_end = str.end();
+
+    // Windows files case :
+    // If line contains carriage return (\r\n), we decrement the end iterator.
+    if (str.back() == '\r') {
+        s_end--;
+        // if line is empty, we skip the parser
+        if (s_begin == s_end) {
+            return {ParseStatus::OK, {}};
+        }
+    }
 
     bool result = false;
     try {
@@ -258,19 +269,3 @@ void remove_bom(std::fstream& stream){
         stream.unget();
     }
 }
-
-/**
- * @brief check if row is empty
- * Avoid to process empty row and row with only carriage return characters.
- *
- * @return true if row is empty
- */
-bool CsvReader::row_is_empty(const std::vector<std::string>& row) {
-    if (row.empty() || (row.size() == 1 && row[0].empty())) {
-        return true;
-    }
-    else {
-        return false;
-    }
-}
-
