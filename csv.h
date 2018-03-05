@@ -67,8 +67,6 @@ class CsvReader {
 
         std::string filename;
 
-        static bool row_is_empty(const std::vector<std::string>& row);
-
     private:
 
         qi::rule<std::string::const_iterator, std::string()> quoted_string;
