@@ -42,24 +42,18 @@ using namespace navitia::utils;
 using std::string;
 
 namespace {
-    struct MapFind_fixture
+    struct MapFindFixture
     {
         std::map<uint32_t, string> map;
-        std::unordered_map<uint32_t, string> umap;
-
-        MapFind_fixture() {
+        MapFindFixture() {
             map[1] = "one";
             map[2] = "two";
             map[3] = "three";
-
-            umap[1] = "one";
-            umap[2] = "two";
-            umap[3] = "three";
         }
     };
 } // namespace
 
-BOOST_FIXTURE_TEST_CASE(MapFind_should_find_key_in_map, MapFind_fixture) {
+BOOST_FIXTURE_TEST_CASE(should_find_key_in_map, MapFindFixture) {
 
     string found_2;
     string not_found_2;
@@ -72,7 +66,7 @@ BOOST_FIXTURE_TEST_CASE(MapFind_should_find_key_in_map, MapFind_fixture) {
     BOOST_CHECK_EQUAL(not_found_2, "");
 }
 
-BOOST_FIXTURE_TEST_CASE(MapFind_should_not_find_key_not_in_map, MapFind_fixture) {
+BOOST_FIXTURE_TEST_CASE(should_not_find_key_not_in_map, MapFindFixture) {
 
     string found_42;
     string not_found_42;
@@ -85,7 +79,12 @@ BOOST_FIXTURE_TEST_CASE(MapFind_should_not_find_key_not_in_map, MapFind_fixture)
     BOOST_CHECK_EQUAL(not_found_42, "Not Found");
 }
 
-BOOST_FIXTURE_TEST_CASE(MapFinder_should_also_work_on_unordered_map, MapFind_fixture) {
+BOOST_FIXTURE_TEST_CASE(should_also_work_on_unordered_map, MapFindFixture) {
+
+    std::unordered_map<uint32_t, string> umap;
+    umap[1] = "one";
+    umap[2] = "two";
+    umap[3] = "three";
 
     string two;
     string forty_two;
@@ -102,10 +101,10 @@ BOOST_FIXTURE_TEST_CASE(MapFinder_should_also_work_on_unordered_map, MapFind_fix
     BOOST_CHECK_EQUAL(forty_two, "Not found");
 }
 
-BOOST_FIXTURE_TEST_CASE(should_not_copy_value_object_when_queried, MapFind_fixture) {
+BOOST_FIXTURE_TEST_CASE(should_not_copy_value_object_when_queried, MapFindFixture) {
 
     struct NonCopyable {
-        const string & str;
+        const string str;
         NonCopyable(const string & str): str(str) {};
 
         /// We remove the copy semantic to make sure objects are not duplicated along the way
@@ -125,12 +124,12 @@ BOOST_FIXTURE_TEST_CASE(should_not_copy_value_object_when_queried, MapFind_fixtu
 
     string two;
     make_map_find(non_cop_map, 2)
-         .if_found([&](const NonCopyable & s){ two = s.str; });
+        .if_found([&](const NonCopyable & s){ two = s.str; });
 
-    BOOST_CHECK_EQUAL(two, umap[2]);
+    BOOST_CHECK_EQUAL(two, "two");
 }
 
-BOOST_FIXTURE_TEST_CASE(should_find_key_in_const_map, MapFind_fixture) {
+BOOST_FIXTURE_TEST_CASE(should_find_key_in_const_map, MapFindFixture) {
 
     const auto const_map = map;
     string two;

@@ -48,7 +48,7 @@ class MapFind
 public:
     typedef typename Map::key_type KeyType;
     typedef typename Map::mapped_type ValueType;
-    typedef std::reference_wrapper<const ValueType> ConstRefValueType;
+    typedef ValueType const * ConstPtrValueType;
 
     /**
      * @brief Create a MapFind object on a map, no find is performed until find() is called.
@@ -56,7 +56,6 @@ public:
      * @param map : the map to perform the search on
      */
     MapFind(Map & map): map(map) {}
-
 
     /**
      * @brief Create a MapFind object and find the key in the associated map
@@ -75,9 +74,10 @@ public:
      * @param fn : a callback function that takes a constant mapped type reference as parameter
      * @returns A MapFind object to query the restult or perfom another find
      */
-    MapFind& if_found(std::function<void(const ValueType &)> fn) {
+    template<class Func>
+    MapFind& if_found(Func fn) {
         if( res ) {
-            fn( res->get() );
+            fn( **res );
         }
         return *this;
     }
@@ -106,8 +106,7 @@ public:
     MapFind& find(const Key & key) {
         auto it = map.find(key);
         if(it != map.end()) {
-            auto cref_val = std::cref(it->second);
-            res = boost::make_optional(cref_val);
+            res = boost::make_optional(&it->second);
         } else {
             res = boost::none;
         }
@@ -116,7 +115,7 @@ public:
 
 private:
     Map & map;
-    boost::optional<ConstRefValueType> res;
+    boost::optional<ConstPtrValueType> res;
 };
 
 /**
