@@ -34,6 +34,7 @@ www.navitia.io
 #include "utils/map_find.h"
 
 #include <boost/test/unit_test.hpp>
+#include <boost/move/utility.hpp>
 #include <map>
 #include <unordered_map>
 #include <string>
@@ -107,20 +108,18 @@ BOOST_FIXTURE_TEST_CASE(should_not_copy_value_object_when_queried, MapFindFixtur
         const string str;
         NonCopyable(const string & str): str(str) {};
 
-        /// We remove the copy semantic to make sure objects are not duplicated along the way
-        NonCopyable(const NonCopyable &) = delete;
-        NonCopyable& operator=(const NonCopyable &) = delete;
-
         /// we only keep the move construction semantic to emplace into the map
         NonCopyable(NonCopyable && rhs): str(std::move(rhs.str)) {};
         NonCopyable& operator=(NonCopyable && rhs) = delete;
 
+    private:
+        BOOST_MOVABLE_BUT_NOT_COPYABLE(NonCopyable)
     };
 
     std::map<int, NonCopyable> non_cop_map;
-    non_cop_map.emplace( 1, string("one"));
-    non_cop_map.emplace( 2, string("two"));
-    non_cop_map.emplace( 3, string("three"));
+    non_cop_map.insert( std::make_pair(1, NonCopyable("one")) );
+    non_cop_map.insert( std::make_pair(2, NonCopyable("two")) );
+    non_cop_map.insert( std::make_pair(3, NonCopyable("three")) );
 
     string two;
     make_map_find(non_cop_map, 2)
