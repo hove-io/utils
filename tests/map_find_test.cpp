@@ -114,13 +114,12 @@ BOOST_FIXTURE_TEST_CASE(should_not_copy_value_object_when_queried, MapFindFixtur
         /// we only keep the move construction semantic to emplace into the map
         NonCopyable(NonCopyable && rhs): str(std::move(rhs.str)) {};
         NonCopyable& operator=(NonCopyable && rhs) = delete;
-
     };
 
     std::map<int, NonCopyable> non_cop_map;
-    non_cop_map.emplace( 1, string("one"));
-    non_cop_map.emplace( 2, string("two"));
-    non_cop_map.emplace( 3, string("three"));
+    non_cop_map.insert( std::make_pair(1, NonCopyable("one")) );
+    non_cop_map.insert( std::make_pair(2, NonCopyable("two")) );
+    non_cop_map.insert( std::make_pair(3, NonCopyable("three")) );
 
     string two;
     make_map_find(non_cop_map, 2)
