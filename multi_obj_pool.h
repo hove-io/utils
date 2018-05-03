@@ -29,7 +29,11 @@ www.navitia.io
 */
 
 #pragma once
+
+#include <boost/assert.hpp>
+
 #include <list>
+#include <cstddef>
 
 template <typename Obj>
 struct DefaultParetoFrontVisitor {
