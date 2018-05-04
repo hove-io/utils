@@ -74,7 +74,7 @@ public:
     inline const_iterator begin() const { return pareto_front.begin(); }
     inline const_iterator end() const { return pareto_front.end(); }
 
-    Pool get_pool() const { return pareto_front; }
+    const Pool& get_pool() const { return pareto_front; }
 
 private:
     Pool pareto_front;
