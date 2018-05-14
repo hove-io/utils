@@ -30,6 +30,7 @@ www.navitia.io
 
 #pragma once
 
+#include <iterator>
 #include <functional>
 
 namespace navitia {
@@ -46,7 +47,9 @@ namespace utils {
  *
  *    auto pairs_gen = make_pairs_generator(s);
  *    for(auto pair : pairs_gen) {
- *        pairs.push_back(pair);
+ *      // pair.first and pair.second are iterators
+ *      // to the container `s`
+ *       pairs.push_back({*pair.first, *pair.second});
  *    }
  *    ```
  *
@@ -68,26 +71,35 @@ public:
     {
         It it;
         It sub_it;
-        It sub_end;
+        It end;
 
     public:
-        PairsGeneratorIterator(It it, It sub_it, It sub_end):
+        PairsGeneratorIterator(It it, It sub_it, It end):
             it(it),
             sub_it(sub_it),
-            sub_end(sub_end)
+            end(end)
         {}
 
-        std::pair<const T&, const T&> operator*() const {
-            return std::make_pair( std::cref(*it), std::cref(*sub_it));
+        std::pair<It, It> operator*() const {
+            return std::make_pair( it, sub_it);
         }
 
         PairsGeneratorIterator& operator++() {
 
-            sub_it++;
+            std::advance(sub_it, 1);
+            if(sub_it == end) {
 
-            if(sub_it == sub_end) {
-                it++;
-                sub_it = it + 1;
+                std::advance(it, 1);
+                auto next_it = std::next(it);
+                if( next_it == end ) {
+                    /// We stop before the end of the container (ie 'end-1')
+                    /// as we need at least 2 elements to make a pair
+                    /// and at this point we only have one.
+                    it = sub_it = end;
+                    return *this;
+                }
+
+                sub_it = next_it;
             }
 
             return *this;
@@ -102,24 +114,28 @@ public:
         }
     };
 
-    PairsGenerator(It beg, It end): _begin(beg), _sub_begin(beg+1), _end(end) {
+    PairsGenerator(It beg, It end): _begin(beg), _end(end) {
         if( _begin == _end )
             throw std::length_error("Container should not be empty");
     }
 
     PairsGeneratorIterator begin() const {
-        return PairsGeneratorIterator(_begin, _sub_begin, _end);
+        auto next_it = std::next(_begin);
+        if( next_it == _end) {
+            /// we need at least 2 elements to make a pair
+            /// and we only have one...
+            return end();
+        }
+
+        return PairsGeneratorIterator(_begin, next_it, _end);
     }
 
     PairsGeneratorIterator end() const {
-        /// We stop before the end of the container (ie 'end-1') as we need 2 elements to make a pair
-        /// and at this point we only have one.
-        return PairsGeneratorIterator(_end-1, _end, _end);
+        return PairsGeneratorIterator(_end, _end, _end);
     }
 
 private:
     It _begin;
-    It _sub_begin;
     It _end;
 };
 

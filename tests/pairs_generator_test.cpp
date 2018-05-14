@@ -50,20 +50,20 @@ BOOST_AUTO_TEST_CASE(should_generate_pairs_from_a_container_std_style) {
     {
         BOOST_REQUIRE(it != end);
         auto pair = *it;
-        BOOST_CHECK_EQUAL(pair.first, 1);
-        BOOST_CHECK_EQUAL(pair.second, 2);
+        BOOST_CHECK_EQUAL(*pair.first, 1);
+        BOOST_CHECK_EQUAL(*pair.second, 2);
         ++it;
     }{
         BOOST_REQUIRE(it != end);
         auto pair = *it;
-        BOOST_CHECK_EQUAL(pair.first, 1);
-        BOOST_CHECK_EQUAL(pair.second, 3);
+        BOOST_CHECK_EQUAL(*pair.first, 1);
+        BOOST_CHECK_EQUAL(*pair.second, 3);
         ++it;
     }{
         BOOST_REQUIRE(it != end);
         auto pair = *it;
-        BOOST_CHECK_EQUAL(pair.first, 2);
-        BOOST_CHECK_EQUAL(pair.second, 3);
+        BOOST_CHECK_EQUAL(*pair.first, 2);
+        BOOST_CHECK_EQUAL(*pair.second, 3);
         ++it;
     }
 
@@ -78,7 +78,7 @@ BOOST_AUTO_TEST_CASE(shoud_generate_pairs_with_range_based_loop) {
     auto pairs_gen = make_pairs_generator(s);
 
     for(auto pair : pairs_gen) {
-        pairs.push_back(pair);
+        pairs.push_back({*pair.first, *pair.second});
     }
 
     vector<pair<int, int>> expected {
