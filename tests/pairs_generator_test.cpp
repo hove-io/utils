@@ -33,11 +33,14 @@ www.navitia.io
 
 #include "utils/pairs_generator.h"
 #include <boost/test/unit_test.hpp>
+#include <functional>
+#include <algorithm>
 
 using namespace navitia::utils;
 
 using std::pair;
 using std::vector;
+using std::find;
 
 BOOST_AUTO_TEST_CASE(should_generate_pairs_from_a_container_std_style) {
 
@@ -106,4 +109,13 @@ BOOST_AUTO_TEST_CASE(shoud_not_iterate_over_container_with_only_1_element) {
     auto couples = make_pairs_generator(s);
 
     BOOST_CHECK( couples.begin() == couples.end() );
+}
+
+BOOST_AUTO_TEST_CASE(should_return_unique_iterator_list) {
+
+    vector<int> s {1, 1, 1, 42};
+
+    auto iterators = pairs_generator_unique_iterators(s, std::greater<int>());
+    BOOST_CHECK_EQUAL(iterators.size(), 1);
+    BOOST_CHECK(iterators[0] == find(s.begin(), s.end(), 42));
 }

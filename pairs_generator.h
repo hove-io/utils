@@ -30,6 +30,7 @@ www.navitia.io
 
 #pragma once
 
+#include <boost/range/algorithm/count_if.hpp>
 #include <iterator>
 #include <functional>
 
@@ -143,6 +144,40 @@ template<class Container>
 PairsGenerator<Container> make_pairs_generator(const Container & container)
 {
     return PairsGenerator<Container>(container.cbegin(), container.cend());
+}
+
+template<class Container, class Op>
+std::vector<typename Container::const_iterator> pairs_generator_unique_iterators(
+    const Container & container,
+    Op on_pair)
+{
+    typedef typename Container::const_iterator const_itr;
+
+    std::vector<const_itr> visited_iterators;
+
+    auto pairs_gen = make_pairs_generator(container);
+    for(auto pair : pairs_gen) {
+
+        auto already_visited = boost::count_if(visited_iterators,
+            [&](const const_itr& it) {
+                return it == pair.first || it == pair.second;
+        });
+
+        if (already_visited)
+            continue;
+
+        auto& pair1 = *pair.first;
+        auto& pair2 = *pair.second;
+
+        if(on_pair(pair1, pair2)) {
+            visited_iterators.push_back(pair.first);
+        }
+        else if(on_pair(pair2, pair1)) {
+            visited_iterators.push_back(pair.second);
+        }
+    }
+
+    return visited_iterators;
 }
 
 } // namespace utils
