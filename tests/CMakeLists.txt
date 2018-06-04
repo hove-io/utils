@@ -28,3 +28,7 @@ add_boost_test(obj_factory_test)
 add_executable(map_find_test map_find_test.cpp)
 target_link_libraries(map_find_test utils ${Boost_LIBRARIES} log4cplus)
 add_boost_test(map_find_test)
+
+add_executable(pairs_generator_test pairs_generator_test.cpp)
+target_link_libraries(pairs_generator_test utils ${Boost_LIBRARIES} log4cplus)
+add_boost_test(pairs_generator_test)
