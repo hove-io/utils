@@ -33,6 +33,7 @@ www.navitia.io
 #include <boost/range/algorithm/count_if.hpp>
 #include <iterator>
 #include <functional>
+#include <stdexcept>
 
 namespace navitia {
 namespace utils {
@@ -65,7 +66,7 @@ class PairsGenerator
 {
 public:
 
-    typedef typename Container::const_iterator It;
+    typedef typename Container::iterator It;
     typedef typename Container::value_type T;
 
     class PairsGeneratorIterator
@@ -117,7 +118,7 @@ public:
 
     PairsGenerator(It beg, It end): _begin(beg), _end(end) {
         if( _begin == _end )
-            throw std::length_error("Container should not be empty");
+            throw std::invalid_argument("Container should not be empty");
     }
 
     PairsGeneratorIterator begin() const {
@@ -141,25 +142,25 @@ private:
 };
 
 template<class Container>
-PairsGenerator<Container> make_pairs_generator(const Container & container)
+PairsGenerator<Container> make_pairs_generator(Container & container)
 {
-    return PairsGenerator<Container>(container.cbegin(), container.cend());
+    return PairsGenerator<Container>(container.begin(), container.end());
 }
 
 template<class Container, class Op>
-std::vector<typename Container::const_iterator> pairs_generator_unique_iterators(
-    const Container & container,
+std::vector<typename Container::iterator> pairs_generator_unique_iterators(
+    Container & container,
     Op on_pair)
 {
-    typedef typename Container::const_iterator const_itr;
+    typedef typename Container::iterator itr;
 
-    std::vector<const_itr> visited_iterators;
+    std::vector<itr> visited_iterators;
 
     auto pairs_gen = make_pairs_generator(container);
     for(auto pair : pairs_gen) {
 
         auto already_visited = boost::count_if(visited_iterators,
-            [&](const const_itr& it) {
+            [&](const itr& it) {
                 return it == pair.first || it == pair.second;
         });
 
