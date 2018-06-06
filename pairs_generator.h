@@ -33,6 +33,7 @@ www.navitia.io
 #include <boost/range/algorithm/count_if.hpp>
 #include <iterator>
 #include <functional>
+#include <stdexcept>
 
 namespace navitia {
 namespace utils {
@@ -117,7 +118,7 @@ public:
 
     PairsGenerator(It beg, It end): _begin(beg), _end(end) {
         if( _begin == _end )
-            throw std::length_error("Container should not be empty");
+            throw std::invalid_argument("Container should not be empty");
     }
 
     PairsGeneratorIterator begin() const {
