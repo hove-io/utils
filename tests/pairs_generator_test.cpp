@@ -101,7 +101,7 @@ BOOST_AUTO_TEST_CASE(shoud_generate_pairs_with_range_based_loop) {
 
 BOOST_AUTO_TEST_CASE(shoud_raise_exception_over_empty_container) {
     vector<int> s {};
-    BOOST_CHECK_THROW( make_pairs_generator(s), std::length_error);
+    BOOST_CHECK_THROW( make_pairs_generator(s), std::exception);
 }
 
 BOOST_AUTO_TEST_CASE(shoud_not_iterate_over_container_with_only_1_element) {
