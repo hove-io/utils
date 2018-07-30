@@ -184,7 +184,7 @@ BOOST_AUTO_TEST_CASE(flatEnumMap_iterator_test) {
     std::vector<int> val;
     std::vector<RawEnum> enumVal;
 
-    for (const auto& pair : map) {
+    for (const auto pair : map) {
         val.push_back(pair.second);
         enumVal.push_back(pair.first);
     }
