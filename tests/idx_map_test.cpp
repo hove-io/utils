@@ -54,7 +54,7 @@ BOOST_AUTO_TEST_CASE(idx_map_iterations_read_write) {
     //we need a container to back our idx map
     std::vector<Bob> bob_container;
     for (size_t i = 0; i < 42; ++i) {
-        bob_container.emplace_back(std::move(Bob(i)));
+        bob_container.emplace_back(Bob(i));
     }
 
     navitia::IdxMap<Bob, int> map;
@@ -91,7 +91,7 @@ BOOST_AUTO_TEST_CASE(idx_map_iterations_read_write) {
 
     // const iteration
     idx = 0;
-    for (const auto& elt: const_map) {
+    for (const auto elt: const_map) {
         BOOST_CHECK_EQUAL(elt.first, navitia::Idx<Bob>(Bob(idx)));
         BOOST_CHECK_EQUAL(elt.second, int(idx + 10));
         ++idx;

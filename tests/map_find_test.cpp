@@ -105,14 +105,14 @@ BOOST_FIXTURE_TEST_CASE(should_not_copy_value_object_when_queried, MapFindFixtur
 
     struct NonCopyable {
         const string str;
-        NonCopyable(const string & str): str(str) {};
+        NonCopyable(const string & str): str(str) {}
 
         /// We remove the copy semantic to make sure objects are not duplicated along the way
         NonCopyable(const NonCopyable &) = delete;
         NonCopyable& operator=(const NonCopyable &) = delete;
 
         /// we only keep the move construction semantic to emplace into the map
-        NonCopyable(NonCopyable && rhs): str(std::move(rhs.str)) {};
+        NonCopyable(NonCopyable && rhs): str(std::move(rhs.str)) {}
         NonCopyable& operator=(NonCopyable && rhs) = delete;
     };
 
