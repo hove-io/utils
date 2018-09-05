@@ -227,7 +227,7 @@ std::string absolute_path();
  * math_mod(1, 5) == 1
  * math_mod(-1, 5) == 4
  * */
-int math_mod(int x, int m){
+inline int math_mod(int x, int m){
 	return (x%m + m)%m;
 }
 
