@@ -220,4 +220,16 @@ inline bool contains_if(const Container& c, Pred p) {
  */
 std::string absolute_path();
 
+
+/*
+ * mathematical modulus or euclidean modulus
+ *
+ * math_mod(1, 5) == 1
+ * math_mod(-1, 5) == 4
+ * */
+int math_mod(int x, int m){
+	return (x%m + m)%m;
+}
+
+
 } // namespace navitia

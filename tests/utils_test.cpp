@@ -292,3 +292,8 @@ BOOST_AUTO_TEST_CASE(contains_test) {
     navitia::contains(mocked_container, 4);
     BOOST_CHECK_EQUAL(mocked_container.find_is_called, true);
 }
+
+BOOST_AUTO_TEST_CASE(math_mod_test) {
+	BOOST_CHECK_EQUAL(navitia::math_mod(1, 5), 1);
+	BOOST_CHECK_EQUAL(navitia::math_mod(-1, 5), 4);
+}
