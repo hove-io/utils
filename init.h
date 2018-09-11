@@ -87,11 +87,12 @@ inline void init_signal_handling() {
     signal(SIGINT, before_exit);
 }
 
-inline void init_app(const std::string& name = "",
-                     const std::string& level = "DEBUG",
-                     const bool active_local_syslog = false)
+inline void init_app(const std::string& log_name = "",
+                     const std::string& log_level = "DEBUG",
+                     const bool active_local_syslog = false,
+                     const std::string& log_comment = "")
 {
-    init_logger(name, level, active_local_syslog);
+    init_logger(log_name, log_level, active_local_syslog, log_comment);
 
     init_signal_handling();
 }

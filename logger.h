@@ -40,10 +40,11 @@ www.navitia.io
 
 namespace navitia {
 
-// logger pattern example : [18-09-10 17:02:17,186] [INFO ] [NDC] - message file.cpp:248
-static const std::string console_pattern_ref = "[%D{%y-%m-%d %H:%M:%S,%q}] [%-5p] [%x] - %m %b:%L  %n";
+// logger pattern example : [18-09-10 17:02:17,186] [comment] [INFO ] [NDC] - message file.cpp:248
+static const std::string console_pattern_ref1 = "[%D{%y-%m-%d %H:%M:%S,%q}] ";
+static const std::string console_pattern_ref2 = "[%-5p] [%x] - %m %b:%L  %n";
 
-// syslog pattern example : Sep 11 14:16:11 hostname binary_name: [PID] [INFO] [NDC] - message file.cpp:261
+// syslog pattern example : Sep 11 14:16:11 hostname binary_name: [comment] [PID] [INFO] [NDC] - message file.cpp:261
 static const std::string syslog_pattern_ref  = "[%i] [%p] [%x] - %m %b:%L  %n";
 
 /**
@@ -58,7 +59,7 @@ inline void init_logger()
     properties.setProperty("log4cplus.rootLogger", "DEBUG, console");
     properties.setProperty("log4cplus.appender.console", "log4cplus::ConsoleAppender");
     properties.setProperty("log4cplus.appender.console.layout", "log4cplus::PatternLayout");
-    properties.setProperty("log4cplus.appender.console.layout.ConversionPattern", console_pattern_ref);
+    properties.setProperty("log4cplus.appender.console.layout.ConversionPattern", console_pattern_ref1 + console_pattern_ref2);
 
     log4cplus::PropertyConfigurator configurator(properties);
     configurator.configure();
@@ -75,35 +76,40 @@ inline void init_logger()
 inline void init_logger(const std::string& name,
                         const std::string& level,
                         const bool active_local_syslog = false,
+                        const std::string& comment = "",
                         const std::string& pattern = "")
 {
+    std::string prefix = "";
+    if (!comment.empty()) {
+        prefix = prefix + "[" + comment + "] ";
+    }
+
     log4cplus::BasicConfigurator config;
     config.configure();
 
     auto properties = log4cplus::helpers::Properties();
 
     if (active_local_syslog) {
-        properties.setProperty("log4cplus.rootLogger", (boost::format("%s, console, syslog") % level).str());
+        properties.setProperty("log4cplus.rootLogger", (boost::format("%s, syslog") % level).str());
         properties.setProperty("log4cplus.appender.syslog", "log4cplus::SysLogAppender");
         properties.setProperty("log4cplus.appender.syslog.ident", name);
         properties.setProperty("log4cplus.appender.syslog.facility", "local7");
         properties.setProperty("log4cplus.appender.syslog.layout", "log4cplus::PatternLayout");
         if (pattern.empty()) {
-            properties.setProperty("log4cplus.appender.syslog.layout.ConversionPattern", syslog_pattern_ref);
+            properties.setProperty("log4cplus.appender.syslog.layout.ConversionPattern", prefix + syslog_pattern_ref);
         } else {
-            properties.setProperty("log4cplus.appender.syslog.layout.ConversionPattern", pattern);
+            properties.setProperty("log4cplus.appender.syslog.layout.ConversionPattern", prefix + pattern);
         }
-
     } else {
         properties.setProperty("log4cplus.rootLogger", (boost::format("%s, console") % level).str());
-    }
-    properties.setProperty("log4cplus.appender.console", "log4cplus::ConsoleAppender");
-    properties.setProperty("log4cplus.appender.console.ident", name);
-    properties.setProperty("log4cplus.appender.console.layout", "log4cplus::PatternLayout");
-    if (pattern.empty()) {
-        properties.setProperty("log4cplus.appender.console.layout.ConversionPattern", console_pattern_ref);
-    } else {
-        properties.setProperty("log4cplus.appender.console.layout.ConversionPattern", pattern);
+        properties.setProperty("log4cplus.appender.console", "log4cplus::ConsoleAppender");
+        properties.setProperty("log4cplus.appender.console.ident", name);
+        properties.setProperty("log4cplus.appender.console.layout", "log4cplus::PatternLayout");
+        if (pattern.empty()) {
+            properties.setProperty("log4cplus.appender.console.layout.ConversionPattern", console_pattern_ref1 + prefix + console_pattern_ref2);
+        } else {
+            properties.setProperty("log4cplus.appender.console.layout.ConversionPattern", prefix + pattern);
+        }
     }
 
     log4cplus::PropertyConfigurator configurator(properties);
