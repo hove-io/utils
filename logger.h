@@ -84,6 +84,13 @@ inline void init_logger(const std::string& name,
         prefix = prefix + "[" + comment + "] ";
     }
 
+    auto syslog_pattern = prefix + syslog_pattern_ref;
+    auto console_pattern = console_pattern_ref1 + prefix + console_pattern_ref2;
+    if (!pattern.empty()) {
+        syslog_pattern = prefix + pattern;
+        console_pattern = prefix + pattern;
+    }
+
     log4cplus::BasicConfigurator config;
     config.configure();
 
@@ -95,21 +102,13 @@ inline void init_logger(const std::string& name,
         properties.setProperty("log4cplus.appender.syslog.ident", name);
         properties.setProperty("log4cplus.appender.syslog.facility", "local7");
         properties.setProperty("log4cplus.appender.syslog.layout", "log4cplus::PatternLayout");
-        if (pattern.empty()) {
-            properties.setProperty("log4cplus.appender.syslog.layout.ConversionPattern", prefix + syslog_pattern_ref);
-        } else {
-            properties.setProperty("log4cplus.appender.syslog.layout.ConversionPattern", prefix + pattern);
-        }
+        properties.setProperty("log4cplus.appender.syslog.layout.ConversionPattern", syslog_pattern);
     } else {
         properties.setProperty("log4cplus.rootLogger", (boost::format("%s, console") % level).str());
         properties.setProperty("log4cplus.appender.console", "log4cplus::ConsoleAppender");
         properties.setProperty("log4cplus.appender.console.ident", name);
         properties.setProperty("log4cplus.appender.console.layout", "log4cplus::PatternLayout");
-        if (pattern.empty()) {
-            properties.setProperty("log4cplus.appender.console.layout.ConversionPattern", console_pattern_ref1 + prefix + console_pattern_ref2);
-        } else {
-            properties.setProperty("log4cplus.appender.console.layout.ConversionPattern", prefix + pattern);
-        }
+        properties.setProperty("log4cplus.appender.console.layout.ConversionPattern", console_pattern);
     }
 
     log4cplus::PropertyConfigurator configurator(properties);
