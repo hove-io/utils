@@ -167,6 +167,26 @@ void sort_and_truncate(typename google::protobuf::RepeatedPtrField<Elem>& input,
 }
 
 /**
+ * sort_and_truncate:
+ * Here we compare two structures on different attributswe compare the string
+ * and truncate the list at position nbmax
+ */
+template <typename Elem, typename Cmp>
+void sort_and_truncate(typename std::vector<Elem>& input, size_t nbmax, Cmp cmp) {
+    typedef typename std::vector<Elem> Vector;
+    typename Vector::iterator middle_iterator;
+    if (nbmax < size_t(input.size())){
+        middle_iterator = input.begin() + nbmax;
+    }else{
+        middle_iterator = input.end();
+    }
+    std::partial_sort(input.begin(), middle_iterator, input.end(), cmp);
+    if(size_t(input.size()) > nbmax){
+        input.resize(nbmax);
+    }
+}
+
+/**
  * cleanup a vector a weak_ptr, removing expired ones
  */
 template <typename T>
