@@ -28,6 +28,8 @@ https://groups.google.com/d/forum/navitia
 www.navitia.io
 */
 
+#pragma once
+
 #include <boost/date_time/posix_time/posix_time.hpp>
 
 namespace navitia {
