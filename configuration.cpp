@@ -40,7 +40,7 @@ HINSTANCE hinstance = NULL;
 
 
 Configuration * Configuration::get() {
-    if (instance == 0) {
+    if (instance == nullptr) {
         instance = new Configuration();
 #ifdef WIN32
         char buf[2048];
@@ -55,7 +55,7 @@ Configuration * Configuration::get() {
 }
 
 bool Configuration::is_instanciated(){
-    return instance != 0;
+    return instance != nullptr;
 }
 
 void Configuration::load_ini(const std::string & filename){
@@ -102,4 +102,4 @@ void Configuration::set_int(const std::string & key, int value){
 }
 
 
-Configuration * Configuration::instance = 0;
+Configuration * Configuration::instance = nullptr;

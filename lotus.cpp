@@ -98,23 +98,23 @@ void Lotus::insert(std::vector<std::string> elements) {
 }
 
 void Lotus::finish_bulk_insert() {
-    int result_code =  PQputCopyEnd(this->connection, NULL);
+    int result_code =  PQputCopyEnd(this->connection, nullptr);
     if(result_code != 1){
         throw LotusException(std::string("finish bulk insert failed: ")
                              + PQerrorMessage(this->connection));
     }
 
-    PGresult *res = NULL;
+    PGresult *res = nullptr;
     do{
         PQclear(res);
-        res = NULL;
+        res = nullptr;
         res = PQgetResult(this->connection);
-        if(res != NULL && PQresultStatus(res) != PGRES_COMMAND_OK){
+        if(res != nullptr && PQresultStatus(res) != PGRES_COMMAND_OK){
             PQclear(res);
             throw LotusException(std::string("failed to finish bulk insert in final loop: ")
                                  + PQerrorMessage(this->connection));
         }
-    } while(res != NULL);
+    } while(res != nullptr);
 
 }
 
