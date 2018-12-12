@@ -80,7 +80,7 @@ void LoadBalancer::run(){
             zmq::message_t msg_request;
             clients.recv(&msg_request);
 
-            std::string worker_addr = avalailable_worker.front();
+            std::string worker_addr = avalailable_worker.top();
             avalailable_worker.pop();
 
             z_send(workers, worker_addr, ZMQ_SNDMORE);
