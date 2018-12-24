@@ -34,14 +34,14 @@ www.navitia.io
 
 #pragma once
 #include <zmq.hpp>
-#include <queue>
+#include <stack>
 
 void z_send(zmq::socket_t& socket, const std::string& str, int flags=0);
 void z_send(zmq::socket_t& socket, zmq::message_t& msg, int flags=0);
 std::string z_recv(zmq::socket_t& socket);
 
 class LoadBalancer{
-    std::queue<std::string> avalailable_worker;
+    std::stack<std::string> avalailable_worker;
     zmq::socket_t clients;
     zmq::socket_t workers;
     public:
