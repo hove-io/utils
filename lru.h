@@ -36,6 +36,7 @@ www.navitia.io
 #include <boost/type_traits/remove_cv.hpp>
 #include <boost/type_traits/remove_reference.hpp>
 #include <mutex>
+#include <future>
 #include <stdexcept>
 
 namespace navitia {
@@ -120,24 +121,32 @@ private:
             typename boost::remove_reference<
                 typename F::result_type>::type
             >::type const;
-        using result_type = std::shared_ptr<underlying_type>;
+        using result_type = std::shared_future<std::shared_ptr<underlying_type>>;
+
         result_type operator()(argument_type arg) const {
-            return std::make_shared<underlying_type>(f(arg));
+            //build a future that will be lazy initialized
+            return std::async(std::launch::deferred, [&](){
+                return std::make_shared<underlying_type>(f(arg));
+            }).share();
         }
     };
     Lru<SharedPtrF> lru;
     std::unique_ptr<std::mutex> mutex = std::make_unique<std::mutex>();
 
 public:
-    using result_type = typename SharedPtrF::result_type;
+    using result_type = typename std::shared_ptr<typename SharedPtrF::underlying_type>;
     using argument_type = typename SharedPtrF::argument_type;
 
     ConcurrentLru(F fun, size_t max = 10): lru(SharedPtrF{std::move(fun)}, max) {}
     ConcurrentLru(ConcurrentLru&&) = default;// needed by old version of gcc
 
     result_type operator()(argument_type arg) const {
-        std::lock_guard<std::mutex> lock(*mutex);
-        return lru(arg);
+        typename SharedPtrF::result_type future;
+        {
+            std::lock_guard<std::mutex> lock(*mutex);
+            future = lru(arg);
+        }
+        return future.get();
     }
 
     size_t get_nb_cache_miss() const { return lru.get_nb_cache_miss(); }
