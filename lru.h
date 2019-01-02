@@ -146,6 +146,8 @@ public:
             std::lock_guard<std::mutex> lock(*mutex);
             future = lru(arg);
         }
+        // As arg might be a reference, the maybe newly created future must be run 
+        // before the end of the current method, else we can have a use after free.
         return future.get();
     }
 
