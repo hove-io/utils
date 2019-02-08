@@ -41,6 +41,9 @@ www.navitia.io
 
 namespace navitia {
 
+//forward declare
+template<typename T> struct ConcurrentLru;
+
 // Encapsulate a unary function, and provide a least recently used
 // cache.  The function must be pure (same argument => same result),
 // and a Lru object must not be shared across threads.
@@ -74,6 +77,19 @@ private:
     mutable size_t nb_cache_miss = 0;
     mutable size_t nb_calls = 0;
 
+
+    std::vector<key_type> keys() const{
+        auto& list = cache.template get<0>();
+        std::vector<key_type> result;
+        for(const auto& p: list){
+            result.push_back(p.first);
+        }
+        return result;
+    }
+
+    template <typename T>
+    friend struct ConcurrentLru;
+
 public:
     typedef mapped_type const& result_type;
     typedef typename F::argument_type argument_type;
@@ -106,6 +122,16 @@ public:
 
     size_t get_nb_cache_miss() const { return nb_cache_miss; }
     size_t get_nb_calls() const { return nb_calls; }
+
+    void warmup(const Lru<F>& other) {
+        auto keys = other.keys();
+        //reverse keys to keep the order of the lru
+        std::reverse(begin(keys), end(keys));
+        for(const auto& key: keys){
+            this->operator()(key);
+        }
+    }
+
 };
 template<typename F> inline Lru<F> make_lru(F fun, size_t max = 10) {
     return Lru<F>(std::move(fun), max);
@@ -133,6 +159,12 @@ private:
     Lru<SharedPtrF> lru;
     std::unique_ptr<std::mutex> mutex = std::make_unique<std::mutex>();
 
+    std::vector<typename Lru<SharedPtrF>::key_type> keys() const{
+        std::lock_guard<std::mutex> lock(*mutex);
+        return lru.keys();
+    }
+
+
 public:
     using result_type = typename std::shared_ptr<typename SharedPtrF::underlying_type>;
     using argument_type = typename SharedPtrF::argument_type;
@@ -153,6 +185,16 @@ public:
 
     size_t get_nb_cache_miss() const { return lru.get_nb_cache_miss(); }
     size_t get_nb_calls() const { return lru.get_nb_calls(); }
+
+    void warmup(const ConcurrentLru<F>& other) {
+        //we can't use the warmup of the lru direclty as it will mess with the future
+        auto keys = other.keys();
+        //reverse keys to keep the order of the lru
+        std::reverse(begin(keys), end(keys));
+        for(const auto& key: keys){
+            this->operator()(key);
+        }
+    }
 };
 template<typename F> inline ConcurrentLru<F> make_concurrent_lru(F fun, size_t max = 10) {
     return ConcurrentLru<F>(std::move(fun), max);
