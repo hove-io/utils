@@ -125,6 +125,7 @@ public:
 
     void warmup(const Lru<F>& other) {
         auto keys = other.keys();
+        //reverse keys to keep the order of the lru
         std::reverse(begin(keys), end(keys));
         for(const auto& key: keys){
             this->operator()(key);
@@ -188,6 +189,7 @@ public:
     void warmup(const ConcurrentLru<F>& other) {
         //we can't use the warmup of the lru direclty as it will mess with the future
         auto keys = other.keys();
+        //reverse keys to keep the order of the lru
         std::reverse(begin(keys), end(keys));
         for(const auto& key: keys){
             this->operator()(key);
