@@ -48,6 +48,18 @@ private:
     inner_vector vec;
     inner_map map;
 
+    bool shift_from(const uint start_idx) {
+        if (start_idx >= vec.size()) {
+            return false;
+        }
+        for (size_t i = start_idx; i < vec.size() - 1;  ++i) {
+            std::swap(vec[i], vec[i + 1]);
+        }
+        vec[vec.size() - 1].release();
+        vec.resize(vec.size() - 1);
+        return true;
+    }
+
 public:
     using iterator = typename inner_vector::iterator;
     using const_iterator = typename inner_vector::const_iterator;
@@ -100,6 +112,63 @@ public:
             return nullptr;
         }
         return vec[idx.val].get();
+    }
+
+    bool if_exist(const std::string& uri) {
+        if (map.find(uri) == map.end()) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    bool erase(const Idx<ObjType>& idx) {
+        if (idx.val >= vec.size()) {
+            return false;
+        }
+        // erase map menber
+        std::string finded_key;
+        const auto* elem_ptr = vec[idx.val].get();
+        for (const auto& elem : map) {
+            if (elem.second == elem_ptr) {
+                finded_key = elem.first;
+                break;
+            }
+        }
+        if (finded_key.empty() || map.erase(finded_key) == 0) {
+            return false;
+        }
+        // erase vec menber
+        if (shift_from(idx.val) == false) {
+            return false;
+        }
+        return true;
+    }
+
+    bool erase(const std::string& uri) {
+        if (if_exist(uri) == false) {
+            return false;
+        }
+        // erase vec menber
+        const auto* elem_ptr = map.at(uri);
+        int elem_idx = -1;
+        for (int i = 0; i < (int)vec.size(); ++i) {
+            if (vec[i].get() == elem_ptr) {
+                elem_idx = i;
+                break;
+            }
+        }
+        if (elem_idx == -1) {
+            return false;
+        }
+        if (shift_from(elem_idx) == false) {
+            return false;
+        }
+        // erase map menber
+        if (map.erase(uri) == 0) {
+            return false;
+        }
+        return true;
     }
 
     iterator begin() { return std::begin(vec); }
