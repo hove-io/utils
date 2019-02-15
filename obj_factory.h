@@ -102,7 +102,7 @@ public:
         return vec[idx.val].get();
     }
 
-    bool if_exist(const std::string& uri) {
+    bool exist(const std::string& uri) {
         if (map.find(uri) == map.end()) {
             return false;
         } else {
@@ -114,27 +114,27 @@ public:
         if (idx.val >= vec.size()) {
             return false;
         }
-        // erase map menber
+        // erase map member
         const auto* elem_ptr = vec[idx.val].get();
-        if (elem_ptr->uri.empty() || map.erase(elem_ptr->uri) == 0) {
+        if (map.erase(elem_ptr->uri) == 0) {
             return false;
         }
-        // erase vec menber
+        // erase vec member
         vec.erase(vec.begin() + idx.val);
         return true;
     }
 
     bool erase(const std::string& uri) {
-        if (if_exist(uri) == false) {
+        if (exist(uri) == false) {
             return false;
         }
-        // erase vec menber
         const auto* elem_ptr = map.at(uri);
-        vec.erase(vec.begin() + elem_ptr->idx);
-        // erase map menber
+        // erase map member
         if (map.erase(uri) == 0) {
             return false;
         }
+        // erase vec member
+        vec.erase(vec.begin() + elem_ptr->idx);
         return true;
     }
 

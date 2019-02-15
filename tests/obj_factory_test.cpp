@@ -110,7 +110,7 @@ BOOST_AUTO_TEST_CASE(erase_menber_into_obj_factory) {
 
             navitia::ObjFactory<HeaderInt> obj_factory;
 
-            std::array<std::string, 4> uris = {"Val_1", "Val_2", "Val_3", "Val_4"};
+            std::array<std::string, 4> uris = {"Val_0", "Val_1", "Val_2", "Val_3"};
             std::array<size_t, 4> values = {0, 1, 2, 3};
 
             // Data
@@ -130,7 +130,7 @@ BOOST_AUTO_TEST_CASE(erase_menber_into_obj_factory) {
             BOOST_CHECK_EQUAL(obj_factory.erase("Val_10"), false);
             BOOST_CHECK_EQUAL(obj_factory.erase(uris[i]), true);
             BOOST_CHECK_EQUAL(obj_factory.size(), 3);
-            BOOST_CHECK_EQUAL(obj_factory.if_exist(uris[i]), false);
+            BOOST_CHECK_EQUAL(obj_factory.exist(uris[i]), false);
             for (size_t j = 0; j < obj_factory.size(); ++j) {
                 if (j < i) {
                     BOOST_CHECK_EQUAL(obj_factory.get_mut(navitia::Idx<HeaderInt>(j))->val, j);
@@ -148,7 +148,7 @@ BOOST_AUTO_TEST_CASE(erase_menber_into_obj_factory) {
 
             navitia::ObjFactory<HeaderInt> obj_factory;
 
-            std::array<std::string, 4> uris = {"Val_1", "Val_2", "Val_3", "Val_4"};
+            std::array<std::string, 4> uris = {"Val_0", "Val_1", "Val_2", "Val_3"};
             std::array<size_t, 4> values = {0, 1, 2, 3};
 
             // Data
@@ -167,7 +167,7 @@ BOOST_AUTO_TEST_CASE(erase_menber_into_obj_factory) {
             BOOST_CHECK_EQUAL(obj_factory.erase(navitia::Idx<HeaderInt>(10)), false);
             BOOST_CHECK_EQUAL(obj_factory.erase(navitia::Idx<HeaderInt>(i)), true);
             BOOST_CHECK_EQUAL(obj_factory.size(), 3);
-            BOOST_CHECK_EQUAL(obj_factory.if_exist(uris[i]), false);
+            BOOST_CHECK_EQUAL(obj_factory.exist(uris[i]), false);
             for (size_t j = 0; j < obj_factory.size(); ++j) {
                 if (j < i) {
                     BOOST_CHECK_EQUAL(obj_factory.get_mut(navitia::Idx<HeaderInt>(j))->val, j);
