@@ -116,6 +116,7 @@ BOOST_AUTO_TEST_CASE(erase_menber_into_obj_factory) {
             // Data
             for (size_t j = 0; j < 4; ++j) {
                 auto data = HeaderInt();
+                data.idx = values[j];
                 data.val = values[j];
                 obj_factory.insert(uris[j], std::move(data));
             }
@@ -130,8 +131,9 @@ BOOST_AUTO_TEST_CASE(erase_menber_into_obj_factory) {
             BOOST_CHECK_EQUAL(obj_factory.erase("Val_10"), false);
             BOOST_CHECK_EQUAL(obj_factory.erase(uris[i]), true);
             BOOST_CHECK_EQUAL(obj_factory.size(), 3);
-            BOOST_CHECK_EQUAL(obj_factory.exist(uris[i]), false);
+            BOOST_CHECK_EQUAL(obj_factory.exists(uris[i]), false);
             for (size_t j = 0; j < obj_factory.size(); ++j) {
+                BOOST_CHECK_EQUAL(obj_factory.get_mut(navitia::Idx<HeaderInt>(j))->idx, j);
                 if (j < i) {
                     BOOST_CHECK_EQUAL(obj_factory.get_mut(navitia::Idx<HeaderInt>(j))->val, j);
                 }
@@ -154,6 +156,7 @@ BOOST_AUTO_TEST_CASE(erase_menber_into_obj_factory) {
             // Data
             for (size_t j = 0; j < 4; ++j) {
                 auto data = HeaderInt();
+                data.idx = values[j];
                 data.val = values[j];
                 obj_factory.insert(uris[j], std::move(data));
             }
@@ -167,8 +170,9 @@ BOOST_AUTO_TEST_CASE(erase_menber_into_obj_factory) {
             BOOST_CHECK_EQUAL(obj_factory.erase(navitia::Idx<HeaderInt>(10)), false);
             BOOST_CHECK_EQUAL(obj_factory.erase(navitia::Idx<HeaderInt>(i)), true);
             BOOST_CHECK_EQUAL(obj_factory.size(), 3);
-            BOOST_CHECK_EQUAL(obj_factory.exist(uris[i]), false);
+            BOOST_CHECK_EQUAL(obj_factory.exists(uris[i]), false);
             for (size_t j = 0; j < obj_factory.size(); ++j) {
+                BOOST_CHECK_EQUAL(obj_factory.get_mut(navitia::Idx<HeaderInt>(j))->idx, j);
                 if (j < i) {
                     BOOST_CHECK_EQUAL(obj_factory.get_mut(navitia::Idx<HeaderInt>(j))->val, j);
                 }

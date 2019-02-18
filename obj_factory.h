@@ -48,6 +48,16 @@ private:
     inner_vector vec;
     inner_map map;
 
+    void reindex_and_erase(const uint idx)
+    {
+        // reindex idx elements
+        for (uint i = idx + 1; i < vec.size(); ++i) {
+            vec[i].get()->idx--;
+        }
+        // erase vec member
+        vec.erase(vec.begin() + idx);
+    }
+
 public:
     using iterator = typename inner_vector::iterator;
     using const_iterator = typename inner_vector::const_iterator;
@@ -102,12 +112,8 @@ public:
         return vec[idx.val].get();
     }
 
-    bool exist(const std::string& uri) {
-        if (map.find(uri) == map.end()) {
-            return false;
-        } else {
-            return true;
-        }
+    bool exists(const std::string& uri) const {
+        return (map.find(uri) != map.end());
     }
 
     bool erase(const Idx<ObjType>& idx) {
@@ -119,13 +125,12 @@ public:
         if (map.erase(elem_ptr->uri) == 0) {
             return false;
         }
-        // erase vec member
-        vec.erase(vec.begin() + idx.val);
+        reindex_and_erase(idx.val);
         return true;
     }
 
     bool erase(const std::string& uri) {
-        if (exist(uri) == false) {
+        if (exists(uri) == false) {
             return false;
         }
         const auto* elem_ptr = map.at(uri);
@@ -133,8 +138,7 @@ public:
         if (map.erase(uri) == 0) {
             return false;
         }
-        // erase vec member
-        vec.erase(vec.begin() + elem_ptr->idx);
+        reindex_and_erase(elem_ptr->idx);
         return true;
     }
 
