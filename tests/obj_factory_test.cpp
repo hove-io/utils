@@ -102,7 +102,7 @@ BOOST_AUTO_TEST_CASE(non_copyable_obj_factory) {
     BOOST_CHECK_EQUAL(obj_factory.size(), 6);
 }
 
-BOOST_AUTO_TEST_CASE(erase_menber_into_obj_factory) {
+BOOST_AUTO_TEST_CASE(erase_member_into_obj_factory) {
 
     // Erase with uri key
     {
