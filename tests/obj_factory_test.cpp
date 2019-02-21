@@ -1,28 +1,28 @@
 /* Copyright © 2001-2015, Canal TP and/or its affiliates. All rights reserved.
-  
+
 This file is part of Navitia,
     the software to build cool stuff with public transport.
- 
+
 Hope you'll enjoy and contribute to this project,
     powered by Canal TP (www.canaltp.fr).
 Help us simplify mobility and open public transport:
     a non ending quest to the responsive locomotion way of traveling!
-  
+
 LICENCE: This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
-   
+
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU Affero General Public License for more details.
-   
+
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
-  
+
 Stay tuned using
-twitter @navitia 
+twitter @navitia
 IRC #navitia on freenode
 https://groups.google.com/d/forum/navitia
 www.navitia.io
@@ -101,3 +101,86 @@ BOOST_AUTO_TEST_CASE(non_copyable_obj_factory) {
     BOOST_CHECK_EQUAL(*(obj_factory["OpenData"]->val), 4);
     BOOST_CHECK_EQUAL(obj_factory.size(), 6);
 }
+
+BOOST_AUTO_TEST_CASE(erase_member_into_obj_factory) {
+
+    // Erase with uri key
+    {
+        for (size_t i = 0; i < 4; ++i) {
+
+            navitia::ObjFactory<HeaderInt> obj_factory;
+
+            std::array<std::string, 4> uris = {"Val_0", "Val_1", "Val_2", "Val_3"};
+            std::array<size_t, 4> values = {0, 1, 2, 3};
+
+            // Data
+            for (size_t j = 0; j < 4; ++j) {
+                auto data = HeaderInt();
+                data.idx = values[j];
+                data.val = values[j];
+                obj_factory.insert(uris[j], std::move(data));
+            }
+            BOOST_CHECK_EQUAL(obj_factory.size(), 4);
+            for (size_t j = 0; j < obj_factory.size(); ++j) {
+                BOOST_CHECK_EQUAL((obj_factory[uris[i]]->val), i);
+            }
+
+            // Erase with Idx
+            // Be carefull, erase function shifts (<<) elems inside vector
+            // It changes the idx for all shifted elems
+            BOOST_CHECK_EQUAL(obj_factory.erase("Val_10"), false);
+            BOOST_CHECK_EQUAL(obj_factory.erase(uris[i]), true);
+            BOOST_CHECK_EQUAL(obj_factory.size(), 3);
+            BOOST_CHECK_EQUAL(obj_factory.exists(uris[i]), false);
+            for (size_t j = 0; j < obj_factory.size(); ++j) {
+                BOOST_CHECK_EQUAL(obj_factory.get_mut(navitia::Idx<HeaderInt>(j))->idx, j);
+                if (j < i) {
+                    BOOST_CHECK_EQUAL(obj_factory.get_mut(navitia::Idx<HeaderInt>(j))->val, j);
+                }
+                else {
+                    BOOST_CHECK_EQUAL(obj_factory.get_mut(navitia::Idx<HeaderInt>(j))->val, j + 1);
+                }
+            }
+        }
+    }
+
+    // Erase with idx
+    {
+        for (size_t i = 0; i < 4; ++i) {
+
+            navitia::ObjFactory<HeaderInt> obj_factory;
+
+            std::array<std::string, 4> uris = {"Val_0", "Val_1", "Val_2", "Val_3"};
+            std::array<size_t, 4> values = {0, 1, 2, 3};
+
+            // Data
+            for (size_t j = 0; j < 4; ++j) {
+                auto data = HeaderInt();
+                data.idx = values[j];
+                data.val = values[j];
+                obj_factory.insert(uris[j], std::move(data));
+            }
+            BOOST_CHECK_EQUAL(obj_factory.size(), 4);
+            for (size_t j = 0; j < obj_factory.size(); ++j) {
+                BOOST_CHECK_EQUAL((obj_factory[uris[i]]->val), i);
+            }
+
+            // Erase with Idx
+            // Be carefull, erase function shifts elems inside vector
+            BOOST_CHECK_EQUAL(obj_factory.erase(navitia::Idx<HeaderInt>(10)), false);
+            BOOST_CHECK_EQUAL(obj_factory.erase(navitia::Idx<HeaderInt>(i)), true);
+            BOOST_CHECK_EQUAL(obj_factory.size(), 3);
+            BOOST_CHECK_EQUAL(obj_factory.exists(uris[i]), false);
+            for (size_t j = 0; j < obj_factory.size(); ++j) {
+                BOOST_CHECK_EQUAL(obj_factory.get_mut(navitia::Idx<HeaderInt>(j))->idx, j);
+                if (j < i) {
+                    BOOST_CHECK_EQUAL(obj_factory.get_mut(navitia::Idx<HeaderInt>(j))->val, j);
+                }
+                else {
+                    BOOST_CHECK_EQUAL(obj_factory.get_mut(navitia::Idx<HeaderInt>(j))->val, j + 1);
+                }
+            }
+        }
+    }
+}
+
