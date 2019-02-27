@@ -130,7 +130,7 @@ public:
     }
 
     bool erase(const std::string& uri) {
-        if (exists(uri) == false) {
+        if (!exists(uri)) {
             return false;
         }
         const auto* elem_ptr = map.at(uri);

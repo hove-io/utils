@@ -72,7 +72,7 @@ public:
      * if the find was successful
      *
      * @param fn : a callback function that takes a constant mapped type reference as parameter
-     * @returns A MapFind object to query the restult or perfom another find
+     * @returns A MapFind object to query the result or perform another find
      */
     template<class Func>
     MapFind& if_found(Func fn) {
@@ -86,7 +86,7 @@ public:
      * @brief Callback fn if nothing was found in the map
      *
      * @param fn : a callback function with no parameter
-     * @returns A MapFind object to query the restult or perfom another find
+     * @returns A MapFind object to query the result or perform another find
      */
     template<class Func>
     MapFind& if_not_found(Func fn) {
@@ -100,7 +100,7 @@ public:
      * @brief Search for key within the map used in the constructor
      *
      * @param key : the key to be searched in the map
-     * @returns A MapFind object to query the restult or perfom another find
+     * @returns A MapFind object to query the result or perform another find
      */
     template<class Key>
     MapFind& find(const Key & key) {
@@ -121,10 +121,10 @@ private:
 /**
  * @brief Create a MapFind object with the associated map
  *
- * This function facilitates the contruction of a MapFind
- * as it allowes type deduction.
+ * This function facilitates the construction of a MapFind
+ * as it allows type deduction.
  * @param map : the map to perform the search on
- * @returns A MapFind object to query the restult or perfom another find
+ * @returns A MapFind object to query the result or perform another find
  */
 template<class Map>
 MapFind<Map> make_map_find(Map& map) {
@@ -134,11 +134,11 @@ MapFind<Map> make_map_find(Map& map) {
 /**
  * @brief Create a MapFind object with the associated map
  *
- * This function facilitates the contruction of a MapFind
- * as it allowes type deduction.
+ * This function facilitates the construction of a MapFind
+ * as it allows type deduction.
  * @param map : the map to perform the search on
  * @param key : the key to search in the map
- * @returns A MapFind object to query the restult or perfom another find
+ * @returns A MapFind object to query the result or perform another find
  */
 template<class Map, class Key>
 MapFind<Map> make_map_find(Map& c, const Key& key) {
