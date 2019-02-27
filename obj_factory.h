@@ -95,7 +95,7 @@ public:
     }
 
     const ObjType* operator[] (const Idx<ObjType>& idx) const {
-        if (idx.val >= vec.size()) {
+        if (!exists(idx)) {
             return nullptr;
         }
         return vec[idx.val].get();
@@ -106,7 +106,7 @@ public:
     }
 
     ObjType* get_mut(const Idx<ObjType>& idx) {
-        if (idx.val >= vec.size()) {
+        if (!exists(idx)) {
             return nullptr;
         }
         return vec[idx.val].get();
@@ -116,8 +116,12 @@ public:
         return (map.find(uri) != map.end());
     }
 
+    bool exists(const Idx<ObjType>& idx) const {
+        return (idx.val < vec.size());
+    }
+
     bool erase(const Idx<ObjType>& idx) {
-        if (idx.val >= vec.size()) {
+        if (!exists(idx)) {
             return false;
         }
         // erase map member
