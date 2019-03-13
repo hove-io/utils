@@ -1,4 +1,4 @@
-FIND_PACKAGE(Boost 1.55 COMPONENTS unit_test_framework thread regex serialization REQUIRED)
+FIND_PACKAGE(Boost 1.55 COMPONENTS unit_test_framework thread regex serialization date_time REQUIRED)
 
 add_executable(utils_test utils_test.cpp)
 target_link_libraries(utils_test utils ${Boost_LIBRARIES} log4cplus)
@@ -28,3 +28,7 @@ add_boost_test(obj_factory_test)
 add_executable(map_find_test map_find_test.cpp)
 target_link_libraries(map_find_test utils ${Boost_LIBRARIES} log4cplus)
 add_boost_test(map_find_test)
+
+add_executable(deadline_test deadline_test.cpp)
+target_link_libraries(deadline_test utils ${Boost_LIBRARIES} log4cplus)
+add_boost_test(deadline_test)
