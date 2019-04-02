@@ -105,6 +105,8 @@ template<typename idx_t>
 struct Indexer{
     idx_t idx;
     Indexer(): idx(0){}
+    template<class T>
+    Indexer(T obj): idx(obj->idx){}
 
     template<class T>
     void operator()(T obj){obj->idx = idx; idx++;}
