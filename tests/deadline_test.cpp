@@ -47,6 +47,8 @@ BOOST_AUTO_TEST_CASE(simple_deadline) {
     // an unitialised deadline never expire
     BOOST_CHECK_EQUAL(deadline.expired(past), false);
     BOOST_CHECK_EQUAL(deadline.expired(future), false);
+    BOOST_REQUIRE_NO_THROW(deadline.check(past));
+    BOOST_REQUIRE_NO_THROW(deadline.check(future));
 
     // we can set the deadline
     deadline.set(sometime);

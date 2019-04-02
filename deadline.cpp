@@ -47,10 +47,7 @@ namespace navitia{
         if(!deadline) {
             return false;
         }
-        if(now > deadline){
-            return true;
-        }
-        return false;
+        return now > deadline;
     }
 
     void Deadline::check(const boost::posix_time::ptime& now) const{
