@@ -38,6 +38,7 @@ SET(UTILS_SRC
      threadbuf.cpp
      get_hostname.cpp
      zmq.cpp
+     deadline.cpp
 )
 
 add_library(utils ${UTILS_SRC})
