@@ -33,6 +33,8 @@ www.navitia.io
 
 namespace navitia{
 
+    DeadlineExpired::~DeadlineExpired() = default;
+
     Deadline::Deadline() {}
     Deadline::Deadline(const boost::posix_time::ptime& deadline) : deadline(deadline) {}
     void Deadline::set(const boost::posix_time::ptime& deadline){
