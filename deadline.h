@@ -37,6 +37,10 @@ namespace navitia{
 
     class DeadlineExpired: public recoverable_exception{
         using recoverable_exception::recoverable_exception;
+
+        public:
+        DeadlineExpired(const DeadlineExpired& o) = default;
+        virtual ~DeadlineExpired();
     };
 
     class Deadline{
