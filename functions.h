@@ -92,8 +92,23 @@ struct Less{
  */
 template<typename T, typename U>
 bool in(const T& elt, std::initializer_list<U> range) {
-    for (const auto& cur: range)
-        if (elt == cur) return true;
+    for (const auto& cur: range) {
+        if (elt == cur) {return true;}
+    }
+    return false;
+}
+template<typename T, typename It>
+bool in(const T& elt, It first, It last) {
+    for (auto it = first; it != last; ++it) {
+        if (elt == *it) {return true;}
+    }
+    return false;
+}
+template<typename T>
+bool in(const T& elt, const std::vector<T> range) {
+    for (const T& r: range) {
+        if (elt == r) {return true;}
+    }
     return false;
 }
 
