@@ -87,16 +87,6 @@ struct Less{
 
 };
 
-/**
- * tests if elt is in range range
- */
-template<typename T, typename U>
-bool in(const T& elt, std::initializer_list<U> range) {
-    for (const auto& cur: range)
-        if (elt == cur) return true;
-    return false;
-}
-
 /** Foncteur fixe le membre "idx" d'un objet en incrémentant toujours de 1
  *
  * Cela permet de numéroter tous les objets de 0 à n-1 d'un vecteur de pointeurs
