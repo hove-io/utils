@@ -225,6 +225,10 @@ template<class Container, class Value>
 inline auto contains(const Container& c, const Value& x) -> decltype(std::end(c), true) {
     return impl::contains_impl(c, x, 0);
 }
+template<typename T, typename Value>
+inline auto contains(std::initializer_list<T> c, const Value& x) -> decltype(std::end(c), true) {
+    return impl::contains_impl(c, x, 0);
+}
 
 template<class Container, class Pred>
 inline bool contains_if(const Container& c, Pred p) {
