@@ -49,9 +49,11 @@ template<typename T> struct Rank {
     inline bool operator<(const Rank& other) const { return val < other.val; }
     inline bool operator<=(const Rank& other) const { return val <= other.val; }
     inline Rank<T> operator-(const rank_t& v) const { return Rank(val - v); }
-    inline void operator--() { --val; }
+    inline Rank<T>& operator--() { --val; return *this;}
+    inline Rank<T> operator--(int) { Rank res(*this); --(*this); return res;}
     inline Rank<T> operator+(const rank_t& v) const { return Rank(val + v); }
-    inline void operator++() { ++val; }
+    inline Rank<T>& operator++() { ++val; return *this; }
+    inline Rank<T> operator++(int) { Rank res(*this); ++(*this); return res;}
     inline friend std::ostream& operator<<(std::ostream& os, const Rank& idx) {
         return os << idx.val;
     }
