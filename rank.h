@@ -35,7 +35,7 @@ www.navitia.io
 
 namespace navitia {
 
-typedef uint16_t rank_t;
+using rank_t = uint16_t;
 const rank_t invalid_rank = std::numeric_limits<rank_t>::max();
 
 // Strong typing of rank with a phantom type!
