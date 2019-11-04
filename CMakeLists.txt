@@ -1,4 +1,5 @@
 #uri base64 encoding activated by giving a ENABLE_URI_ENCODING variable to cmake
+
 IF(DEFINED ENABLE_URI_ENCODING)
     add_definitions(-DENABLE_URI_ENCODING)
 ENDIF(DEFINED ENABLE_URI_ENCODING)
@@ -42,7 +43,6 @@ SET(UTILS_SRC
 )
 
 add_library(utils ${UTILS_SRC})
-
-target_link_libraries(utils ${Boost_SYSTEM_LIBRARY} ${PQ_LIB} log4cplus config ${ZMQ_LIB})
+target_link_libraries(utils ${Boost_REGEX_LIBRARY} ${Boost_THREAD_LIBRARY} ${PQ_LIB} log4cplus config ${ZMQ_LIB})
 
 add_subdirectory(tests)
