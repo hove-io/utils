@@ -126,10 +126,6 @@ struct pseudo_natural_sort {
     bool operator() (const std::string&, const std::string&) const;
 };
 
-/**
- * strip_accents_and_lower:
- * We compare strings: integers and accents are taken in account for the sort
- */
 std::string strip_accents(std::string str);
 std::string strip_accents_and_lower(const std::string& str);
 
