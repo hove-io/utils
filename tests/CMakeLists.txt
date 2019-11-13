@@ -32,3 +32,7 @@ add_boost_test(map_find_test)
 add_executable(deadline_test deadline_test.cpp)
 target_link_libraries(deadline_test utils ${Boost_LIBRARIES} log4cplus)
 add_boost_test(deadline_test)
+
+add_executable(functions_test functions_test.cpp)
+target_link_libraries(functions_test utils ${Boost_LIBRARIES} log4cplus)
+add_boost_test(functions_test)
