@@ -38,8 +38,6 @@ www.navitia.io
 #include <cstdio>
 #include <unistd.h>  // getcwd() definition
 
-#include <boost/algorithm/string/replace.hpp>
-#include <boost/algorithm/string/case_conv.hpp>
 #include <boost/range/algorithm/remove_if.hpp>
 #include <boost/range/algorithm/find_if.hpp>
 #include <boost/weak_ptr.hpp>
@@ -119,15 +117,12 @@ unique_ptr<T> make_unique(Args&& ...args) {
 namespace navitia {
 
 /**
- * pseudo natural sort:
- * if both string carry integer, we compare them, else we compare the string
+ * speudo natural sort:
+ * if both string cary integer, we compare them, else we compare the string
  */
 struct pseudo_natural_sort {
     bool operator() (const std::string&, const std::string&) const;
 };
-
-std::string strip_accents(std::string str);
-std::string strip_accents_and_lower(const std::string& str);
 
 /**
  * sort_and_truncate:
