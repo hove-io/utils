@@ -36,15 +36,16 @@ www.navitia.io
 /**
  * Boost serialize for the fusion map
  */
-namespace boost { namespace serialization {
+namespace boost {
+namespace serialization {
 
 template <typename Ar>
 struct Saver {
     Ar& ar;
-    Saver(Ar& a): ar(a) {}
+    Saver(Ar& a) : ar(a) {}
     template <typename Pair>
     void operator()(Pair& data) const {
-        ar & data.second;
+        ar& data.second;
     }
 };
 
@@ -54,4 +55,5 @@ void serialize(Ar& ar, boost::fusion::map<TArgs...>& fmap, unsigned /*version*/)
     fusion::for_each(fmap, s);
 }
 
-}} // namespace boost::serialization
+}  // namespace serialization
+}  // namespace boost

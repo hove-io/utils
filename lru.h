@@ -1,28 +1,28 @@
 /* Copyright © 2001-2015, Canal TP and/or its affiliates. All rights reserved.
-  
+
 This file is part of Navitia,
     the software to build cool stuff with public transport.
- 
+
 Hope you'll enjoy and contribute to this project,
     powered by Canal TP (www.canaltp.fr).
 Help us simplify mobility and open public transport:
     a non ending quest to the responsive locomotion way of traveling!
-  
+
 LICENCE: This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
-   
+
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU Affero General Public License for more details.
-   
+
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
-  
+
 Stay tuned using
-twitter @navitia 
+twitter @navitia
 IRC #navitia on freenode
 https://groups.google.com/d/forum/navitia
 www.navitia.io
@@ -41,29 +41,26 @@ www.navitia.io
 
 namespace navitia {
 
-//forward declare
-template<typename T> struct ConcurrentLru;
+// forward declare
+template <typename T>
+struct ConcurrentLru;
 
 // Encapsulate a unary function, and provide a least recently used
 // cache.  The function must be pure (same argument => same result),
 // and a Lru object must not be shared across threads.
-template<typename F>
+template <typename F>
 class Lru {
 private:
-    typedef typename boost::remove_cv<typename boost::remove_reference<
-                                          typename F::argument_type>::type
-                                      >::type key_type;
-    typedef typename boost::remove_cv<typename boost::remove_reference<
-                                          typename F::result_type>::type
-                                      >::type mapped_type;
+    typedef typename boost::remove_cv<typename boost::remove_reference<typename F::argument_type>::type>::type key_type;
+    typedef
+        typename boost::remove_cv<typename boost::remove_reference<typename F::result_type>::type>::type mapped_type;
     typedef std::pair<const key_type, mapped_type> value_type;
     typedef boost::multi_index_container<
         value_type,
-        boost::multi_index::indexed_by<
-            boost::multi_index::sequenced<>,
-            boost::multi_index::ordered_unique<
-                boost::multi_index::member<value_type, const key_type, &value_type::first> > >
-        > Cache;
+        boost::multi_index::indexed_by<boost::multi_index::sequenced<>,
+                                       boost::multi_index::ordered_unique<
+                                           boost::multi_index::member<value_type, const key_type, &value_type::first>>>>
+        Cache;
 
     // the encapsulate function
     F f;
@@ -77,11 +74,10 @@ private:
     mutable size_t nb_cache_miss = 0;
     mutable size_t nb_calls = 0;
 
-
-    std::vector<key_type> keys() const{
+    std::vector<key_type> keys() const {
         auto& list = cache.template get<0>();
         std::vector<key_type> result;
-        for(const auto& p: list){
+        for (const auto& p : list) {
             result.push_back(p.first);
         }
         return result;
@@ -94,7 +90,7 @@ public:
     typedef mapped_type const& result_type;
     typedef typename F::argument_type argument_type;
 
-    Lru(F fun, size_t max = 10): f(std::move(fun)), max_cache(max) {
+    Lru(F fun, size_t max = 10) : f(std::move(fun)), max_cache(max) {
         if (max < 1) {
             throw std::invalid_argument("max (size of cache) must be strictly positive");
         }
@@ -115,7 +111,9 @@ public:
             const auto ins = list.push_front(std::make_pair(arg, f(arg)));
             // clean the cache by the end (where the entries are the
             // older ones) until the requested size
-            while (list.size() > max_cache) { list.pop_back(); }
+            while (list.size() > max_cache) {
+                list.pop_back();
+            }
             return ins.first->second;
         }
     }
@@ -125,52 +123,48 @@ public:
 
     void warmup(const Lru<F>& other) {
         auto keys = other.keys();
-        //reverse keys to keep the order of the lru
+        // reverse keys to keep the order of the lru
         std::reverse(begin(keys), end(keys));
-        for(const auto& key: keys){
+        for (const auto& key : keys) {
             this->operator()(key);
         }
     }
-
 };
-template<typename F> inline Lru<F> make_lru(F fun, size_t max = 10) {
+template <typename F>
+inline Lru<F> make_lru(F fun, size_t max = 10) {
     return Lru<F>(std::move(fun), max);
 }
 
-template<typename F> struct ConcurrentLru {
+template <typename F>
+struct ConcurrentLru {
 private:
     struct SharedPtrF {
         F f;
         using argument_type = typename F::argument_type;
         using underlying_type =
-            typename boost::remove_cv<
-            typename boost::remove_reference<
-                typename F::result_type>::type
-            >::type const;
+            typename boost::remove_cv<typename boost::remove_reference<typename F::result_type>::type>::type const;
         using result_type = std::shared_future<std::shared_ptr<underlying_type>>;
 
         result_type operator()(argument_type arg) const {
-            //build a future that will be lazy initialized
-            return std::async(std::launch::deferred, [&](){
-                return std::make_shared<underlying_type>(f(arg));
-            }).share();
+            // build a future that will be lazy initialized
+            return std::async(std::launch::deferred, [&]() { return std::make_shared<underlying_type>(f(arg)); })
+                .share();
         }
     };
     Lru<SharedPtrF> lru;
     std::unique_ptr<std::mutex> mutex = std::make_unique<std::mutex>();
 
-    std::vector<typename Lru<SharedPtrF>::key_type> keys() const{
+    std::vector<typename Lru<SharedPtrF>::key_type> keys() const {
         std::lock_guard<std::mutex> lock(*mutex);
         return lru.keys();
     }
-
 
 public:
     using result_type = typename std::shared_ptr<typename SharedPtrF::underlying_type>;
     using argument_type = typename SharedPtrF::argument_type;
 
-    ConcurrentLru(F fun, size_t max = 10): lru(SharedPtrF{std::move(fun)}, max) {}
-    ConcurrentLru(ConcurrentLru&&) = default;// needed by old version of gcc
+    ConcurrentLru(F fun, size_t max = 10) : lru(SharedPtrF{std::move(fun)}, max) {}
+    ConcurrentLru(ConcurrentLru&&) = default;  // needed by old version of gcc
 
     result_type operator()(argument_type arg) const {
         typename SharedPtrF::result_type future;
@@ -178,7 +172,7 @@ public:
             std::lock_guard<std::mutex> lock(*mutex);
             future = lru(arg);
         }
-        // As arg might be a reference, the maybe newly created future must be run 
+        // As arg might be a reference, the maybe newly created future must be run
         // before the end of the current method, else we can have a use after free.
         return future.get();
     }
@@ -187,17 +181,18 @@ public:
     size_t get_nb_calls() const { return lru.get_nb_calls(); }
 
     void warmup(const ConcurrentLru<F>& other) {
-        //we can't use the warmup of the lru direclty as it will mess with the future
+        // we can't use the warmup of the lru direclty as it will mess with the future
         auto keys = other.keys();
-        //reverse keys to keep the order of the lru
+        // reverse keys to keep the order of the lru
         std::reverse(begin(keys), end(keys));
-        for(const auto& key: keys){
+        for (const auto& key : keys) {
             this->operator()(key);
         }
     }
 };
-template<typename F> inline ConcurrentLru<F> make_concurrent_lru(F fun, size_t max = 10) {
+template <typename F>
+inline ConcurrentLru<F> make_concurrent_lru(F fun, size_t max = 10) {
     return ConcurrentLru<F>(std::move(fun), max);
 }
 
-} // namespace navitia
+}  // namespace navitia

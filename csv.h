@@ -49,52 +49,52 @@ www.navitia.io
 namespace qi = boost::spirit::qi;
 
 class CsvReader {
-    public:
-        CsvReader(const std::string& filename, char separator=';', bool read_headers = false, bool to_lower_headers = false, std::string encoding="UTF-8");
-        CsvReader(std::stringstream& sstream, char separator=';', bool read_headers = false, bool to_lower_headers = false, std::string encoding="UTF-8");
+public:
+    CsvReader(const std::string& filename,
+              char separator = ';',
+              bool read_headers = false,
+              bool to_lower_headers = false,
+              std::string encoding = "UTF-8");
+    CsvReader(std::stringstream& sstream,
+              char separator = ';',
+              bool read_headers = false,
+              bool to_lower_headers = false,
+              std::string encoding = "UTF-8");
 
-        ~CsvReader();
-        std::vector<std::string> next();
-        int get_pos_col(const std::string&) const;
-        bool has_col(int col_idx, const std::vector<std::string>& row) const;
-        bool is_valid(int col_idx, const std::vector<std::string>& row) const;
-        bool eof() const;
-        void close();
-        bool is_open() const;
-        bool validate(const std::vector<std::string> &mandatory_headers) const;
-        std::string missing_headers(const std::vector<std::string> &mandatory_headers) const;
-        std::string convert(const std::string& st) const;
+    ~CsvReader();
+    std::vector<std::string> next();
+    int get_pos_col(const std::string&) const;
+    bool has_col(int col_idx, const std::vector<std::string>& row) const;
+    bool is_valid(int col_idx, const std::vector<std::string>& row) const;
+    bool eof() const;
+    void close();
+    bool is_open() const;
+    bool validate(const std::vector<std::string>& mandatory_headers) const;
+    std::string missing_headers(const std::vector<std::string>& mandatory_headers) const;
+    std::string convert(const std::string& st) const;
 
-        std::string filename;
+    std::string filename;
 
-    private:
+private:
+    qi::rule<std::string::const_iterator, std::string()> quoted_string;
+    qi::rule<std::string::const_iterator, std::string()> valid_characters;
+    qi::rule<std::string::const_iterator, std::string()> item;
+    qi::rule<std::string::const_iterator, std::vector<std::string>()> csv_parser;
 
-        qi::rule<std::string::const_iterator, std::string()> quoted_string;
-        qi::rule<std::string::const_iterator, std::string()> valid_characters;
-        qi::rule<std::string::const_iterator, std::string()> item ;
-        qi::rule<std::string::const_iterator, std::vector<std::string>()> csv_parser;
-
-        std::fstream file;
-        std::stringstream sstream;
-        std::istream *stream;
-        char separator;
-        bool closed;
-        std::unordered_map<std::string, int> headers;
+    std::fstream file;
+    std::stringstream sstream;
+    std::istream* stream;
+    char separator;
+    bool closed;
+    std::unordered_map<std::string, int> headers;
 #ifdef HAVE_ICONV_H
-        std::unique_ptr<EncodingConverter> converter;
+    std::unique_ptr<EncodingConverter> converter;
 #endif
 
-        void init();
-        enum class ParseStatus {
-            OK,
-            CONTINUE,
-            FAIL
-        };
-        std::pair<ParseStatus, std::vector<std::string>>
-        get_line(const std::string& str) const;
-
+    void init();
+    enum class ParseStatus { OK, CONTINUE, FAIL };
+    std::pair<ParseStatus, std::vector<std::string>> get_line(const std::string& str) const;
 };
 
 /// Supprime le BOM s'il existe, il n'y a donc pas de risque à l'appeler tout seul
 void remove_bom(std::fstream& stream);
-
