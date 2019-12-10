@@ -2,7 +2,7 @@
 
 namespace navitia {
 
-exception::~exception() noexcept {}
-recoverable_exception::~recoverable_exception() noexcept {}
+exception::~exception() noexcept = default;
+recoverable_exception::~recoverable_exception() noexcept = default;
 
 }  // namespace navitia

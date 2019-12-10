@@ -30,8 +30,8 @@ www.navitia.io
 
 #include "base64_encode.h"
 #include <boost/archive/iterators/base64_from_binary.hpp>
-#include <boost/archive/iterators/transform_width.hpp>
 #include <boost/archive/iterators/ostream_iterator.hpp>
+#include <boost/archive/iterators/transform_width.hpp>
 #include <sstream>
 #include <string>
 

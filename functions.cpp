@@ -31,9 +31,9 @@ www.navitia.io
 #include "functions.h"
 #include "alphanum.hpp"
 #include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/lexical_cast.hpp>
-#include <boost/algorithm/string/split.hpp>
 
 double str_to_double(std::string str) {
     boost::trim(str);
@@ -64,8 +64,9 @@ std::vector<std::string> split_string(const std::string& str, const std::string&
 }
 
 std::string value_by_key(const std::map<std::string, std::string>& vect, const std::string& key) {
-    if (vect.find(key) != vect.end())
+    if (vect.find(key) != vect.end()) {
         return vect.at(key);
+    }
     return "";
 }
 
@@ -75,7 +76,7 @@ bool pseudo_natural_sort::operator()(const std::string& a, const std::string& b)
     return doj::alphanum_less<std::string>()(a, b);
 }
 std::string make_adapted_uri_fast(const std::string& ref_uri, size_t s) {
-    return ref_uri + ":adapted-" + boost::lexical_cast<std::string>(s);
+    return ref_uri + ":adapted-" + std::to_string(s);
 }
 
 std::string make_adapted_uri(const std::string& ref_uri) {
@@ -89,10 +90,9 @@ std::string absolute_path() {
     char buf[256];
     if (getcwd(buf, sizeof(buf))) {
         return std::string(buf) + "/";
-    } else {
-        std::perror("getcwd");
-        return "";
     }
+    std::perror("getcwd");
+    return "";
 }
 
 }  // namespace navitia

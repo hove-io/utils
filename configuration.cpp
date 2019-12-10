@@ -29,9 +29,9 @@ www.navitia.io
 */
 
 #include "configuration.h"
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/ini_parser.hpp>
 #include <boost/foreach.hpp>
+#include <boost/property_tree/ini_parser.hpp>
+#include <boost/property_tree/ptree.hpp>
 
 #ifdef WIN32
 #include "windows.h"

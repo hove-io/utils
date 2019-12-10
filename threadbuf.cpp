@@ -25,4 +25,4 @@
 
 #include "threadbuf.h"
 
-threadbuf::~threadbuf() {}
+threadbuf::~threadbuf() = default;

@@ -34,12 +34,12 @@ www.navitia.io
 
 namespace navitia {
 
-wrong_coordinate::~wrong_coordinate() noexcept {}
+wrong_coordinate::~wrong_coordinate() noexcept = default;
 
 static std::pair<double, double> make_coord(const std::string& lon, const std::string& lat) {
     try {
-        double dlon = boost::lexical_cast<double>(lon);
-        double dlat = boost::lexical_cast<double>(lat);
+        auto dlon = boost::lexical_cast<double>(lon);
+        auto dlat = boost::lexical_cast<double>(lat);
         return {dlon, dlat};
     } catch (const boost::bad_lexical_cast&) {
         throw wrong_coordinate("conversion failed");
@@ -59,7 +59,7 @@ std::pair<double, double> parse_coordinate(const std::string& uri) {
     if (uri.size() > 6 && uri.substr(0, 6) == "coord:") {
         // old style to represent coord.
         // done for retrocompatibility
-        size_t pos2 = uri.find(":", 6);
+        size_t pos2 = uri.find(':', 6);
         if (pos2 != std::string::npos) {
             return make_coord(uri.substr(6, pos2 - 6), uri.substr(pos2 + 1));
         }

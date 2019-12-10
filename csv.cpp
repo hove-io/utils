@@ -29,13 +29,13 @@ www.navitia.io
 */
 
 #include "csv.h"
-#include "logger.h"
 #include "exception.h"
 #include "functions.h"
-#include <iostream>
-#include <fstream>
-#include <sstream>
+#include "logger.h"
 #include <boost/foreach.hpp>
+#include <fstream>
+#include <iostream>
+#include <sstream>
 
 void CsvReader::init() {
     // Our parser will fail (and thus throw) if a quoted string is not
@@ -60,7 +60,7 @@ CsvReader::CsvReader(const std::string& filename,
                      bool to_lower_headers,
                      std::string encoding)
     : filename(filename),
-      file(),
+
       separator(separator),
       closed(false),
 #ifdef HAVE_ICONV_H
@@ -84,8 +84,9 @@ CsvReader::CsvReader(const std::string& filename,
         if (read_headers) {
             auto line = next();
             for (size_t i = 0; i < line.size(); ++i) {
-                if (to_lower_headers)
+                if (to_lower_headers) {
                     boost::to_lower(line[i]);
+                }
                 this->headers.insert(std::make_pair(line[i], i));
             }
         }
@@ -100,7 +101,7 @@ CsvReader::CsvReader(std::stringstream& sstream,
                      bool to_lower_headers,
                      std::string encoding)
     : filename("sstream"),
-      file(),
+
       separator(separator),
       closed(false),
 #ifdef HAVE_ICONV_H
@@ -119,8 +120,9 @@ CsvReader::CsvReader(std::stringstream& sstream,
     if (read_headers) {
         auto line = next();
         for (size_t i = 0; i < line.size(); ++i) {
-            if (to_lower_headers)
+            if (to_lower_headers) {
                 boost::to_lower(line[i]);
+            }
             this->headers.insert(std::make_pair(line[i], i));
         }
     }
@@ -132,8 +134,9 @@ bool CsvReader::is_open() const {
 
 bool CsvReader::validate(const std::vector<std::string>& mandatory_headers) const {
     BOOST_FOREACH (auto header, mandatory_headers) {
-        if (headers.find(header) == headers.end())
+        if (headers.find(header) == headers.end()) {
             return false;
+        }
     }
     return true;
 }
@@ -141,8 +144,9 @@ bool CsvReader::validate(const std::vector<std::string>& mandatory_headers) cons
 std::string CsvReader::missing_headers(const std::vector<std::string>& mandatory_headers) const {
     std::string result;
     BOOST_FOREACH (auto header, mandatory_headers) {
-        if (headers.find(header) == headers.end())
+        if (headers.find(header) == headers.end()) {
             result += header + ", ";
+        }
     }
 
     return result;
@@ -196,9 +200,8 @@ std::pair<CsvReader::ParseStatus, std::vector<std::string>> CsvReader::get_line(
         // then we need the next line to complete
         if (e.first == s_end) {
             return {ParseStatus::CONTINUE, {}};
-        } else {
-            return {ParseStatus::FAIL, {}};
         }
+        return {ParseStatus::FAIL, {}};
     }
 
     if (!result || s_begin != s_end) {
@@ -251,8 +254,9 @@ std::vector<std::string> CsvReader::next() {
 
 int CsvReader::get_pos_col(const std::string& str) const {
     auto it = headers.find(str);
-    if (it != headers.end())
+    if (it != headers.end()) {
         return it->second;
+    }
     return -1;
 }
 
@@ -267,8 +271,9 @@ bool CsvReader::is_valid(int col_idx, const std::vector<std::string>& row) const
 void remove_bom(std::fstream& stream) {
     char buffer[3];
     stream.read(buffer, 3);
-    if (stream.gcount() != 3)
+    if (stream.gcount() != 3) {
         return;
+    }
     if (buffer[0] == '\xEF' && buffer[1] == '\xBB') {
         // BOM UTF8
         return;
