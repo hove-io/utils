@@ -83,7 +83,7 @@ private:
 
     std::fstream file;
     std::stringstream sstream;
-    std::istream* stream;
+    std::unique_ptr<std::istream> stream;
     char separator;
     bool closed;
     std::unordered_map<std::string, int> headers;

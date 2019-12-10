@@ -43,7 +43,7 @@ www.navitia.io
  */
 struct Configuration {
 private:
-    static Configuration* instance;
+    static std::unique_ptr<Configuration> instance;
     /// Dictionnaire de chaînes de caractères
     /// Par défaut contient au moins :
     /// application : le nom de la dll ou de l'exécutable

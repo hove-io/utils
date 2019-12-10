@@ -69,7 +69,7 @@ CsvReader::CsvReader(const std::string& filename,
 {
     this->init();
     file.open(filename, std::fstream::in);
-    stream = new std::istream(file.rdbuf());
+    stream = std::make_unique<std::istream>(file.rdbuf());
     stream->setstate(file.rdstate());
     if (encoding != "UTF-8") {
         // TODO la taille en dur s'mal
@@ -95,7 +95,7 @@ CsvReader::CsvReader(const std::string& filename,
     }
 }
 
-CsvReader::CsvReader(std::stringstream& sstream,
+CsvReader::CsvReader(std::stringstream& /*sstream*/,
                      char separator,
                      bool read_headers,
                      bool to_lower_headers,
@@ -109,7 +109,7 @@ CsvReader::CsvReader(std::stringstream& sstream,
 #endif
 {
     this->init();
-    stream = new std::istream(sstream.rdbuf());
+    stream = std::make_unique<std::istream>(file.rdbuf());
     if (encoding != "UTF-8") {
         // TODO la taille en dur s'mal
 #ifdef HAVE_ICONV_H
@@ -160,7 +160,7 @@ void CsvReader::close() {
 }
 
 bool CsvReader::eof() const {
-    return stream->eof() | stream->bad() | stream->fail();
+    return stream->eof() || stream->bad() || stream->fail();
 }
 
 CsvReader::~CsvReader() {

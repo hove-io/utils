@@ -40,7 +40,7 @@ HINSTANCE hinstance = NULL;
 
 Configuration* Configuration::get() {
     if (instance == nullptr) {
-        instance = new Configuration();
+        instance = std::make_unique<Configuration>();
 #ifdef WIN32
         char buf[2048];
         DWORD filePath = GetModuleFileName(::hinstance, buf, 2048);
@@ -50,7 +50,7 @@ Configuration* Configuration::get() {
         instance->strings["path"] = std::string(buf).substr(0, posSlash) + "\\";
 #endif
     }
-    return instance;
+    return instance.get();
 }
 
 bool Configuration::is_instanciated() {
@@ -100,4 +100,4 @@ void Configuration::set_int(const std::string& key, int value) {
     mutex.unlock();
 }
 
-Configuration* Configuration::instance = nullptr;
+std::unique_ptr<Configuration> Configuration::instance = nullptr;
