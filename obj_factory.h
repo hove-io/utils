@@ -39,7 +39,7 @@ namespace navitia {
  * Factory handling all collections for one object
  * Object must inherit from navitia::type::Header
  */
-template<typename ObjType>
+template <typename ObjType>
 class ObjFactory {
 private:
     using inner_vector = typename std::vector<std::unique_ptr<ObjType>>;
@@ -48,8 +48,7 @@ private:
     inner_vector vec;
     inner_map map;
 
-    void reindex_and_erase(const uint idx)
-    {
+    void reindex_and_erase(const uint idx) {
         // reindex idx elements
         for (uint i = idx + 1; i < vec.size(); ++i) {
             vec[i].get()->idx--;
@@ -61,13 +60,13 @@ private:
 public:
     using iterator = typename inner_vector::iterator;
     using const_iterator = typename inner_vector::const_iterator;
-    using const_reference = ObjType const * const;
+    using const_reference = ObjType const* const;
 
-    template<typename ...Args>
-    ObjType* emplace(const std::string& uri, Args&& ...args) {
+    template <typename... Args>
+    ObjType* emplace(const std::string& uri, Args&&... args) {
         if (navitia::contains(map, uri)) {
-            throw(std::logic_error(std::string("In ") + typeid(*this).name() +
-                                   ": Object with same uri (" + uri + ") already stored."));
+            throw(std::logic_error(std::string("In ") + typeid(*this).name() + ": Object with same uri (" + uri
+                                   + ") already stored."));
         }
         vec.push_back(std::make_unique<ObjType>(std::forward<Args>(args)...));
         ObjType* obj = vec.back().get();
@@ -77,8 +76,8 @@ public:
         return obj;
     }
 
-    template<typename ...Args>
-    ObjType* get_or_create(const std::string& uri, Args&& ...args) {
+    template <typename... Args>
+    ObjType* get_or_create(const std::string& uri, Args&&... args) {
         ObjType* obj = get_mut(uri);
         if (obj == nullptr) {
             obj = emplace(uri, args...);
@@ -86,24 +85,18 @@ public:
         return obj;
     }
 
-    ObjType* insert(const std::string& uri, ObjType&& obj) {
-        return emplace(uri, std::move(obj));
-    }
+    ObjType* insert(const std::string& uri, ObjType&& obj) { return emplace(uri, std::move(obj)); }
 
-    const ObjType* operator[] (const std::string& uri) const {
-        return find_or_default(uri, map);
-    }
+    const ObjType* operator[](const std::string& uri) const { return find_or_default(uri, map); }
 
-    const ObjType* operator[] (const Idx<ObjType>& idx) const {
+    const ObjType* operator[](const Idx<ObjType>& idx) const {
         if (!exists(idx)) {
             return nullptr;
         }
         return vec[idx.val].get();
     }
 
-    ObjType* get_mut(const std::string& uri) {
-        return find_or_default(uri, map);
-    }
+    ObjType* get_mut(const std::string& uri) { return find_or_default(uri, map); }
 
     ObjType* get_mut(const Idx<ObjType>& idx) {
         if (!exists(idx)) {
@@ -112,13 +105,9 @@ public:
         return vec[idx.val].get();
     }
 
-    bool exists(const std::string& uri) const {
-        return (map.find(uri) != map.end());
-    }
+    bool exists(const std::string& uri) const { return (map.find(uri) != map.end()); }
 
-    bool exists(const Idx<ObjType>& idx) const {
-        return (idx.val < vec.size());
-    }
+    bool exists(const Idx<ObjType>& idx) const { return (idx.val < vec.size()); }
 
     bool erase(const Idx<ObjType>& idx) {
         if (!exists(idx)) {
@@ -153,13 +142,15 @@ public:
 
     size_t size() const noexcept { return vec.size(); }
 
-    template<class Archive> void serialize(Archive & ar, const unsigned int) { ar & vec & map; }
+    template <class Archive>
+    void serialize(Archive& ar, const unsigned int) {
+        ar& vec& map;
+    }
 };
 
-} // namespace navitia
+}  // namespace navitia
 
-template<typename T>
-const T*
-find_or_default(const std::string& key, const navitia::ObjFactory<T>& m) {
+template <typename T>
+const T* find_or_default(const std::string& key, const navitia::ObjFactory<T>& m) {
     return m[key];
 }

@@ -42,20 +42,19 @@ namespace utils {
  * or when find() is called.
  * Result is accessible via : if_found() or if_not_found()
  */
-template<class Map>
-class MapFind
-{
+template <class Map>
+class MapFind {
 public:
     typedef typename Map::key_type KeyType;
     typedef typename Map::mapped_type ValueType;
-    typedef ValueType const * ConstPtrValueType;
+    typedef ValueType const* ConstPtrValueType;
 
     /**
      * @brief Create a MapFind object on a map, no find is performed until find() is called.
      *
      * @param map : the map to perform the search on
      */
-    MapFind(Map & map): map(map) {}
+    MapFind(Map& map) : map(map) {}
 
     /**
      * @brief Create a MapFind object and find the key in the associated map
@@ -63,9 +62,7 @@ public:
      * @param map : the map to perform the search on
      * @param key : the key to be searched in the map
      */
-    MapFind(Map & map, const KeyType & key): map(map) {
-        find(key);
-    }
+    MapFind(Map& map, const KeyType& key) : map(map) { find(key); }
 
     /**
      * @brief Callback fn with the value associated to the searched key
@@ -74,10 +71,10 @@ public:
      * @param fn : a callback function that takes a constant mapped type reference as parameter
      * @returns A MapFind object to query the result or perform another find
      */
-    template<class Func>
+    template <class Func>
     MapFind& if_found(Func fn) {
-        if( res ) {
-            fn( **res );
+        if (res) {
+            fn(**res);
         }
         return *this;
     }
@@ -88,9 +85,9 @@ public:
      * @param fn : a callback function with no parameter
      * @returns A MapFind object to query the result or perform another find
      */
-    template<class Func>
+    template <class Func>
     MapFind& if_not_found(Func fn) {
-        if( !res ) {
+        if (!res) {
             fn();
         }
         return *this;
@@ -102,10 +99,10 @@ public:
      * @param key : the key to be searched in the map
      * @returns A MapFind object to query the result or perform another find
      */
-    template<class Key>
-    MapFind& find(const Key & key) {
+    template <class Key>
+    MapFind& find(const Key& key) {
         auto it = map.find(key);
-        if(it != map.end()) {
+        if (it != map.end()) {
             res = boost::make_optional(&it->second);
         } else {
             res = boost::none;
@@ -114,7 +111,7 @@ public:
     }
 
 private:
-    Map & map;
+    Map& map;
     boost::optional<ConstPtrValueType> res;
 };
 
@@ -126,7 +123,7 @@ private:
  * @param map : the map to perform the search on
  * @returns A MapFind object to query the result or perform another find
  */
-template<class Map>
+template <class Map>
 MapFind<Map> make_map_find(Map& map) {
     return MapFind<Map>(map);
 }
@@ -140,10 +137,10 @@ MapFind<Map> make_map_find(Map& map) {
  * @param key : the key to search in the map
  * @returns A MapFind object to query the result or perform another find
  */
-template<class Map, class Key>
+template <class Map, class Key>
 MapFind<Map> make_map_find(Map& c, const Key& key) {
     return MapFind<Map>(c, key);
 }
 
-} // namespace utils
-} // namespace navitia
+}  // namespace utils
+}  // namespace navitia

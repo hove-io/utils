@@ -37,51 +37,55 @@ www.navitia.io
 #include <sstream>
 #include <boost/foreach.hpp>
 
-void CsvReader::init(){
+void CsvReader::init() {
     // Our parser will fail (and thus throw) if a quoted string is not
     // finished (by using > instead of >> that disallow backtrack).
     // Like that, if the parser throw, we ask for more input to read
     // the next line
-    this->quoted_string = (qi::omit[(*qi::space)] >> // skipping spaces before
-                           qi::lit('"')) >
-                         *(
-                             '\\' >> qi::char_('"') // \" as "
-                             | '"' >> qi::char_('"') // or "" as "
-                             | (qi::char_ - '"') // or not(")
-                             ) >
-                         qi::lit('"') >
-                         qi::omit[(*qi::space)]; // skipping spaces after
+    this->quoted_string = (qi::omit[(*qi::space)] >>  // skipping spaces before
+                           qi::lit('"'))
+                          > *('\\' >> qi::char_('"')   // \" as "
+                              | '"' >> qi::char_('"')  // or "" as "
+                              | (qi::char_ - '"')      // or not(")
+                              )
+                          > qi::lit('"') > qi::omit[(*qi::space)];  // skipping spaces after
     this->valid_characters = qi::char_ - '"' - this->separator - '\n';
     this->item = this->quoted_string | *this->valid_characters;
     this->csv_parser = this->item % separator;
 }
 
-CsvReader::CsvReader(const std::string& filename, char separator, bool read_headers, bool to_lower_headers, std::string encoding): filename(filename),
-    file(), separator(separator), closed(false)
+CsvReader::CsvReader(const std::string& filename,
+                     char separator,
+                     bool read_headers,
+                     bool to_lower_headers,
+                     std::string encoding)
+    : filename(filename),
+      file(),
+      separator(separator),
+      closed(false),
 #ifdef HAVE_ICONV_H
-    , converter(nullptr)
+      converter(nullptr)
 #endif
 {
     this->init();
     file.open(filename, std::fstream::in);
     stream = new std::istream(file.rdbuf());
     stream->setstate(file.rdstate());
-    if(encoding != "UTF-8"){
-        //TODO la taille en dur s'mal
+    if (encoding != "UTF-8") {
+        // TODO la taille en dur s'mal
 #ifdef HAVE_ICONV_H
         converter = std::make_unique<EncodingConverter>(encoding, "UTF-8", 2048);
 #endif
     }
 
-    if(file.is_open()) {
-
+    if (file.is_open()) {
         remove_bom(file);
 
-        if(read_headers) {
+        if (read_headers) {
             auto line = next();
-            for(size_t i=0; i<line.size(); ++i){
-	            if(to_lower_headers)
-            		boost::to_lower(line[i]);
+            for (size_t i = 0; i < line.size(); ++i) {
+                if (to_lower_headers)
+                    boost::to_lower(line[i]);
                 this->headers.insert(std::make_pair(line[i], i));
             }
         }
@@ -90,26 +94,33 @@ CsvReader::CsvReader(const std::string& filename, char separator, bool read_head
     }
 }
 
-CsvReader::CsvReader(std::stringstream &sstream, char separator, bool read_headers, bool to_lower_headers, std::string encoding): filename("sstream"),
-    file() , separator(separator), closed(false)
+CsvReader::CsvReader(std::stringstream& sstream,
+                     char separator,
+                     bool read_headers,
+                     bool to_lower_headers,
+                     std::string encoding)
+    : filename("sstream"),
+      file(),
+      separator(separator),
+      closed(false),
 #ifdef HAVE_ICONV_H
-    , converter(nullptr)
+      converter(nullptr)
 #endif
 {
     this->init();
     stream = new std::istream(sstream.rdbuf());
-    if(encoding != "UTF-8"){
-        //TODO la taille en dur s'mal
+    if (encoding != "UTF-8") {
+        // TODO la taille en dur s'mal
 #ifdef HAVE_ICONV_H
         converter = std::make_unique<EncodingConverter>(encoding, "UTF-8", 2048);
 #endif
     }
 
-    if(read_headers) {
+    if (read_headers) {
         auto line = next();
-        for(size_t i=0; i<line.size(); ++i){
-            if(to_lower_headers)
-	            boost::to_lower(line[i]);
+        for (size_t i = 0; i < line.size(); ++i) {
+            if (to_lower_headers)
+                boost::to_lower(line[i]);
             this->headers.insert(std::make_pair(line[i], i));
         }
     }
@@ -119,51 +130,49 @@ bool CsvReader::is_open() const {
     return stream->good();
 }
 
-bool CsvReader::validate(const std::vector<std::string> &mandatory_headers) const {
-    BOOST_FOREACH(auto header, mandatory_headers){
-        if(headers.find(header) == headers.end())
+bool CsvReader::validate(const std::vector<std::string>& mandatory_headers) const {
+    BOOST_FOREACH (auto header, mandatory_headers) {
+        if (headers.find(header) == headers.end())
             return false;
-	}
+    }
     return true;
 }
 
-std::string CsvReader::missing_headers(const std::vector<std::string> &mandatory_headers) const {
+std::string CsvReader::missing_headers(const std::vector<std::string>& mandatory_headers) const {
     std::string result;
-    BOOST_FOREACH(auto header, mandatory_headers){
-        if(headers.find(header) == headers.end())
+    BOOST_FOREACH (auto header, mandatory_headers) {
+        if (headers.find(header) == headers.end())
             result += header + ", ";
     }
 
     return result;
 }
 
-void CsvReader::close(){
-    if(!closed){
+void CsvReader::close() {
+    if (!closed) {
         file.close();
         closed = true;
     }
 }
 
-bool CsvReader::eof() const{
+bool CsvReader::eof() const {
     return stream->eof() | stream->bad() | stream->fail();
 }
 
-CsvReader::~CsvReader(){
+CsvReader::~CsvReader() {
     this->close();
 }
 
 std::string CsvReader::convert(const std::string& st) const {
 #ifdef HAVE_ICONV_H
-    if(converter != nullptr){
+    if (converter != nullptr) {
         return converter->convert(st);
     }
 #endif
     return st;
 }
 
-std::pair<CsvReader::ParseStatus, std::vector<std::string>>
-CsvReader::get_line(const std::string& str) const
-{
+std::pair<CsvReader::ParseStatus, std::vector<std::string>> CsvReader::get_line(const std::string& str) const {
     std::vector<std::string> vec;
     std::string::const_iterator s_begin = str.begin();
     std::string::const_iterator s_end = str.end();
@@ -192,18 +201,18 @@ CsvReader::get_line(const std::string& str) const
         }
     }
 
-    if (! result || s_begin != s_end) {
+    if (!result || s_begin != s_end) {
         return {ParseStatus::FAIL, {}};
     }
-    for(auto& elt: vec) {
+    for (auto& elt : vec) {
         elt = this->convert(elt);
         boost::trim(elt);
     }
     return {ParseStatus::OK, vec};
 }
 
-std::vector<std::string> CsvReader::next(){
-    if(!is_open()){
+std::vector<std::string> CsvReader::next() {
+    if (!is_open()) {
         throw navitia::exception("file not open");
     }
     std::string temp;
@@ -212,32 +221,35 @@ std::vector<std::string> CsvReader::next(){
     auto log = log4cplus::Logger::getInstance("log");
 
     while (true) {
-        if(eof()){
-            if (!line.empty()){
-                LOG4CPLUS_WARN(log ,"Impossible to parse line: " << line);
+        if (eof()) {
+            if (!line.empty()) {
+                LOG4CPLUS_WARN(log, "Impossible to parse line: " << line);
             }
             return {};
         }
         std::getline(*stream, temp);
-        if (line.empty()){
+        if (line.empty()) {
             line = temp;
-        }else{
-            if (!temp.empty()){
-                line += '\n'; line += temp;
+        } else {
+            if (!temp.empty()) {
+                line += '\n';
+                line += temp;
             }
         }
         status_vec = get_line(line);
         switch (status_vec.first) {
-        case ParseStatus::OK: return status_vec.second;
-        case ParseStatus::FAIL:
-            LOG4CPLUS_WARN(log ,"Impossible to parse line: " << line);
-            return {};
-        case ParseStatus::CONTINUE: break;
+            case ParseStatus::OK:
+                return status_vec.second;
+            case ParseStatus::FAIL:
+                LOG4CPLUS_WARN(log, "Impossible to parse line: " << line);
+                return {};
+            case ParseStatus::CONTINUE:
+                break;
         }
     }
 }
 
-int CsvReader::get_pos_col(const std::string & str) const {
+int CsvReader::get_pos_col(const std::string& str) const {
     auto it = headers.find(str);
     if (it != headers.end())
         return it->second;
@@ -252,18 +264,17 @@ bool CsvReader::is_valid(int col_idx, const std::vector<std::string>& row) const
     return (has_col(col_idx, row) && (!row[col_idx].empty()));
 }
 
-
-void remove_bom(std::fstream& stream){
+void remove_bom(std::fstream& stream) {
     char buffer[3];
     stream.read(buffer, 3);
-    if(stream.gcount() != 3)
+    if (stream.gcount() != 3)
         return;
-    if(buffer[0] == '\xEF' && buffer[1] == '\xBB'){
-        //BOM UTF8
+    if (buffer[0] == '\xEF' && buffer[1] == '\xBB') {
+        // BOM UTF8
         return;
     }
     // no match with the BOM, we put back the char read
-    for(int i=0; i<3; i++){
+    for (int i = 0; i < 3; i++) {
         stream.unget();
     }
 }

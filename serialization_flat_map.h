@@ -41,44 +41,34 @@ www.navitia.io
 
 #include <boost/serialization/map.hpp>
 
-namespace boost { namespace serialization {
+namespace boost {
+namespace serialization {
 
-template<class Archive, class ...Types>
-inline void save(
-    Archive & ar,
-    const boost::container::flat_map<Types...> &t,
-    const unsigned int /* file_version */
-){
+template <class Archive, class... Types>
+inline void save(Archive& ar, const boost::container::flat_map<Types...>& t, const unsigned int /* file_version */
+) {
     boost::serialization::stl::save_collection<Archive, boost::container::flat_map<Types...>>(ar, t);
 }
 
-template<class Archive, class ...Types>
-inline void load(
-    Archive & ar,
-    boost::container::flat_map<Types...> &t,
-    const unsigned int /* file_version */
-){
+template <class Archive, class... Types>
+inline void load(Archive& ar, boost::container::flat_map<Types...>& t, const unsigned int /* file_version */
+) {
 #if BOOST_VERSION >= 105800
     load_map_collection(ar, t);
 #else
     boost::serialization::stl::load_collection<
-        Archive,
-        boost::container::flat_map<Types...>,
+        Archive, boost::container::flat_map<Types...>,
         boost::serialization::stl::archive_input_map<Archive, boost::container::flat_map<Types...>>,
-        boost::serialization::stl::reserve_imp<boost::container::flat_map<Types...>>
-    >(ar, t);
+        boost::serialization::stl::reserve_imp<boost::container::flat_map<Types...>>>(ar, t);
 #endif
 }
 
 // split non-intrusive serialization function member into separate
 // non intrusive save/load member functions
-template<class Archive, class ...Types>
-inline void serialize(
-    Archive & ar,
-    boost::container::flat_map<Types...> &t,
-    const unsigned int file_version
-){
+template <class Archive, class... Types>
+inline void serialize(Archive& ar, boost::container::flat_map<Types...>& t, const unsigned int file_version) {
     boost::serialization::split_free(ar, t, file_version);
 }
 
-}} // namespace boost::serialization
+}  // namespace serialization
+}  // namespace boost

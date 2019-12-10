@@ -45,11 +45,10 @@ www.navitia.io
 
 namespace navitia {
 
-
 inline void print_backtrace() {
     LOG4CPLUS_ERROR(log4cplus::Logger::getInstance("Logger"), get_backtrace());
 
-    //without the flush we might not have the error in the standard output
+    // without the flush we might not have the error in the standard output
     std::cout.flush();
     std::cerr.flush();
 }
@@ -58,13 +57,13 @@ namespace {
 
 void before_dying(int signum) {
     log4cplus::Logger logger = log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("logger"));
-    LOG4CPLUS_FATAL(logger, "We received signal: " << signum << ", so it's time to die!! version: "
-                    << config::project_version);
+    LOG4CPLUS_FATAL(logger,
+                    "We received signal: " << signum << ", so it's time to die!! version: " << config::project_version);
 
     navitia::print_backtrace();
 
     signal(signum, SIG_DFL);
-    kill(getpid(), signum); //kill the process to enable the core generation
+    kill(getpid(), signum);  // kill the process to enable the core generation
 }
 
 void before_exit(int signum) {
@@ -74,7 +73,7 @@ void before_exit(int signum) {
     exit(0);
 }
 
-}
+}  // namespace
 
 inline void init_signal_handling() {
     signal(SIGPIPE, before_dying);
@@ -90,12 +89,10 @@ inline void init_signal_handling() {
 inline void init_app(const std::string& log_name = "",
                      const std::string& log_level = "DEBUG",
                      const bool active_local_syslog = false,
-                     const std::string& log_comment = "")
-{
+                     const std::string& log_comment = "") {
     init_logger(log_name, log_level, active_local_syslog, log_comment);
 
     init_signal_handling();
 }
 
-} // namespace navitia
-
+}  // namespace navitia
