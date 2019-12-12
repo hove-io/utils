@@ -87,7 +87,7 @@ void LoadBalancer::run(){
 
             std::vector<zmq::message_t> frames{};
             do {
-            	zmq::message_t frame;
+                zmq::message_t frame;
                 clients.recv(&frame);
                 frames.push_back(std::move(frame));
                 // Are there more frames coming?
