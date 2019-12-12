@@ -17,6 +17,13 @@ std::string z_recv(zmq::socket_t& socket){
     return std::string(static_cast<char*>(msg.data()), msg.size());
 }
 
+namespace {
+
+bool is_valid_message(const std::vector<zmq::message_t>& frames){
+    return frames.size() == 3 && frames[1].size() == 0;
+}
+
+} // end namespace
 
 LoadBalancer::LoadBalancer(zmq::context_t& context):
             clients(context, ZMQ_ROUTER), workers(context, ZMQ_ROUTER){
@@ -68,26 +75,40 @@ void LoadBalancer::run(){
         }
         //handle clients request
         if (items[1].revents & ZMQ_POLLIN){
-            //first we get the client id
-            zmq::message_t msg_identity;
-            clients.recv(&msg_identity);
-            {
-                //then an empty frame
-                std::string empty = z_recv(clients);
-                assert(empty.size() == 0);
-            }
+            // The client request is a multi-part ZMQ message, we have to check every frame and be sure the multi-part message frame
+            // is composed as we wish, otherwise the multi-part message may be shifted unexpectedly.
 
-            zmq::message_t msg_request;
-            clients.recv(&msg_request);
+            // The multi-part ZMQ message should have 3 parts
+            // The first one is the ID of message
+            // The second one is an empty frame
+            // The third one is the real request
+            int more = 0;
+            size_t more_size = sizeof (more);
+
+            std::vector<zmq::message_t> frames{};
+            do {
+                zmq::message_t frame;
+                clients.recv(&frame);
+                frames.push_back(std::move(frame));
+                // Are there more frames coming?
+                clients.getsockopt(ZMQ_RCVMORE, &more, &more_size);
+            }while(more);
+
+            if (! is_valid_message(frames)) {
+                z_send(clients, "");
+                continue;
+            }
 
             std::string worker_addr = avalailable_worker.top();
             avalailable_worker.pop();
 
             z_send(workers, worker_addr, ZMQ_SNDMORE);
             z_send(workers, "", ZMQ_SNDMORE);
-            z_send(workers, msg_identity, ZMQ_SNDMORE);
+            // frames[0] is the id of message
+            z_send(workers, frames[0], ZMQ_SNDMORE);
             z_send(workers, "", ZMQ_SNDMORE);
-            z_send(workers, msg_request);
+            // frames[2] is the request
+            z_send(workers, frames[2]);
         }
     }
 }
