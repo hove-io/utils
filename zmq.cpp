@@ -104,8 +104,10 @@ void LoadBalancer::run(){
 
             z_send(workers, worker_addr, ZMQ_SNDMORE);
             z_send(workers, "", ZMQ_SNDMORE);
+            // frames[0] is the id of message
             z_send(workers, frames[0], ZMQ_SNDMORE);
             z_send(workers, "", ZMQ_SNDMORE);
+            // frames[1] is the request
             z_send(workers, frames[2]);
         }
     }
