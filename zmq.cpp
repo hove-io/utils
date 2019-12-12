@@ -19,14 +19,8 @@ std::string z_recv(zmq::socket_t& socket){
 
 namespace {
 
-void purge_and_reply(zmq::socket_t& clients, int more, bool should_purge) {
-
-    size_t more_size = sizeof (more);
-	while(more && should_purge) {
-		z_recv(clients);
-		clients.getsockopt(ZMQ_RCVMORE, &more, &more_size);
-	}
-	z_send(clients, "");
+bool is_valid_message(const std::vector<zmq::message_t>& frames){
+    return frames.size() == 3 && frames[1].size() == 0;
 }
 
 } // end namespace
@@ -84,58 +78,35 @@ void LoadBalancer::run(){
             // The client request is a multi-part ZMQ message, we have to check every frame and be sure the multi-part message frame
             // is composed as we wish, otherwise the multi-part message may be shifted unexpectedly.
 
-            int more;
+            // The multi-part ZMQ message should have 3 parts
+            // The first one is the ID of message
+            // The second one is an empty frame
+            // The third one is the real request
+            int more = 0;
             size_t more_size = sizeof (more);
 
-            //first we get the client id
-            zmq::message_t msg_identity;
-            clients.recv(&msg_identity);
-            // Are there more frames coming?
-            clients.getsockopt(ZMQ_RCVMORE, &more, &more_size);
-            assert(more == 1);
+            std::vector<zmq::message_t> frames{};
+            do {
+            	zmq::message_t frame;
+                clients.recv(&frame);
+                frames.push_back(std::move(frame));
+                // Are there more frames coming?
+                clients.getsockopt(ZMQ_RCVMORE, &more, &more_size);
+            }while(more);
 
-            // We're waiting for an empty frame...
-            // If no more frames, we reply immediately
-            if (more == 0) {
-                bool should_purge = false;
-                purge_and_reply(clients, more, should_purge);
+            if (! is_valid_message(frames)) {
+                z_send(clients, "");
                 continue;
             }
 
-            //then an empty frame, there should be another frame follows up...
-            std::string empty = z_recv(clients);
-            clients.getsockopt(ZMQ_RCVMORE, &more, &more_size);
-            assert(empty.empty());
-            assert(more == 1);
-
-            if (!empty.empty() || more == 0){
-                // Case 1: If no more frames follow up, we reply and return
-                // Case 2: the current frame is NOT empty, so we consider it as a bad request, we purge the queue and then reply
-                bool should_purge = true;
-                purge_and_reply(clients, more, should_purge);
-                continue;
-            }
-
-            zmq::message_t msg_request;
-            clients.recv(&msg_request);
-            clients.getsockopt(ZMQ_RCVMORE, &more, &more_size);
-            assert(more == 0);
-
-            if (more != 0) {
-                // the current frame must be the last frame, if there are more frames coming, we consider it as a bad request
-                // we purge the queue and then reply same as what's done above
-                bool should_purge = true;
-                purge_and_reply(clients, more, should_purge);
-                continue;
-            }
             std::string worker_addr = avalailable_worker.top();
             avalailable_worker.pop();
 
             z_send(workers, worker_addr, ZMQ_SNDMORE);
             z_send(workers, "", ZMQ_SNDMORE);
-            z_send(workers, msg_identity, ZMQ_SNDMORE);
+            z_send(workers, frames[0], ZMQ_SNDMORE);
             z_send(workers, "", ZMQ_SNDMORE);
-            z_send(workers, msg_request);
+            z_send(workers, frames[2]);
         }
     }
 }
