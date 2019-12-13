@@ -35,36 +35,35 @@ www.navitia.io
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/split.hpp>
 
-double str_to_double(std::string str){
+double str_to_double(std::string str) {
     boost::trim(str);
-    try{
+    try {
         boost::replace_all(str, ",", ".");
         return boost::lexical_cast<double>(str);
-    } catch(...){
+    } catch (...) {
         return -1;
     }
 }
 
-int str_to_int(std::string str){
+int str_to_int(std::string str) {
     boost::trim(str);
-    if (str.empty()){
+    if (str.empty()) {
         return -1;
     }
-    try{
+    try {
         return boost::lexical_cast<int>(str);
-    } catch(...){
+    } catch (...) {
         return -1;
     }
 }
 
-std::vector<std::string> split_string(const std::string& str,const std::string & separator){
-    std::vector< std::string > SplitVec;
-    split( SplitVec, str, boost::is_any_of(separator), boost::token_compress_on );
+std::vector<std::string> split_string(const std::string& str, const std::string& separator) {
+    std::vector<std::string> SplitVec;
+    split(SplitVec, str, boost::is_any_of(separator), boost::token_compress_on);
     return SplitVec;
 }
 
-std::string value_by_key(const std::map<std::string, std::string>& vect, const std::string& key){
-
+std::string value_by_key(const std::map<std::string, std::string>& vect, const std::string& key) {
     if (vect.find(key) != vect.end())
         return vect.at(key);
     return "";
@@ -72,7 +71,7 @@ std::string value_by_key(const std::map<std::string, std::string>& vect, const s
 
 namespace navitia {
 
-bool pseudo_natural_sort::operator() (const std::string& a, const std::string&b) const {
+bool pseudo_natural_sort::operator()(const std::string& a, const std::string& b) const {
     return doj::alphanum_less<std::string>()(a, b);
 }
 std::string make_adapted_uri_fast(const std::string& ref_uri, size_t s) {
@@ -86,7 +85,7 @@ std::string make_adapted_uri(const std::string& ref_uri) {
     return ref_uri + ":adapted-" + uuid_stream.str();
 }
 
-std::string absolute_path(){
+std::string absolute_path() {
     char buf[256];
     if (getcwd(buf, sizeof(buf))) {
         return std::string(buf) + "/";
@@ -96,4 +95,4 @@ std::string absolute_path(){
     }
 }
 
-} // namespace navitia
+}  // namespace navitia

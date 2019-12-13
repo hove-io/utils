@@ -1,5 +1,5 @@
 /* Copyright © 2001-2014, Canal TP and/or its affiliates. All rights reserved.
-  
+
 This file is part of Navitia,
     the software to build cool stuff with public transport.
 
@@ -22,7 +22,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 Stay tuned using
-twitter @navitia 
+twitter @navitia
 IRC #navitia on freenode
 https://groups.google.com/d/forum/navitia
 www.navitia.io
@@ -44,48 +44,49 @@ www.navitia.io
 namespace boost {
 namespace serialization {
 
-template<class Archive, class Allocator, class T>
-inline void save(Archive& ar, const std::vector<std::unique_ptr<T>, Allocator>& t,
-        const unsigned int /* file_version */){
+template <class Archive, class Allocator, class T>
+inline void save(Archive& ar,
+                 const std::vector<std::unique_ptr<T>, Allocator>& t,
+                 const unsigned int /* file_version */) {
     // record number of elements
-    collection_size_type count (t.size());
+    collection_size_type count(t.size());
     ar << BOOST_SERIALIZATION_NVP(count);
 
-    for(const auto& elt: t)
+    for (const auto& elt : t)
         ar << boost::serialization::make_nvp("item", elt);
 }
 
-template<class Archive, class Allocator, class T>
-inline void load(Archive & ar, std::vector<std::unique_ptr<T>, Allocator>& t,
-        const unsigned int /* file_version */){
+template <class Archive, class Allocator, class T>
+inline void load(Archive& ar, std::vector<std::unique_ptr<T>, Allocator>& t, const unsigned int /* file_version */) {
     // retrieve number of elements
     collection_size_type count;
     ar >> BOOST_SERIALIZATION_NVP(count);
     t.clear();
-    while(count-- > 0){
+    while (count-- > 0) {
         std::unique_ptr<T> i;
         ar >> boost::serialization::make_nvp("item", i);
-        t.push_back(std::move(i));// move object
+        t.push_back(std::move(i));  // move object
     }
 }
 
-
-template<class Archive, class k, class V, class Comp, class MapAlloc>
-inline void save(Archive& ar, const std::map<k, std::unique_ptr<V>, Comp, MapAlloc>& t,
-        const unsigned int /* file_version */) {
+template <class Archive, class k, class V, class Comp, class MapAlloc>
+inline void save(Archive& ar,
+                 const std::map<k, std::unique_ptr<V>, Comp, MapAlloc>& t,
+                 const unsigned int /* file_version */) {
     // record number of elements
-    collection_size_type count (t.size());
+    collection_size_type count(t.size());
     ar << BOOST_SERIALIZATION_NVP(count);
 
-    for(const auto& p: t) {
+    for (const auto& p : t) {
         ar << boost::serialization::make_nvp("key", p.first);
         ar << boost::serialization::make_nvp("value", p.second);
     }
 }
 
-template<class Archive, class K, class V, class Comp, class MapAlloc>
-inline void load(Archive& ar, std::map<K, std::unique_ptr<V>, Comp, MapAlloc>& map,
-        const unsigned int /* file_version */) {
+template <class Archive, class K, class V, class Comp, class MapAlloc>
+inline void load(Archive& ar,
+                 std::map<K, std::unique_ptr<V>, Comp, MapAlloc>& map,
+                 const unsigned int /* file_version */) {
     // retrieve number of elements
     collection_size_type count;
     ar >> BOOST_SERIALIZATION_NVP(count);
@@ -95,20 +96,20 @@ inline void load(Archive& ar, std::map<K, std::unique_ptr<V>, Comp, MapAlloc>& m
         ar >> boost::serialization::make_nvp("key", k);
         std::unique_ptr<V> v;
         ar >> boost::serialization::make_nvp("value", v);
-        map[k] = std::move(v);// move object
+        map[k] = std::move(v);  // move object
     }
 }
 
-template<class Archive, class Allocator, class T>
-inline void serialize(Archive & ar, std::vector<std::unique_ptr<T>, Allocator>& t,
-        const unsigned int file_version){
+template <class Archive, class Allocator, class T>
+inline void serialize(Archive& ar, std::vector<std::unique_ptr<T>, Allocator>& t, const unsigned int file_version) {
     boost::serialization::split_free(ar, t, file_version);
 }
 
-template<class Archive, class K, class V, class Comp, class Allocator>
-inline void serialize(Archive& ar, std::map<K, std::unique_ptr<V>, Comp, Allocator>& m,
-        const unsigned int file_version) {
+template <class Archive, class K, class V, class Comp, class Allocator>
+inline void serialize(Archive& ar,
+                      std::map<K, std::unique_ptr<V>, Comp, Allocator>& m,
+                      const unsigned int file_version) {
     boost::serialization::split_free(ar, m, file_version);
 }
-}
-}
+}  // namespace serialization
+}  // namespace boost

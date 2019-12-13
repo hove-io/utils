@@ -33,34 +33,33 @@ www.navitia.io
 #include <boost/optional.hpp>
 #include "utils/exception.h"
 
-namespace navitia{
+namespace navitia {
 
-    class DeadlineExpired: public recoverable_exception{
-        using recoverable_exception::recoverable_exception;
+class DeadlineExpired : public recoverable_exception {
+    using recoverable_exception::recoverable_exception;
 
-        public:
-        DeadlineExpired(const DeadlineExpired& o) = default;
-        virtual ~DeadlineExpired();
-    };
+public:
+    DeadlineExpired(const DeadlineExpired& o) = default;
+    virtual ~DeadlineExpired();
+};
 
-    class Deadline{
-        boost::optional<boost::posix_time::ptime> deadline;
+class Deadline {
+    boost::optional<boost::posix_time::ptime> deadline;
 
-        public:
-        Deadline();
-        Deadline(const boost::posix_time::ptime& deadline);
-        void set(const boost::posix_time::ptime& deadline);
-        const boost::optional<boost::posix_time::ptime>& get() const;
+public:
+    Deadline();
+    Deadline(const boost::posix_time::ptime& deadline);
+    void set(const boost::posix_time::ptime& deadline);
+    const boost::optional<boost::posix_time::ptime>& get() const;
 
-        /**
-         * return true if the deadline has expired
-         */
-        bool expired(const boost::posix_time::ptime& now=boost::posix_time::microsec_clock::universal_time()) const;
+    /**
+     * return true if the deadline has expired
+     */
+    bool expired(const boost::posix_time::ptime& now = boost::posix_time::microsec_clock::universal_time()) const;
 
-        /**
-         * throw DeadlineExpired if the deadline has expired
-         */
-        void check(const boost::posix_time::ptime& now=boost::posix_time::microsec_clock::universal_time()) const;
-
-    };
-}
+    /**
+     * throw DeadlineExpired if the deadline has expired
+     */
+    void check(const boost::posix_time::ptime& now = boost::posix_time::microsec_clock::universal_time()) const;
+};
+}  // namespace navitia

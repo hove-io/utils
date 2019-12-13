@@ -31,31 +31,31 @@ www.navitia.io
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include "utils/deadline.h"
 
-namespace navitia{
+namespace navitia {
 
-    DeadlineExpired::~DeadlineExpired() = default;
+DeadlineExpired::~DeadlineExpired() = default;
 
-    Deadline::Deadline() {}
-    Deadline::Deadline(const boost::posix_time::ptime& deadline) : deadline(deadline) {}
-    void Deadline::set(const boost::posix_time::ptime& deadline){
-        this->deadline = deadline;
-    }
-
-    const boost::optional<boost::posix_time::ptime>& Deadline::get() const{
-        return this->deadline;
-    }
-
-    bool Deadline::expired(const boost::posix_time::ptime& now) const{
-        if(!deadline) {
-            return false;
-        }
-        return now > deadline;
-    }
-
-    void Deadline::check(const boost::posix_time::ptime& now) const{
-        if(this->expired(now)){
-            throw DeadlineExpired("deadline expired at " + boost::posix_time::to_iso_string(*deadline));
-        }
-    }
-
+Deadline::Deadline() {}
+Deadline::Deadline(const boost::posix_time::ptime& deadline) : deadline(deadline) {}
+void Deadline::set(const boost::posix_time::ptime& deadline) {
+    this->deadline = deadline;
 }
+
+const boost::optional<boost::posix_time::ptime>& Deadline::get() const {
+    return this->deadline;
+}
+
+bool Deadline::expired(const boost::posix_time::ptime& now) const {
+    if (!deadline) {
+        return false;
+    }
+    return now > deadline;
+}
+
+void Deadline::check(const boost::posix_time::ptime& now) const {
+    if (this->expired(now)) {
+        throw DeadlineExpired("deadline expired at " + boost::posix_time::to_iso_string(*deadline));
+    }
+}
+
+}  // namespace navitia

@@ -34,30 +34,22 @@ www.navitia.io
 
 namespace navitia {
 
-class ptime: public boost::posix_time::ptime
-{
+class ptime : public boost::posix_time::ptime {
 public:
     // Forward constructors
-    ptime(boost::gregorian::date d,time_duration_type td) : boost::posix_time::ptime(d,td)
-    {}
-    explicit ptime(boost::gregorian::date d) : boost::posix_time::ptime(d)
-    {}
-    ptime(const time_rep_type& rhs): boost::posix_time::ptime(rhs)
-    {}
-    ptime(const boost::date_time::special_values sv) : boost::posix_time::ptime(sv)
-    {}
+    ptime(boost::gregorian::date d, time_duration_type td) : boost::posix_time::ptime(d, td) {}
+    explicit ptime(boost::gregorian::date d) : boost::posix_time::ptime(d) {}
+    ptime(const time_rep_type& rhs) : boost::posix_time::ptime(rhs) {}
+    ptime(const boost::date_time::special_values sv) : boost::posix_time::ptime(sv) {}
 
     // Add (copy-)constructor from ancestor
-    ptime(const boost::posix_time::ptime& rhs): boost::posix_time::ptime(rhs)
-    {}
+    ptime(const boost::posix_time::ptime& rhs) : boost::posix_time::ptime(rhs) {}
 
 #if !defined(DATE_TIME_NO_DEFAULT_CONSTRUCTOR)
     // Add noexcept default constructor
     // Cause: Clang requires std::atomic content to have noexcept default constructor
-    ptime() noexcept: boost::posix_time::ptime()
-    {}
-#endif // DATE_TIME_NO_DEFAULT_CONSTRUCTOR
-
+    ptime() noexcept : boost::posix_time::ptime() {}
+#endif  // DATE_TIME_NO_DEFAULT_CONSTRUCTOR
 };
 
-} // namespace navitia
+}  // namespace navitia

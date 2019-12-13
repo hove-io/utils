@@ -36,15 +36,16 @@ www.navitia.io
 #include <zmq.hpp>
 #include <stack>
 
-void z_send(zmq::socket_t& socket, const std::string& str, int flags=0);
-void z_send(zmq::socket_t& socket, zmq::message_t& msg, int flags=0);
+void z_send(zmq::socket_t& socket, const std::string& str, int flags = 0);
+void z_send(zmq::socket_t& socket, zmq::message_t& msg, int flags = 0);
 std::string z_recv(zmq::socket_t& socket);
 
-class LoadBalancer{
+class LoadBalancer {
     std::stack<std::string> avalailable_worker;
     zmq::socket_t clients;
     zmq::socket_t workers;
-    public:
+
+public:
     LoadBalancer(zmq::context_t& context);
     void bind(const std::string& clients_socket_path, const std::string& workers_socket_path);
     void run();

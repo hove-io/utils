@@ -30,7 +30,7 @@ www.navitia.io
 
 // from boost/serialization/map.hpp with the following copyright:
 
-// (C) Copyright 2002 Robert Ramey - http://www.rrsd.com . 
+// (C) Copyright 2002 Robert Ramey - http://www.rrsd.com .
 // Use, modification and distribution is subject to the Boost Software
 // License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -46,41 +46,31 @@ www.navitia.io
 #include <boost/serialization/collections_load_imp.hpp>
 #include <boost/serialization/split_free.hpp>
 
-namespace boost { namespace serialization {
+namespace boost {
+namespace serialization {
 
-template<class Archive, class ...Types>
-inline void save(
-    Archive & ar,
-    const std::unordered_map<Types...> &t,
-    const unsigned int /* file_version */
-){
-    boost::serialization::stl::save_collection<Archive, std::unordered_map<Types...>>(ar, t);
+template <class Archive, class... Types>
+inline void save(Archive& ar, const std::unordered_map<Types...>& t, const unsigned int /* file_version */
+) {
+    boost::serialization::stl::save_collection<Archive, std::unordered_map<Types...> >(ar, t);
 }
 
-template<class Archive, class ...Types>
-inline void load(
-    Archive & ar,
-    std::unordered_map<Types...> &t,
-    const unsigned int /* file_version */
-){
+template <class Archive, class... Types>
+inline void load(Archive& ar, std::unordered_map<Types...>& t, const unsigned int /* file_version */
+) {
     boost::serialization::stl::load_collection<
-        Archive,
-        std::unordered_map<Types...>,
-        boost::serialization::stl::archive_input_map<Archive, std::unordered_map<Types...>>,
-        boost::serialization::stl::reserve_imp<std::unordered_map<Types...>>
-    >(ar, t);
+        Archive, std::unordered_map<Types...>,
+        boost::serialization::stl::archive_input_map<Archive, std::unordered_map<Types...> >,
+        boost::serialization::stl::reserve_imp<std::unordered_map<Types...> > >(ar, t);
 }
 
 // split non-intrusive serialization function member into separate
 // non intrusive save/load member functions
-template<class Archive, class ...Types>
-inline void serialize(
-    Archive & ar,
-    std::unordered_map<Types...> &t,
-    const unsigned int file_version
-){
+template <class Archive, class... Types>
+inline void serialize(Archive& ar, std::unordered_map<Types...>& t, const unsigned int file_version) {
     boost::serialization::split_free(ar, t, file_version);
 }
 
-}} // namespace boost::serialization
+}  // namespace serialization
+}  // namespace boost
 #endif

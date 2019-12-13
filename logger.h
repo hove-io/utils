@@ -45,13 +45,12 @@ static const std::string console_pattern_ref1 = "[%D{%y-%m-%d %H:%M:%S,%q}] ";
 static const std::string console_pattern_ref2 = "[%-5p] [%x] - %m %b:%L  %n";
 
 // syslog pattern example : Sep 11 14:16:11 hostname binary_name: [comment] [PID] [INFO] [NDC] - message file.cpp:261
-static const std::string syslog_pattern_ref  = "[%i] [%p] [%x] - %m %b:%L  %n";
+static const std::string syslog_pattern_ref = "[%i] [%p] [%x] - %m %b:%L  %n";
 
 /**
  * @brief init simple navitia logger
  */
-inline void init_logger()
-{
+inline void init_logger() {
     log4cplus::BasicConfigurator config;
     config.configure();
 
@@ -59,7 +58,8 @@ inline void init_logger()
     properties.setProperty("log4cplus.rootLogger", "DEBUG, console");
     properties.setProperty("log4cplus.appender.console", "log4cplus::ConsoleAppender");
     properties.setProperty("log4cplus.appender.console.layout", "log4cplus::PatternLayout");
-    properties.setProperty("log4cplus.appender.console.layout.ConversionPattern", console_pattern_ref1 + console_pattern_ref2);
+    properties.setProperty("log4cplus.appender.console.layout.ConversionPattern",
+                           console_pattern_ref1 + console_pattern_ref2);
 
     log4cplus::PropertyConfigurator configurator(properties);
     configurator.configure();
@@ -77,8 +77,7 @@ inline void init_logger(const std::string& name,
                         const std::string& level,
                         const bool active_local_syslog = false,
                         const std::string& comment = "",
-                        const std::string& pattern = "")
-{
+                        const std::string& pattern = "") {
     std::string prefix = "";
     if (!comment.empty()) {
         prefix = prefix + "[" + comment + "] ";
@@ -120,9 +119,8 @@ inline void init_logger(const std::string& name,
  *
  * @param config_file The configuration file path
  */
-inline void init_logger(const std::string& config_file)
-{
+inline void init_logger(const std::string& config_file) {
     log4cplus::PropertyConfigurator::doConfigure(config_file);
 }
 
-} // namespace navitia
+}  // namespace navitia
