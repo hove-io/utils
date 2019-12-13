@@ -18,16 +18,14 @@ std::string z_recv(zmq::socket_t& socket) {
 
 namespace {
 
-bool is_valid_message(const std::vector<zmq::message_t>& frames){
+bool is_valid_message(const std::vector<zmq::message_t>& frames) {
     return frames.size() == 3 && frames[1].size() == 0;
 }
 
-} // end namespace
+}  // end namespace
 
-LoadBalancer::LoadBalancer(zmq::context_t& context):
-            clients(context, ZMQ_ROUTER), workers(context, ZMQ_ROUTER){
-}
-void LoadBalancer::bind(const std::string& clients_socket_path, const std::string& workers_socket_path){
+LoadBalancer::LoadBalancer(zmq::context_t& context) : clients(context, ZMQ_ROUTER), workers(context, ZMQ_ROUTER) {}
+void LoadBalancer::bind(const std::string& clients_socket_path, const std::string& workers_socket_path) {
     clients.bind(clients_socket_path.c_str());
     workers.bind(workers_socket_path.c_str());
 }
@@ -70,17 +68,17 @@ void LoadBalancer::run() {
                 z_send(clients, reply);
             }
         }
-        //handle clients request
-        if (items[1].revents & ZMQ_POLLIN){
-            // The client request is a multi-part ZMQ message, we have to check every frame and be sure the multi-part message frame
-            // is composed as we wish, otherwise the multi-part message may be shifted unexpectedly.
+        // handle clients request
+        if (items[1].revents & ZMQ_POLLIN) {
+            // The client request is a multi-part ZMQ message, we have to check every frame and be sure the multi-part
+            // message frame is composed as we wish, otherwise the multi-part message may be shifted unexpectedly.
 
             // The multi-part ZMQ message should have 3 parts
             // The first one is the ID of message
             // The second one is an empty frame
             // The third one is the real request
             int more = 0;
-            size_t more_size = sizeof (more);
+            size_t more_size = sizeof(more);
 
             std::vector<zmq::message_t> frames{};
             do {
@@ -89,9 +87,9 @@ void LoadBalancer::run() {
                 frames.push_back(std::move(frame));
                 // Are there more frames coming?
                 clients.getsockopt(ZMQ_RCVMORE, &more, &more_size);
-            }while(more);
+            } while (more);
 
-            if (! is_valid_message(frames)) {
+            if (!is_valid_message(frames)) {
                 z_send(clients, "");
                 continue;
             }
