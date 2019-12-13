@@ -27,10 +27,11 @@ IRC #navitia on freenode
 https://groups.google.com/d/forum/navitia
 www.navitia.io
 */
-
+#pragma once
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/split_free.hpp>
+
 #include <atomic>
 
 namespace boost {

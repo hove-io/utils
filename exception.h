@@ -29,10 +29,10 @@ www.navitia.io
 */
 
 #pragma once
+#include "backtrace.h"
 
 #include <string>
 #include <exception>
-#include "backtrace.h"
 
 namespace navitia {
 class exception : public std::exception {

@@ -30,9 +30,9 @@ www.navitia.io
 
 #include "lotus.h"
 
-#include <postgresql/libpq-fe.h>
 #include <boost/algorithm/string/join.hpp>
 #include <boost/algorithm/string/replace.hpp>
+#include <postgresql/libpq-fe.h>
 
 const char* LotusException::what() const noexcept {
     return message.c_str();

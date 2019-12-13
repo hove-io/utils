@@ -1,4 +1,5 @@
 #include "get_hostname.h"
+
 #include <unistd.h>
 
 namespace navitia {

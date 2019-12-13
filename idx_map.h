@@ -29,10 +29,10 @@ www.navitia.io
 */
 
 #pragma once
+#include <boost/range/iterator_range_core.hpp>
 
 #include <vector>
 #include <iterator>
-#include <boost/range/iterator_range_core.hpp>
 
 namespace navitia {
 

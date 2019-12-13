@@ -38,7 +38,6 @@ www.navitia.io
 #pragma once
 
 #include <boost/container/flat_map.hpp>
-
 #include <boost/serialization/map.hpp>
 
 namespace boost {

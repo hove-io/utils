@@ -37,7 +37,7 @@ www.navitia.io
 /// Classe permettant de convertir l'encodage de chaînes de caractères
 class EncodingConverter {
 public:
-    EncodingConverter(std::string from, std::string to, size_t buffer_size);
+    EncodingConverter(const std::string& from, const std::string& to, size_t buffer_size);
     std::string convert(const std::string& str);
     virtual ~EncodingConverter();
 

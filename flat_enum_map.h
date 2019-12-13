@@ -29,12 +29,13 @@ www.navitia.io
 */
 
 #pragma once
-#include <array>
-#include <type_traits>
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/array.hpp>
 #include <boost/iterator/iterator_facade.hpp>
 #include <boost/range/iterator_range_core.hpp>
+
+#include <array>
+#include <type_traits>
 
 namespace navitia {
 

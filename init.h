@@ -32,6 +32,7 @@ www.navitia.io
 #include "conf.h"
 #include "logger.h"
 #include "backtrace.h"
+
 #include <csignal>
 #include <unistd.h>
 #include <iostream>

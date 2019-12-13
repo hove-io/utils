@@ -28,10 +28,11 @@ https://groups.google.com/d/forum/navitia
 www.navitia.io
 */
 #pragma once
-#include <vector>
-#include <unordered_map>
 #include "utils/functions.h"
 #include "utils/idx_map.h"
+
+#include <vector>
+#include <unordered_map>
 
 namespace navitia {
 

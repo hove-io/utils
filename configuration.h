@@ -30,10 +30,11 @@ www.navitia.io
 
 #pragma once
 
-#include <map>
-#include <string>
 #include <boost/lexical_cast.hpp>
 #include <boost/thread/shared_mutex.hpp>
+
+#include <map>
+#include <string>
 
 /** Configuration est un singleton : c'est à dire qu'on l'utilise
  * Configuration * conf = Configuration::get();
