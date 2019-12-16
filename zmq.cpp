@@ -17,7 +17,6 @@ std::string z_recv(zmq::socket_t& socket) {
     return std::string(static_cast<char*>(msg.data()), msg.size());
 }
 
-namespace {
 
 LoadBalancer::LoadBalancer(zmq::context_t& context) : clients(context, ZMQ_ROUTER), workers(context, ZMQ_ROUTER) {}
 void LoadBalancer::bind(const std::string& clients_socket_path, const std::string& workers_socket_path) {
