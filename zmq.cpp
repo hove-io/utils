@@ -90,7 +90,7 @@ void LoadBalancer::run() {
                 nb_frames++;
             } while (more);
 
-            if (nb_frames > 3 || frames[1].size() != 0 ) {
+            if (nb_frames > 3 || frames.at(1).size() != 0 ) {
                 z_send(clients, "");
                 continue;
             }
@@ -108,4 +108,3 @@ void LoadBalancer::run() {
         }
     }
 }
-
