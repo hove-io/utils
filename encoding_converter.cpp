@@ -31,11 +31,12 @@ www.navitia.io
 #include "encoding_converter.h"
 
 #ifdef HAVE_ICONV_H
-#include <string.h>
+#include <cstring>
 #include <fstream>
 #include <limits>
 
-EncodingConverter::EncodingConverter(std::string from, std::string to, size_t buffer_size) : buffer_size(buffer_size) {
+EncodingConverter::EncodingConverter(const std::string& from, const std::string& to, size_t buffer_size)
+    : buffer_size(buffer_size) {
     iconv_handler = iconv_open(to.c_str(), from.c_str());
     iconv_input_buffer = new char[buffer_size];
     iconv_output_buffer = new char[buffer_size];

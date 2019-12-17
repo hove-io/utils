@@ -38,14 +38,14 @@ www.navitia.io
 /// Small tool to time something and print these informations
 struct Timer {
 private:
-    struct tms tms_start;
-    clock_t real_start;
+    struct tms tms_start {};
+    clock_t real_start{};
     std::string header;
     bool print_at_destruction;
 
 public:
     Timer();
-    Timer(const std::string& header, bool print_at_destruction = true);
+    Timer(std::string h, bool p = true);
     ~Timer();
     int ms() const;
 

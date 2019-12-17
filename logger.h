@@ -30,8 +30,8 @@ www.navitia.io
 #pragma once
 
 #include "conf.h"
-#include <boost/format.hpp>
 
+#include <boost/format.hpp>
 #include <log4cplus/logger.h>
 #include <log4cplus/configurator.h>
 #ifdef HAVE_LOGGINGMACROS_H

@@ -40,11 +40,12 @@ www.navitia.io
 #if BOOST_VERSION >= 105700
 #include <boost/serialization/unordered_set.hpp>
 #else
-#include <unordered_set>
 #include <boost/serialization/utility.hpp>
 #include <boost/serialization/collections_save_imp.hpp>
 #include <boost/serialization/collections_load_imp.hpp>
 #include <boost/serialization/split_free.hpp>
+
+#include <unordered_set>
 
 namespace boost {
 namespace serialization {

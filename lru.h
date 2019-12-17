@@ -29,12 +29,14 @@ www.navitia.io
 */
 
 #include "functions.h"
+
 #include <boost/multi_index_container.hpp>
 #include <boost/multi_index/ordered_index.hpp>
 #include <boost/multi_index/sequenced_index.hpp>
 #include <boost/multi_index/member.hpp>
 #include <boost/type_traits/remove_cv.hpp>
 #include <boost/type_traits/remove_reference.hpp>
+
 #include <mutex>
 #include <future>
 #include <stdexcept>

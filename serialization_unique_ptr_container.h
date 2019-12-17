@@ -28,15 +28,15 @@ https://groups.google.com/d/forum/navitia
 www.navitia.io
 */
 #pragma once
+#include "serialization_unique_ptr.h"
 
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/split_member.hpp>
+#include <boost/serialization/wrapper.hpp>
+
 #include <memory>
 #include <map>
-
-#include <boost/serialization/wrapper.hpp>
-#include "serialization_unique_ptr.h"
 
 /**
  * Serialization specialization for std::vector<std::unique_ptr> because unique_ptr are not copiable

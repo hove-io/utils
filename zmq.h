@@ -34,6 +34,7 @@ www.navitia.io
 
 #pragma once
 #include <zmq.hpp>
+
 #include <stack>
 
 void z_send(zmq::socket_t& socket, const std::string& str, int flags = 0);

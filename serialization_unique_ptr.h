@@ -32,6 +32,7 @@ www.navitia.io
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/split_free.hpp>
+
 #include <memory>
 
 namespace boost {

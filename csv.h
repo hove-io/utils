@@ -31,17 +31,20 @@ www.navitia.io
 #pragma once
 
 #include "conf.h"
+
+#ifdef HAVE_ICONV_H
+#include "encoding_converter.h"
+#endif
+
+#include <boost/spirit/include/qi.hpp>
+#include <boost/algorithm/string.hpp>
+
 #include <string>
 #include <fstream>
 #include <sstream>
 #include <vector>
 #include <unordered_map>
-#ifdef HAVE_ICONV_H
-#include "encoding_converter.h"
-#endif
 #include <map>
-#include <boost/spirit/include/qi.hpp>
-#include <boost/algorithm/string.hpp>
 
 /**
  * lecteur CSV basique, si iconv est disponible, le resultat serat retourné en UTF8

@@ -30,14 +30,6 @@ www.navitia.io
 
 #pragma once
 
-#include <iostream>
-#include <vector>
-#include <memory>
-#include <map>
-#include <algorithm>
-#include <cstdio>
-#include <unistd.h>  // getcwd() definition
-
 #include <boost/range/algorithm/remove_if.hpp>
 #include <boost/range/algorithm/find_if.hpp>
 #include <boost/weak_ptr.hpp>
@@ -46,6 +38,14 @@ www.navitia.io
 #include <boost/lexical_cast.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include <boost/range/algorithm_ext/erase.hpp>
+
+#include <iostream>
+#include <vector>
+#include <memory>
+#include <map>
+#include <algorithm>
+#include <cstdio>
+#include <unistd.h>  // getcwd() definition
 
 namespace google {
 namespace protobuf {
