@@ -71,3 +71,17 @@ std::ostream& operator<<(std::ostream& os, const Timer& timer) {
     return os << timer.header << "real = " << std::get<0>(rus) << "s, user = " << std::get<1>(rus)
               << "s, sys = " << std::get<2>(rus) << "s";
 }
+
+StopWatch::StopWatch():
+    start(std::chrono::high_resolution_clock::now())
+{}
+   
+
+TimerGuard::TimerGuard(ElapsedTimeCallback cb):
+    callback(std::move(cb))
+{}
+
+TimerGuard::~TimerGuard() {
+    callback(stopwatch);
+}
+

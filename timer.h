@@ -33,6 +33,8 @@ www.navitia.io
 #include <string>
 #include <iostream>
 #include <tuple>
+#include <chrono>
+#include <functional>
 #include <sys/times.h>
 
 /// Small tool to time something and print these informations
@@ -65,3 +67,30 @@ inline auto time_it(const std::string& header, Function&& f, Args&&... args)
     Timer t(header);
     return f(std::forward<Args>(args)...);
 }
+
+class StopWatch {
+    std::chrono::system_clock::time_point start;
+
+public:
+    StopWatch();
+    
+    template<class T=std::chrono::microseconds>
+    typename T::rep elapsed() const {
+        auto end = std::chrono::high_resolution_clock::now();
+        auto elapsed = std::chrono::duration_cast<T>(end - start);
+        return elapsed.count();
+    }
+};
+
+class TimerGuard {
+public:
+    using ElapsedTimeCallback = std::function<void(const StopWatch&)>;
+
+    TimerGuard(ElapsedTimeCallback cb);
+    ~TimerGuard();
+
+private:
+    ElapsedTimeCallback callback;
+    StopWatch stopwatch;
+};
+
