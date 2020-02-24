@@ -1,4 +1,5 @@
 #include "utils/zmq.h"
+#include "utils/exception.h"
 #include <array>
 
 void z_send(zmq::socket_t& socket, const std::string& str, int flags) {
@@ -92,7 +93,7 @@ void LoadBalancer::run() {
 
             if (nb_frames > 3 || frames.at(1).size() != 0 ) {
                 z_send(clients, "");
-                continue;
+                throw navitia::recoverable_exception{"bad ZMQ message has been received and ignored"};
             }
 
             std::string worker_addr = avalailable_worker.top();
