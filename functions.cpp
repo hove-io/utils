@@ -99,7 +99,6 @@ std::string absolute_path() {
 
 std::string strip_accents(std::string str) {
     const static std::vector<std::pair<std::string, std::string> > vec_str {
-        
         {"à", "a"},  {"À", "a"},  {"â", "a"},  {"Â", "a"},  {"ä", "a"},  {"Ä", "a"},  {"Á", "a"},  {"á", "a"},
         {"Ã", "a"},  {"ã", "a"},  {"Å", "a"},  {"å", "a"},  {"Ǎ", "a"},  {"ǎ", "a"},  {"Ą", "a"},  {"ą", "a"},
         {"Ă", "a"},  {"ă", "a"},  {"Ā", "a"},  {"ā", "a"},  {"Ç", "c"},  {"ç", "c"},  {"Ć", "c"},  {"ć", "c"},
