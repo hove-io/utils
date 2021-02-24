@@ -103,6 +103,8 @@ struct IdxMap {
     inline IdxMap() = default;
     inline IdxMap(const std::vector<T*>& c, const V& val = V()) : map(c.size(), val) {}
     inline IdxMap(const std::vector<T>& c, const V& val = V()) : map(c.size(), val) {}
+    inline IdxMap(const size_t size, const V& val = V()) : map(size, val) {}
+
     inline friend void swap(IdxMap& lhs, IdxMap& rhs) {
         using std::swap;
         swap(lhs.map, rhs.map);
@@ -118,6 +120,7 @@ struct IdxMap {
     }
 
     // resize the map
+    inline void resize(const size_t size) { map.resize(size); }
     inline void resize(const std::vector<T*>& c) { map.resize(c.size()); }
     inline void resize(const std::vector<T>& c) { map.resize(c.size()); }
     template <typename U>
