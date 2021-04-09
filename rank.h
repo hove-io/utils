@@ -45,6 +45,7 @@ struct Rank {
     inline explicit Rank(const rank_t& v) : val(v) {}
     inline explicit Rank(const T& o) : val(o.order().val) {}
     inline bool is_valid() const { return val != invalid_rank; }
+    inline operator int() const { return val; }
     inline bool operator==(const Rank& other) const { return val == other.val; }
     inline bool operator!=(const Rank& other) const { return val != other.val; }
     inline bool operator<(const Rank& other) const { return val < other.val; }
