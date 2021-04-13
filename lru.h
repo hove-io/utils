@@ -29,6 +29,7 @@ www.navitia.io
 */
 
 #include "functions.h"
+#include "logger.h"
 
 #include <boost/multi_index_container.hpp>
 #include <boost/multi_index/ordered_index.hpp>
@@ -76,6 +77,8 @@ private:
     mutable size_t nb_cache_miss = 0;
     mutable size_t nb_calls = 0;
 
+    mutable log4cplus::Logger logger = log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("raptor"));
+
     std::vector<key_type> keys() const {
         auto& list = cache.template get<0>();
         std::vector<key_type> result;
@@ -115,6 +118,7 @@ public:
             // older ones) until the requested size
             while (list.size() > max_cache) {
                 list.pop_back();
+                LOG4CPLUS_INFO(logger, "Invalidate lru cache");
             }
             return ins.first->second;
         }
