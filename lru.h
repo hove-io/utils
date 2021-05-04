@@ -122,6 +122,7 @@ public:
 
     size_t get_nb_cache_miss() const { return nb_cache_miss; }
     size_t get_nb_calls() const { return nb_calls; }
+    size_t get_max_size() const { return max_cache; }
 
     void warmup(const Lru<F>& other) {
         auto keys = other.keys();
@@ -181,6 +182,7 @@ public:
 
     size_t get_nb_cache_miss() const { return lru.get_nb_cache_miss(); }
     size_t get_nb_calls() const { return lru.get_nb_calls(); }
+    size_t get_max_size() const { return lru.get_max_size(); }
 
     void warmup(const ConcurrentLru<F>& other) {
         // we can't use the warmup of the lru direclty as it will mess with the future
