@@ -82,6 +82,8 @@ inline void init_signal_handling() {
     signal(SIGSEGV, before_dying);
     signal(SIGFPE, before_dying);
     signal(SIGILL, before_dying);
+    signal(SIGXCPU, before_dying);
+    signal(SIGXFSZ, before_dying);
 
     signal(SIGTERM, before_exit);
     signal(SIGINT, before_exit);
