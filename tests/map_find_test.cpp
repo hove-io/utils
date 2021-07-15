@@ -37,6 +37,7 @@ www.navitia.io
 #include <map>
 #include <unordered_map>
 #include <string>
+#include <utility>
 
 using namespace navitia::utils;
 using std::string;
@@ -105,14 +106,14 @@ BOOST_FIXTURE_TEST_CASE(should_not_copy_value_object_when_queried, MapFindFixtur
 
     struct NonCopyable {
         const string str;
-        NonCopyable(const string & str): str(str) {}
+        NonCopyable(string str) : str(std::move(str)) {}
 
         /// We remove the copy semantic to make sure objects are not duplicated along the way
         NonCopyable(const NonCopyable &) = delete;
         NonCopyable& operator=(const NonCopyable &) = delete;
 
         /// we only keep the move construction semantic to emplace into the map
-        NonCopyable(NonCopyable && rhs): str(std::move(rhs.str)) {}
+        NonCopyable(NonCopyable&& rhs) noexcept : str(std::move(rhs.str)) {}
         NonCopyable& operator=(NonCopyable && rhs) = delete;
     };
 

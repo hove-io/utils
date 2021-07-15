@@ -33,6 +33,7 @@ www.navitia.io
 
 #include <string>
 #include <exception>
+#include <utility>
 
 namespace navitia {
 class exception : public std::exception {
@@ -41,13 +42,13 @@ protected:
     std::string _backtrace;
 
 public:
-    exception(const std::string& msg) : msg(msg), _backtrace(get_backtrace()) {}
+    exception(std::string msg) : msg(std::move(msg)), _backtrace(get_backtrace()) {}
     exception() = default;
     exception(const exception&) = default;
     exception& operator=(const exception&) = default;
-    virtual ~exception() noexcept;
+    ~exception() noexcept override;
 
-    const char* what() const noexcept { return msg.c_str(); }
+    const char* what() const noexcept override { return msg.c_str(); }
     const std::string& backtrace() const noexcept { return _backtrace; }
 };
 
@@ -62,6 +63,6 @@ struct recoverable_exception : public exception {
     recoverable_exception() = default;
     recoverable_exception(const recoverable_exception&) = default;
     recoverable_exception& operator=(const recoverable_exception&) = default;
-    virtual ~recoverable_exception() noexcept;
+    ~recoverable_exception() noexcept override;
 };
 }  // namespace navitia

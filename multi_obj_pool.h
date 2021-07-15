@@ -34,6 +34,7 @@ www.navitia.io
 
 #include <list>
 #include <cstddef>
+#include <utility>
 
 template <typename Obj>
 struct DefaultParetoFrontVisitor {
@@ -53,14 +54,14 @@ struct DefaultParetoFrontVisitor {
 template <typename Obj, typename Dominator, typename Visitor = DefaultParetoFrontVisitor<Obj>>
 class ParetoFront {
 public:
-    typedef std::list<Obj> Pool;
-    typedef typename Pool::value_type value_type;
-    typedef typename Pool::const_iterator const_iterator;
+    using Pool = std::list<Obj>;
+    using value_type = typename Pool::value_type;
+    using const_iterator = typename Pool::const_iterator;
 
     Visitor visitor;
 
     ParetoFront() = default;
-    explicit ParetoFront(Dominator x) : dominate(x) {}
+    explicit ParetoFront(Dominator x) : dominate(std::move(x)) {}
     explicit ParetoFront(Dominator x, Visitor v) : dominate(x), visitor(v) {}
 
     bool add(const Obj& obj);

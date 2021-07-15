@@ -54,15 +54,15 @@ template <typename F>
 class Lru {
 private:
     typedef typename boost::remove_cv<typename boost::remove_reference<typename F::argument_type>::type>::type key_type;
-    typedef
-        typename boost::remove_cv<typename boost::remove_reference<typename F::result_type>::type>::type mapped_type;
-    typedef std::pair<const key_type, mapped_type> value_type;
-    typedef boost::multi_index_container<
+    using mapped_type =
+        typename boost::remove_cv<typename boost::remove_reference<typename F::result_type>::type>::type;
+    using value_type = std::pair<const key_type, mapped_type>;
+    using Cache = boost::multi_index_container<
         value_type,
-        boost::multi_index::indexed_by<boost::multi_index::sequenced<>,
-                                       boost::multi_index::ordered_unique<
-                                           boost::multi_index::member<value_type, const key_type, &value_type::first>>>>
-        Cache;
+        boost::multi_index::indexed_by<
+            boost::multi_index::sequenced<>,
+            boost::multi_index::ordered_unique<
+                boost::multi_index::member<value_type, const key_type, &value_type::first>>>>;
 
     // the encapsulate function
     F f;
@@ -89,8 +89,8 @@ private:
     friend struct ConcurrentLru;
 
 public:
-    typedef mapped_type const& result_type;
-    typedef typename F::argument_type argument_type;
+    using result_type = const mapped_type&;
+    using argument_type = typename F::argument_type;
 
     Lru(F fun, size_t max = 10) : f(std::move(fun)), max_cache(max) {
         if (max < 1) {
@@ -134,8 +134,8 @@ public:
     }
 };
 template <typename F>
-inline Lru<F> make_lru(F fun, size_t max = 10) {
-    return Lru<F>(std::move(fun), max);
+inline Lru<F> make_lru(F&& fun, size_t max = 10) {
+    return Lru<F>(std::forward<F>(fun), max);
 }
 
 template <typename F>
@@ -167,7 +167,7 @@ public:
     using argument_type = typename SharedPtrF::argument_type;
 
     ConcurrentLru(F fun, size_t max = 10) : lru(SharedPtrF{std::move(fun)}, max) {}
-    ConcurrentLru(ConcurrentLru&&) = default;  // needed by old version of gcc
+    ConcurrentLru(ConcurrentLru&&) = default; // NOLINT // needed by old version of gcc
 
     result_type operator()(argument_type arg) const {
         typename SharedPtrF::result_type future;
@@ -195,8 +195,8 @@ public:
     }
 };
 template <typename F>
-inline ConcurrentLru<F> make_concurrent_lru(F fun, size_t max = 10) {
-    return ConcurrentLru<F>(std::move(fun), max);
+inline ConcurrentLru<F> make_concurrent_lru(F&& fun, size_t max = 10) {
+    return ConcurrentLru<F>(std::forward<F>(fun), max);
 }
 
 }  // namespace navitia

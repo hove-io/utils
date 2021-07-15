@@ -34,8 +34,8 @@
 
 class threadbuf : public std::streambuf {
 private:
-    typedef std::streambuf::traits_type traits_type;
-    typedef std::string::size_type string_size_t;
+    using traits_type = std::streambuf::traits_type;
+    using string_size_t = std::string::size_type;
 
     std::mutex d_mutex;
     std::condition_variable d_condition;
@@ -55,7 +55,7 @@ public:
         this->setp(&this->d_out[0], &this->d_out[0] + this->d_out.size() - 1);
         this->setg(&this->d_in[0], &this->d_in[0], &this->d_in[0]);
     }
-    virtual ~threadbuf();
+    ~threadbuf() override;
     void close() {
         {
             std::unique_lock<std::mutex> lock(this->d_mutex);
@@ -68,7 +68,7 @@ public:
     }
 
 private:
-    int_type underflow() {
+    int_type underflow() override {
         if (this->gptr() == this->egptr()) {
             std::unique_lock<std::mutex> lock(this->d_mutex);
             while (&this->d_tmp[0] == this->d_current && !this->d_closed) {
@@ -84,7 +84,7 @@ private:
         }
         return this->gptr() == this->egptr() ? traits_type::eof() : traits_type::to_int_type(*this->gptr());
     }
-    int_type overflow(int_type c) {
+    int_type overflow(int_type c) override {
         std::unique_lock<std::mutex> lock(this->d_mutex);
         if (!traits_type::eq_int_type(c, traits_type::eof())) {
             *this->pptr() = traits_type::to_char_type(c);
@@ -92,7 +92,7 @@ private:
         }
         return this->internal_sync(lock) ? traits_type::eof() : traits_type::not_eof(c);
     }
-    int sync() {
+    int sync() override {
         std::unique_lock<std::mutex> lock(this->d_mutex);
         return this->internal_sync(lock);
     }

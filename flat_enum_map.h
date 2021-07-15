@@ -50,7 +50,7 @@ struct get_enum_type {
 #else
 template <typename Enum>
 struct get_enum_type {
-    typedef int type;
+    using type = int;
 };
 #endif
 
@@ -92,9 +92,9 @@ class flat_enum_map_iterator;
  */
 template <typename EnumKey, typename Value>
 struct flat_enum_map {
-    typedef std::array<Value, enum_size_trait<EnumKey>::size()> underlying_container;
-    typedef flat_enum_map_iterator<EnumKey, Value> iterator;
-    typedef flat_enum_map_iterator<EnumKey, const Value> const_iterator;
+    using underlying_container = std::array<Value, enum_size_trait<EnumKey>::size()>;
+    using iterator = flat_enum_map_iterator<EnumKey, Value>;
+    using const_iterator = flat_enum_map_iterator<EnumKey, const Value>;
 
     underlying_container array;
 
@@ -136,11 +136,11 @@ struct flat_enum_map {
 template <typename Enum>
 class enum_iterator
     : public boost::iterator_facade<enum_iterator<Enum>, Enum, boost::random_access_traversal_tag, Enum> {
-    typedef typename get_enum_type<Enum>::type underlying_type;
+    using underlying_type = typename get_enum_type<Enum>::type;
     underlying_type _it;
 
 public:
-    typedef std::make_signed<typename get_enum_type<Enum>::type> difference_type;
+    using difference_type = std::make_signed<typename get_enum_type<Enum>::type>;
     enum_iterator() : _it(enum_size_trait<Enum>::size()) {}
     enum_iterator(const Enum& e) : _it(static_cast<underlying_type>(e)) {}
     enum_iterator(const underlying_type& i) : _it(i) {}
@@ -156,27 +156,27 @@ public:
 
 template <typename Enum>
 boost::iterator_range<enum_iterator<Enum>> enum_range() {
-    typedef enum_iterator<Enum> it;
+    using it = enum_iterator<Enum>;
     return boost::make_iterator_range(it(get_first_elt<Enum>()), it());
 }
 
 template <typename Enum>
 boost::iterator_range<boost::reverse_iterator<enum_iterator<Enum>>> reverse_enum_range() {
-    typedef enum_iterator<Enum> it;
-    typedef boost::reverse_iterator<it> rit;
+    using it = enum_iterator<Enum>;
+    using rit = boost::reverse_iterator<it>;
     return boost::make_iterator_range(rit(it(enum_size_trait<Enum>::size())), rit(it(0)));
 }
 
 template <typename Enum>
 boost::iterator_range<enum_iterator<Enum>> enum_range_from(Enum e) {
-    typedef enum_iterator<Enum> it;
+    using it = enum_iterator<Enum>;
     return boost::make_iterator_range(it(e), it());
 }
 
 template <typename Enum>
 boost::iterator_range<boost::reverse_iterator<enum_iterator<Enum>>> reverse_enum_range_from(Enum e) {
-    typedef enum_iterator<Enum> it;
-    typedef boost::reverse_iterator<it> rit;
+    using it = enum_iterator<Enum>;
+    using rit = boost::reverse_iterator<it>;
     using e_type = typename get_enum_type<Enum>::type;
     return boost::make_iterator_range(rit(it(static_cast<Enum>(static_cast<e_type>(e) + 1))), rit(it(0)));
 }
@@ -186,13 +186,13 @@ class flat_enum_map_iterator : public boost::iterator_facade<flat_enum_map_itera
                                                              std::pair<EnumKey, Value&>,
                                                              boost::random_access_traversal_tag,
                                                              std::pair<EnumKey, Value&>> {
-    typedef flat_enum_map<EnumKey, Value> enum_map;
-    typedef typename flat_enum_map_iterator<EnumKey, Value>::difference_type difference_type;
+    using enum_map = flat_enum_map<EnumKey, Value>;
+    using difference_type = typename flat_enum_map_iterator<EnumKey, Value>::difference_type;
     typename enum_map::underlying_container::iterator _iterator;
     enum_iterator<EnumKey> _enum_iterator;
 
 public:
-    flat_enum_map_iterator() {}
+    flat_enum_map_iterator() = default;
     flat_enum_map_iterator(typename enum_map::underlying_container::iterator it) : _iterator(it) {}
     flat_enum_map_iterator(typename enum_map::underlying_container::iterator it, EnumKey e)
         : _iterator(it), _enum_iterator(e) {}

@@ -164,7 +164,7 @@ void sort_and_truncate(Vector& input, size_t nbmax, Cmp cmp) {
  */
 template <typename Elem, typename Cmp>
 void sort_and_truncate(typename google::protobuf::RepeatedPtrField<Elem>& input, size_t nbmax, Cmp cmp) {
-    typedef typename google::protobuf::RepeatedPtrField<Elem> Vector;
+    using Vector = typename google::protobuf::RepeatedPtrField<Elem>;
     typename Vector::iterator middle_iterator;
     if (nbmax < size_t(input.size()))
         middle_iterator = input.begin() + nbmax;
@@ -182,7 +182,7 @@ void sort_and_truncate(typename google::protobuf::RepeatedPtrField<Elem>& input,
  */
 template <typename Elem, typename Cmp>
 void sort_and_truncate(typename std::vector<Elem>& input, size_t nbmax, Cmp cmp) {
-    typedef typename std::vector<Elem> Vector;
+    using Vector = typename std::vector<Elem>;
     typename Vector::iterator middle_iterator;
     if (nbmax < size_t(input.size())) {
         middle_iterator = input.begin() + nbmax;
