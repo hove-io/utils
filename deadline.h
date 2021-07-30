@@ -41,7 +41,7 @@ class DeadlineExpired : public recoverable_exception {
 
 public:
     DeadlineExpired(const DeadlineExpired& o) = default;
-    virtual ~DeadlineExpired();
+    ~DeadlineExpired() override;
 };
 
 class Deadline {

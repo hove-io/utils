@@ -36,7 +36,7 @@ www.navitia.io
 
 struct Fun {
     typedef int const& argument_type;
-    typedef int result_type;
+    using result_type = int;
     size_t& nb_call;
     Fun(size_t& nb): nb_call(nb) {}
     int operator()(const int& i) const { ++nb_call; return i * 2; }

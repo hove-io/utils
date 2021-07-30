@@ -264,11 +264,11 @@ BOOST_AUTO_TEST_CASE(natural_sort_test2) {
 
 struct MockedContainerWithFind {
     struct iterator{};
-    iterator end() const{return iterator();}
+    iterator end() const { return {}; }
     bool mutable find_is_called{false};
     iterator find(int) const {
         find_is_called = true;
-        return iterator();
+        return {};
     }
 };
 

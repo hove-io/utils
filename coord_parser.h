@@ -38,7 +38,7 @@ class wrong_coordinate : public std::runtime_error {
 public:
     wrong_coordinate(const std::string& what) : std::runtime_error(what) {}
     wrong_coordinate(const wrong_coordinate&) = default;
-    virtual ~wrong_coordinate() noexcept;
+    ~wrong_coordinate() noexcept override;
 };
 
 extern const boost::regex coord_regex;

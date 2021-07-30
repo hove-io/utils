@@ -36,7 +36,7 @@ www.navitia.io
 
 namespace navitia {
 
-typedef uint32_t idx_t;
+using idx_t = uint32_t;
 const idx_t invalid_idx = std::numeric_limits<idx_t>::max();
 
 // Strong typing of index with a phantom type!
@@ -60,10 +60,10 @@ class IdxMapIterator : public boost::iterator_facade<IdxMapIterator<K, I>,
                                                      boost::random_access_traversal_tag,
                                                      std::pair<const K, typename std::iterator_traits<I>::reference> > {
 public:
-    typedef typename std::iterator_traits<I> traits;
-    typedef typename traits::difference_type difference_type;
+    using traits = typename std::iterator_traits<I>;
+    using difference_type = typename traits::difference_type;
 
-    inline IdxMapIterator() {}
+    inline IdxMapIterator() = default;
     inline IdxMapIterator(const idx_t& i, I it) : idx(i), iterator(it) {}
 
 private:
@@ -92,13 +92,13 @@ private:
 // A HashMap with optimal hash!
 template <typename T, typename V>
 struct IdxMap {
-    typedef Idx<T> key_type;
-    typedef V mapped_type;
-    typedef std::vector<V> container;
-    typedef IdxMapIterator<key_type, typename container::iterator> iterator;
-    typedef IdxMapIterator<key_type, typename container::const_iterator> const_iterator;
-    typedef boost::iterator_range<typename std::vector<V>::iterator> range;
-    typedef boost::iterator_range<typename std::vector<V>::const_iterator> const_range;
+    using key_type = Idx<T>;
+    using mapped_type = V;
+    using container = std::vector<V>;
+    using iterator = IdxMapIterator<key_type, typename container::iterator>;
+    using const_iterator = IdxMapIterator<key_type, typename container::const_iterator>;
+    using range = boost::iterator_range<typename std::vector<V>::iterator>;
+    using const_range = boost::iterator_range<typename std::vector<V>::const_iterator>;
 
     inline IdxMap() = default;
     inline IdxMap(const std::vector<T*>& c, const V& val = V()) : map(c.size(), val) {}

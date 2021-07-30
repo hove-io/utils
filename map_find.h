@@ -45,9 +45,9 @@ namespace utils {
 template <class Map>
 class MapFind {
 public:
-    typedef typename Map::key_type KeyType;
-    typedef typename Map::mapped_type ValueType;
-    typedef ValueType const* ConstPtrValueType;
+    using KeyType = typename Map::key_type;
+    using ValueType = typename Map::mapped_type;
+    using ConstPtrValueType = const ValueType*;
 
     /**
      * @brief Create a MapFind object on a map, no find is performed until find() is called.

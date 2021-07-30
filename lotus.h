@@ -40,7 +40,7 @@ www.navitia.io
 struct LotusException : public std::exception {
     std::string const message;
     LotusException(std::string message) : message(std::move(message)) {}
-    virtual const char* what() const noexcept override;
+    const char* what() const noexcept override;
 };
 
 struct Lotus {
