@@ -1,4 +1,5 @@
 // From http://stackoverflow.com/a/12413298
+// New Implementation from https://stackoverflow.com/questions/43588275/exceptions-in-stl-streams?noredirect=1&lq=1
 // ----------------------------------------------------------------------------
 //  Copyright (C) 2013 Dietmar Kuehl http://www.dietmar-kuehl.de
 //
@@ -116,6 +117,12 @@ private:
         return traits_type::eof();
     }
 };
+
+
+// ----------------------------------------------------------------------------
+// From https://stackoverflow.com/questions/43588275/exceptions-in-stl-streams?noredirect=1&lq=1
+// basic_pipebuf is a different implementation of threadbuf
+// basic_pipebuf resolves a bug (deadlock) found in threadbuf on debian10 platform
 
 template<class _Elem, class _Traits = std::char_traits<_Elem>>
 class basic_pipebuf : public std::basic_streambuf<_Elem, _Traits>
