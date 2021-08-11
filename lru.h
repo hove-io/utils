@@ -36,8 +36,11 @@ www.navitia.io
 #include <boost/multi_index/member.hpp>
 #include <boost/type_traits/remove_cv.hpp>
 #include <boost/type_traits/remove_reference.hpp>
+#include <boost/range/adaptor/reversed.hpp>
+#include <boost/thread.hpp>
 
 #include <mutex>
+#include <shared_mutex>
 #include <future>
 #include <stdexcept>
 
@@ -123,15 +126,6 @@ public:
     size_t get_nb_cache_miss() const { return nb_cache_miss; }
     size_t get_nb_calls() const { return nb_calls; }
     size_t get_max_size() const { return max_cache; }
-
-    void warmup(const Lru<F>& other) {
-        auto keys = other.keys();
-        // reverse keys to keep the order of the lru
-        std::reverse(begin(keys), end(keys));
-        for (const auto& key : keys) {
-            this->operator()(key);
-        }
-    }
 };
 template <typename F>
 inline Lru<F> make_lru(F&& fun, size_t max = 10) {
@@ -155,10 +149,10 @@ private:
         }
     };
     Lru<SharedPtrF> lru;
-    std::unique_ptr<std::mutex> mutex = std::make_unique<std::mutex>();
+    std::unique_ptr<boost::shared_mutex> mutex{std::make_unique<boost::shared_mutex>()};
 
     std::vector<typename Lru<SharedPtrF>::key_type> keys() const {
-        std::lock_guard<std::mutex> lock(*mutex);
+        boost::shared_lock<boost::shared_mutex> lock(*mutex);
         return lru.keys();
     }
 
@@ -167,12 +161,12 @@ public:
     using argument_type = typename SharedPtrF::argument_type;
 
     ConcurrentLru(F fun, size_t max = 10) : lru(SharedPtrF{std::move(fun)}, max) {}
-    ConcurrentLru(ConcurrentLru&&) = default; // NOLINT // needed by old version of gcc
+    ConcurrentLru(ConcurrentLru&&) = default;  // NOLINT // needed by old version of gcc
 
     result_type operator()(argument_type arg) const {
         typename SharedPtrF::result_type future;
         {
-            std::lock_guard<std::mutex> lock(*mutex);
+            std::lock_guard<boost::shared_mutex> lock(*mutex);
             future = lru(arg);
         }
         // As arg might be a reference, the maybe newly created future must be run
@@ -180,16 +174,23 @@ public:
         return future.get();
     }
 
-    size_t get_nb_cache_miss() const { return lru.get_nb_cache_miss(); }
-    size_t get_nb_calls() const { return lru.get_nb_calls(); }
-    size_t get_max_size() const { return lru.get_max_size(); }
+    size_t get_nb_cache_miss() const {
+        std::shared_lock<boost::shared_mutex> lock(*mutex);
+        return lru.get_nb_cache_miss();
+    }
+    size_t get_nb_calls() const {
+        std::shared_lock<boost::shared_mutex> lock(*mutex);
+        return lru.get_nb_calls();
+    }
+    size_t get_max_size() const {
+        std::shared_lock<boost::shared_mutex> lock(*mutex);
+        return lru.get_max_size();
+    }
 
     void warmup(const ConcurrentLru<F>& other) {
         // we can't use the warmup of the lru direclty as it will mess with the future
         auto keys = other.keys();
-        // reverse keys to keep the order of the lru
-        std::reverse(begin(keys), end(keys));
-        for (const auto& key : keys) {
+        for (const auto& key : boost::adaptors::reverse(keys)) {
             this->operator()(key);
         }
     }
