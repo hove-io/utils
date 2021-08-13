@@ -174,6 +174,13 @@ public:
         return future.get();
     }
 
+    // We add mutex lock in all get_nb_** functions :
+    // Without that a race condition could occurs if operator()
+    // or warmup() functions are used by a thread and get_nb_** functions by another thread
+    // in the same time
+    // Also we prefere to use shared_lock/shared_mutex to allow
+    // multiple reader and one writer in MT context
+
     size_t get_nb_cache_miss() const {
         std::shared_lock<boost::shared_mutex> lock(*mutex);
         return lru.get_nb_cache_miss();
