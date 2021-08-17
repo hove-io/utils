@@ -37,10 +37,8 @@ www.navitia.io
 #include <boost/type_traits/remove_cv.hpp>
 #include <boost/type_traits/remove_reference.hpp>
 #include <boost/range/adaptor/reversed.hpp>
-#include <boost/thread.hpp>
 
 #include <mutex>
-#include <shared_mutex>
 #include <future>
 #include <stdexcept>
 
@@ -149,10 +147,10 @@ private:
         }
     };
     Lru<SharedPtrF> lru;
-    std::unique_ptr<boost::shared_mutex> mutex{std::make_unique<boost::shared_mutex>()};
+    std::unique_ptr<std::mutex> mutex{std::make_unique<std::mutex>()};
 
     std::vector<typename Lru<SharedPtrF>::key_type> keys() const {
-        boost::shared_lock<boost::shared_mutex> lock(*mutex);
+        std::lock_guard<std::mutex> lock(*mutex);
         return lru.keys();
     }
 
@@ -166,7 +164,7 @@ public:
     result_type operator()(argument_type arg) const {
         typename SharedPtrF::result_type future;
         {
-            std::lock_guard<boost::shared_mutex> lock(*mutex);
+            std::lock_guard<std::mutex> lock(*mutex);
             future = lru(arg);
         }
         // As arg might be a reference, the maybe newly created future must be run
@@ -178,19 +176,17 @@ public:
     // Without that a race condition could occurs if operator()
     // or warmup() functions are used by a thread and get_nb_** functions by another thread
     // in the same time
-    // Also we prefere to use shared_lock/shared_mutex to allow
-    // multiple reader and one writer in MT context
 
     size_t get_nb_cache_miss() const {
-        std::shared_lock<boost::shared_mutex> lock(*mutex);
+        std::lock_guard<std::mutex> lock(*mutex);
         return lru.get_nb_cache_miss();
     }
     size_t get_nb_calls() const {
-        std::shared_lock<boost::shared_mutex> lock(*mutex);
+        std::lock_guard<std::mutex> lock(*mutex);
         return lru.get_nb_calls();
     }
     size_t get_max_size() const {
-        std::shared_lock<boost::shared_mutex> lock(*mutex);
+        std::lock_guard<std::mutex> lock(*mutex);
         return lru.get_max_size();
     }
 
