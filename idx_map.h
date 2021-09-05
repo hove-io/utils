@@ -33,6 +33,7 @@ www.navitia.io
 
 #include <vector>
 #include <iterator>
+#include <iostream>
 
 namespace navitia {
 
