@@ -42,11 +42,14 @@
 // basic_pipebuf is a different implementation of threadbuf
 // basic_pipebuf resolves a bug (deadlock) found in threadbuf on debian10 platform
 
-template <class _Elem, class _Traits = std::char_traits<_Elem>>
+template <class _Elem,
+          size_t BUFFER_SIZE = 64 * 1024,
+          size_t CHUNK_SIZE = 16 * 1024,
+          class _Traits = std::char_traits<_Elem> >
 class streambuf_mtsafe : public std::basic_streambuf<_Elem, _Traits> {
 public:
     using traits_type = std::streambuf::traits_type;
-    using buffer_type = typename std::vector<_Elem>;
+    using buffer_type = typename std::array<_Elem, BUFFER_SIZE>;
     using buffer_size_type = typename buffer_type::size_type;
 
     std::mutex m_mutex;
@@ -56,15 +59,11 @@ public:
     buffer_type m_buffer;
     _Elem* m_begin;
     _Elem* m_end;
-    buffer_size_type m_chunk_size;
+    const buffer_size_type m_chunk_size{CHUNK_SIZE};
 
 public:
-    streambuf_mtsafe(buffer_size_type buffer_size = 64 * 1024, buffer_size_type chunk_size = 16 * 1024)
-        : m_closed(false),
-          m_buffer(buffer_size),
-          m_begin(m_buffer.data()),
-          m_end(m_buffer.data() + m_buffer.size()),
-          m_chunk_size(chunk_size) {
+    streambuf_mtsafe()
+        : m_closed(false), m_buffer(), m_begin(m_buffer.data()), m_end(m_buffer.data() + m_buffer.size()) {
         this->setg(m_begin, m_begin + m_chunk_size, m_begin + m_chunk_size);
         this->setp(m_begin + m_chunk_size, m_begin + 2 * m_chunk_size);
     }
@@ -107,7 +106,7 @@ private:
                 }
             }
         }
-        m_condition.notify_all();
+        m_condition.notify_one();
         return ret;
     }
 
@@ -140,7 +139,7 @@ private:
             ret = traits_type::to_int_type(*this->gptr());
         }
 
-        m_condition.notify_all();
+        m_condition.notify_one();
         return ret;
     }
 };
