@@ -174,6 +174,13 @@ struct CloneHelper {
 
     template <class T>
     void operator()(const T& from, T& to) {
+        /*
+         * For boost::archive::binary_oarchive & boost::archive::binary_iarchive
+         * We add << boost::archive::no_codecvt >> argument to avoid using the std::local object
+         * in std::streambuf (boost use text encoding  and changing it midstream is thread unsafe
+         * Thanks to boost::archive::no_codecvt boost will not use std::local object
+         * See : https://www.boost.org/doc/libs/1_49_0/libs/serialization/doc/implementation.html
+         * */
         std::thread write([&]() {
             boost::archive::binary_oarchive oa(pipe.out, boost::archive::no_codecvt);
             oa << from;
