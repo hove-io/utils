@@ -36,8 +36,17 @@ Container paginate(const Container& indexes, int count, int start_page) {
         uint32_t begin_i = start_page * count;
         uint32_t end_i = begin_i + count;
         if (begin_i < indexes.size()) {
-            auto begin = indexes.begin() + begin_i;
-            auto end = (end_i < indexes.size()) ? indexes.begin() + end_i : indexes.end();
+            auto begin = indexes.begin();
+            std::advance(begin, begin_i);
+            auto end = [&]() {
+                if(end_i < indexes.size()){
+                    auto end = indexes.begin();
+                    std::advance(end, end_i);
+                    return end;
+                }
+                else
+                    return indexes.end();
+            }();
             return Container(begin, end);
         }
     }
