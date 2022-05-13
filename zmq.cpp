@@ -26,6 +26,8 @@ void LoadBalancer::bind(const std::string& clients_socket_path, const std::strin
 }
 
 void LoadBalancer::run() {
+
+    std::vector<std::string> frames {};
     while (true) {
         zmq_pollitem_t items[] = {{static_cast<void*>(workers), 0, ZMQ_POLLIN, 0},
                                   {static_cast<void*>(clients), 0, ZMQ_POLLIN, 0}};
@@ -37,75 +39,95 @@ void LoadBalancer::run() {
         }
         // handle worker
         if (items[0].revents & ZMQ_POLLIN) {
+
             // the first frame is the identifier of the worker: we add it to the available worker
             avalailable_worker.push(z_recv(workers));
-            {
-                //  Second frame is empty
-                std::string empty = z_recv(workers);
-                assert(empty.size() == 0);
+
+            // the second frame should be empty
+            std::string empty = z_recv(workers);
+            if (empty != "") {
+                // just skip the rest of the message
+                continue;
             }
 
-            //  Third frame is READY or else a client reply address
-            std::string client_addr = z_recv(workers);
+            frames.clear();
+            size_t more = 0;
+            size_t more_size = sizeof (more);
+            do {
+                std::string frame = z_recv(workers);
+                frames.push_back(frame);
+                // Are there more frames coming?
+                workers.getsockopt(ZMQ_RCVMORE, &more, &more_size);
+            } while (more);
 
-            //  If client reply, send resp back to the appropriate client
-            if (client_addr != "READY") {
-                {
-                    // another empty frame
-                    std::string empty = z_recv(workers);
-                    assert(empty.size() == 0);
-                }
-                // the actual reply
-                zmq::message_t reply;
-                workers.recv(&reply);
-                z_send(clients, client_addr, ZMQ_SNDMORE);
-                z_send(clients, "", ZMQ_SNDMORE);
-                z_send(clients, reply);
+
+            if (frames.size() < 3) {
+                continue;
             }
+            if (frames[0] == "READY") {
+                // the worker just signaled it is ready, nothing to do
+                continue;
+            }
+
+            //here we should get a response from the worker
+
+
+
+            // send every remaining frames to the client
+            for (size_t idx = 0; idx < frames.size() - 1; ++ idx) {
+                z_send(clients, frames[idx], ZMQ_SNDMORE);
+            }
+            z_send(clients, frames.back());
+
         }
         // handle clients request
         if (items[1].revents & ZMQ_POLLIN){
-            // The client request is a multi-part ZMQ message, we have to check every frame and be sure the multi-part message frame
-            // is composed as we wish, otherwise the multi-part message may be shifted unexpectedly.
 
-            // The multi-part ZMQ message should have 3 parts
-            // The first one is the ID of message
-            // The second one is an empty frame
-            // The third one is the real request
+            // The client request is a multi-part ZMQ message, we have to check every frame and be sure the multi-part message frame
+            // is composed as we wish,
+
+            // The multi-part ZMQ message should have :
+            //  - one or more frames identifying the client
+            //  - then an empty frame
+            //  - and finally one frame with the actual request payload
             size_t more = 0;
             size_t more_size = sizeof (more);
 
-            size_t nb_frames = 0;
-            // there is no copy/move constructor in message_t in v2.2, which is the verison used by Jenkins...
-            std::array<zmq::message_t, 3> frames{};
+            frames.clear();
 
             do {
-                zmq::message_t frame{};
-                clients.recv(&frame);
+                std::string frame = z_recv(clients);
+                frames.push_back(frame);
 
-                if (nb_frames < 3) {
-                    frames[nb_frames].move(&frame);
-                }
                 // Are there more frames coming?
                 clients.getsockopt(ZMQ_RCVMORE, &more, &more_size);
-                nb_frames++;
             } while (more);
 
-            if (nb_frames > 3 || frames.at(1).size() != 0 ) {
-                z_send(clients, "");
-                throw navitia::recoverable_exception{"bad ZMQ message has been received and ignored"};
+
+            // if we have less than 3 frames, the message is ill-formed, and we ignore it
+            if (frames.size() < 3) {
+                continue;
+            }
+            // if we the penultimate frame is not empty, the message is ill-formed, and we ignore it
+            if (frames[frames.size() - 2] != "") {
+                continue;
             }
 
             std::string worker_addr = avalailable_worker.top();
             avalailable_worker.pop();
 
+            // let's forward the message to the workers
+            
+            // a first frame identifying the worker
             z_send(workers, worker_addr, ZMQ_SNDMORE);
+            // and empty frame
             z_send(workers, "", ZMQ_SNDMORE);
-            // frames[0] is the id of message
-            z_send(workers, frames[0], ZMQ_SNDMORE);
-            z_send(workers, "", ZMQ_SNDMORE);
-            // frames[2] is the request
-            z_send(workers, frames[2]);
+
+            // and then the message from the client
+            for (size_t idx = 0; idx < frames.size() - 1; ++ idx) {
+                z_send(workers, frames[idx], ZMQ_SNDMORE);
+            }
+            z_send(workers, frames.back());
         }
     }
 }
