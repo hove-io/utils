@@ -42,7 +42,7 @@ void z_send(zmq::socket_t& socket, zmq::message_t& msg, int flags = 0);
 std::string z_recv(zmq::socket_t& socket);
 
 class LoadBalancer {
-    std::stack<std::string> avalailable_worker;
+    std::stack<std::string> available_workers;
     zmq::socket_t clients;
     zmq::socket_t workers;
 

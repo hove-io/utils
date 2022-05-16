@@ -31,7 +31,7 @@ void LoadBalancer::run() {
     while (true) {
         zmq_pollitem_t items[] = {{static_cast<void*>(workers), 0, ZMQ_POLLIN, 0},
                                   {static_cast<void*>(clients), 0, ZMQ_POLLIN, 0}};
-        if (avalailable_worker.empty()) {
+        if (available_workers.empty()) {
             // we don't look for request from client if there is no worker for handling them
             zmq::poll(items, 1, -1);
         } else {
@@ -40,8 +40,8 @@ void LoadBalancer::run() {
         // handle worker
         if (items[0].revents & ZMQ_POLLIN) {
 
-            // the first frame is the identifier of the worker: we add it to the available worker
-            avalailable_worker.push(z_recv(workers));
+            // the first frame is the identifier of the worker: we add it to the available workers list
+            available_workers.push(z_recv(workers));
 
             // the second frame should be empty
             std::string empty = z_recv(workers);
@@ -70,8 +70,6 @@ void LoadBalancer::run() {
             }
 
             //here we should get a response from the worker
-
-
 
             // send every remaining frames to the client
             for (size_t idx = 0; idx < frames.size() - 1; ++ idx) {
@@ -113,14 +111,14 @@ void LoadBalancer::run() {
                 continue;
             }
 
-            std::string worker_addr = avalailable_worker.top();
-            avalailable_worker.pop();
+            std::string worker_addr = available_workers.top();
+            available_workers.pop();
 
             // let's forward the message to the workers
             
-            // a first frame identifying the worker
+            // a first frame identifying the worker to route the request to
             z_send(workers, worker_addr, ZMQ_SNDMORE);
-            // and empty frame
+            // then an empty frame
             z_send(workers, "", ZMQ_SNDMORE);
 
             // and then the message from the client
