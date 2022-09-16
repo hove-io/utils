@@ -44,10 +44,11 @@ BOOST_AUTO_TEST_CASE(regex_strip_accents_and_lower_tests) {
 }
 
 BOOST_AUTO_TEST_CASE(trim) {
-    std::string test(" ab ; cd ;k ; r");
+    std::string test(" ab ; cd ;k ; r; with spaces  inside");
     std::vector<std::string> res = split_string(test, ";");
     BOOST_CHECK_EQUAL(res.at(0), "ab");
     BOOST_CHECK_EQUAL(res.at(1), "cd");
     BOOST_CHECK_EQUAL(res.at(2), "k");
     BOOST_CHECK_EQUAL(res.at(3), "r");
+    BOOST_CHECK_EQUAL(res.at(4), "with spaces  inside");
 }
