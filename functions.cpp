@@ -62,6 +62,9 @@ int str_to_int(std::string str) {
 std::vector<std::string> split_string(const std::string& str, const std::string& separator) {
     std::vector<std::string> SplitVec;
     split(SplitVec, str, boost::is_any_of(separator), boost::token_compress_on);
+    for (std::string& data : SplitVec) {
+        boost::algorithm::trim(data);
+    }
     return SplitVec;
 }
 
