@@ -42,3 +42,12 @@ BOOST_AUTO_TEST_CASE(regex_strip_accents_and_lower_tests) {
     test = "ÂâÄäçÇÉéÈèÊêËëÖöÔôÜüÎîÏïæœ";
     BOOST_CHECK_EQUAL(navitia::strip_accents(test), "aaaacceeeeeeeeoooouuiiiiaeoe");
 }
+
+BOOST_AUTO_TEST_CASE(trim) {
+    std::string test(" ab ; cd ;k ; r");
+    std::vector<std::string> res = split_string(test, ";");
+    BOOST_CHECK_EQUAL(res.at(0), "ab");
+    BOOST_CHECK_EQUAL(res.at(1), "cd");
+    BOOST_CHECK_EQUAL(res.at(2), "k");
+    BOOST_CHECK_EQUAL(res.at(3), "r");
+}
