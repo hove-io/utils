@@ -52,3 +52,22 @@ BOOST_AUTO_TEST_CASE(trim) {
     BOOST_CHECK_EQUAL(res.at(3), "r");
     BOOST_CHECK_EQUAL(res.at(4), "with spaces  inside");
 }
+
+BOOST_AUTO_TEST_CASE(trim_without_comma) {
+        std::string test(" ab ");
+        std::vector<std::string> res = split_string(test, ";");
+        BOOST_CHECK_EQUAL(res.at(0), "ab");
+}
+
+BOOST_AUTO_TEST_CASE(trim_empty_string) {
+        std::string test("");
+        std::vector<std::string> res = split_string(test, ";");
+        BOOST_CHECK_EQUAL(res.size(), 0);
+}
+
+BOOST_AUTO_TEST_CASE(trim_comma_only) {
+        std::string test(";");
+        std::vector<std::string> res = split_string(test, ";");
+        BOOST_CHECK_EQUAL(res.size(), 0);
+}
+

@@ -60,12 +60,15 @@ int str_to_int(std::string str) {
 }
 
 std::vector<std::string> split_string(const std::string& str, const std::string& separator) {
-    std::vector<std::string> SplitVec;
+    std::vector<std::string> SplitVec,  to_return;
     split(SplitVec, str, boost::is_any_of(separator), boost::token_compress_on);
     for (std::string& data : SplitVec) {
         boost::algorithm::trim(data);
+        if (!data.empty()) {
+            to_return.push_back(data);
+        }
     }
-    return SplitVec;
+    return to_return;
 }
 
 std::string value_by_key(const std::map<std::string, std::string>& vect, const std::string& key) {
