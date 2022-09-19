@@ -65,6 +65,8 @@ std::vector<std::string> split_string(const std::string& str, const std::string&
     for (std::string& data : SplitVec) {
         boost::algorithm::trim(data);
     }
+    boost::remove_erase_if(SplitVec,
+                           [&](const std::string& str) { return str.empty(); });
     return SplitVec;
 }
 
