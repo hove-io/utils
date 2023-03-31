@@ -1,4 +1,4 @@
-/* Copyright © 2001-2014, Hove and/or its affiliates. All rights reserved.
+/* Copyright �� 2001-2014, Hove and/or its affiliates. All rights reserved.
 
 This file is part of Navitia,
     the software to build cool stuff with public transport.
@@ -37,8 +37,8 @@ www.navitia.io
 
 #include <stack>
 
-void z_send(zmq::socket_t& socket, const std::string& str, int flags = 0);
-void z_send(zmq::socket_t& socket, zmq::message_t& msg, int flags = 0);
+void z_send(zmq::socket_t& socket, const std::string& str, zmq::send_flags flags=zmq::send_flags::none);
+void z_send(zmq::socket_t& socket, zmq::message_t& msg, zmq::send_flags flags=zmq::send_flags::none);
 std::string z_recv(zmq::socket_t& socket);
 
 class LoadBalancer {

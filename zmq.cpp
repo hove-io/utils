@@ -2,19 +2,19 @@
 #include "utils/exception.h"
 #include <array>
 
-void z_send(zmq::socket_t& socket, const std::string& str, int flags) {
+void z_send(zmq::socket_t& socket, const std::string& str, zmq::send_flags flags) {
     zmq::message_t msg(str.size());
     std::memcpy(msg.data(), str.c_str(), str.size());
     socket.send(msg, flags);
 }
 
-void z_send(zmq::socket_t& socket, zmq::message_t& msg, int flags) {
+void z_send(zmq::socket_t& socket, zmq::message_t& msg, zmq::send_flags flags) {
     socket.send(msg, flags);
 }
 
 std::string z_recv(zmq::socket_t& socket) {
     zmq::message_t msg;
-    socket.recv(&msg);
+    socket.recv(msg, zmq::recv_flags::none);
     return std::string(static_cast<char*>(msg.data()), msg.size());
 }
 
@@ -73,7 +73,7 @@ void LoadBalancer::run() {
 
             // send every remaining frames to the client
             for (size_t idx = 0; idx < frames.size() - 1; ++ idx) {
-                z_send(clients, frames[idx], ZMQ_SNDMORE);
+                z_send(clients, frames[idx], zmq::send_flags::sndmore);
             }
             z_send(clients, frames.back());
 
@@ -117,13 +117,13 @@ void LoadBalancer::run() {
             // let's forward the message to the workers
             
             // a first frame identifying the worker to route the request to
-            z_send(workers, worker_addr, ZMQ_SNDMORE);
+            z_send(workers, worker_addr, zmq::send_flags::sndmore);
             // then an empty frame
-            z_send(workers, "", ZMQ_SNDMORE);
+            z_send(workers, "", zmq::send_flags::sndmore);
 
             // and then the message from the client
             for (size_t idx = 0; idx < frames.size() - 1; ++ idx) {
-                z_send(workers, frames[idx], ZMQ_SNDMORE);
+                z_send(workers, frames[idx], zmq::send_flags::sndmore);
             }
             z_send(workers, frames.back());
         }
