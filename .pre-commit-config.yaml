@@ -1,5 +1,5 @@
 repos:
--   repo: https://github.com/CanalTP/navitia-pre-commit
+-   repo: git@github.com:hove-io/navitia-pre-commit
     rev: master
     hooks:
     -   id: clang-format-6.0
